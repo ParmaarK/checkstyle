@@ -28,6 +28,7 @@ import java.io.UnsupportedEncodingException;
 import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
+import com.puppycrawl.tools.checkstyle.api.LocalizedMessage;
 
 public class DefaultLoggerTest {
 
@@ -39,9 +40,14 @@ public class DefaultLoggerTest {
         dl.addException(new AuditEvent(5000, "myfile"), new IllegalStateException("upsss"));
         dl.auditFinished(new AuditEvent(6000, "myfile"));
         final String output = errorStream.toString("UTF-8");
+        final LocalizedMessage addExceptionMessage = new LocalizedMessage(0,
+                Definitions.CHECKSTYLE_BUNDLE, "DefaultLogger.addException",
+                new String[] {"myfile"}, null,
+                getClass(), null);
 
-        assertTrue(output.contains("Error auditing myfile"));
-        assertTrue(output.contains("java.lang.IllegalStateException: upsss"));
+        assertTrue("Invalid exception", output.contains(addExceptionMessage.getMessage()));
+        assertTrue("Invalid exception class",
+            output.contains("java.lang.IllegalStateException: upsss"));
     }
 
     @Test
@@ -50,5 +56,8 @@ public class DefaultLoggerTest {
         final DefaultLogger dl = new DefaultLogger(infoStream, true);
         dl.addException(new AuditEvent(5000, "myfile"), new IllegalStateException("upsss"));
         dl.auditFinished(new AuditEvent(6000, "myfile"));
+        final String output = infoStream.toString();
+        assertTrue("Message should contain exception info, but was " + output,
+                output.contains("java.lang.IllegalStateException: upsss"));
     }
 }

@@ -148,6 +148,7 @@ public class JavadocDetailNodeParser {
      * @param blockComment
      *        block comment content.
      * @return parse tree
+     * @noinspection deprecation
      */
     private ParseTree parseJavadocAsParseTree(String blockComment) {
         final ANTLRInputStream input = new ANTLRInputStream(blockComment);
@@ -182,6 +183,7 @@ public class JavadocDetailNodeParser {
      *
      * @param parseTreeNode root node of ParseTree
      * @return root of DetailNode tree
+     * @noinspection SuspiciousArrayCast
      */
     private DetailNode convertParseTreeToDetailNode(ParseTree parseTreeNode) {
         final JavadocNodeImpl rootJavadocNode = createRootJavadocNode(parseTreeNode);

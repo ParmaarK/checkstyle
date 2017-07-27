@@ -36,7 +36,7 @@ matrix:
     - jdk: oraclejdk8
       env:
         - DESC="tests and deploy"
-        - CMD="mvn clean integration-test failsafe:verify"
+        - CMD="mvn clean integration-test failsafe:verify -DargLine='-Xms1024m -Xmx2048m'"
         - DEPLOY="true"
 
     # checkstyle (oraclejdk8)
@@ -51,11 +51,11 @@ matrix:
         - DESC="cobertura and codecov"
         - CMD="./.ci/travis/travis.sh cobertura-check"
         - CMD_AFTER_SUCCESS="bash <(curl -s https://codecov.io/bash)"
-    # findbugs and pmd (oraclejdk8)
+    # findbugs, spotbugs and pmd (oraclejdk8)
     - jdk: oraclejdk8
       env:
-        - DESC="findbugs and pmd"
-        - CMD="mvn clean compile pmd:check findbugs:check"
+        - DESC="findbugs, spotbugs and pmd"
+        - CMD="mvn clean compile pmd:check findbugs:check spotbugs:check"
 
     # Releasenotes generation - validaton
     - jdk: oraclejdk8
@@ -84,42 +84,42 @@ matrix:
     - jdk: oraclejdk8
       env:
         - DESC="tests de"
-        - CMD="mvn -X clean integration-test failsafe:verify -DargLine='-Duser.language=de -Duser.country=DE' -Dtest='*,!ConfigurationLoaderTest'"
+        - CMD="mvn clean integration-test failsafe:verify -DargLine='-Duser.language=de -Duser.country=DE -Xms1024m -Xmx2048m'"
     # unit tests in Spanish locale (oraclejdk8)
     - jdk: oraclejdk8
       env:
         - DESC="tests es"
-        - CMD="mvn -X clean integration-test failsafe:verify -DargLine='-Duser.language=es -Duser.country=ES' -Dtest='*,!ConfigurationLoaderTest'"
+        - CMD="mvn clean integration-test failsafe:verify -DargLine='-Duser.language=es -Duser.country=ES -Xms1024m -Xmx2048m'"
     # unit tests in Finnish locale (oraclejdk8)
     - jdk: oraclejdk8
       env:
         - DESC="tests fi"
-        - CMD="mvn -X clean integration-test failsafe:verify -DargLine='-Duser.language=fi -Duser.country=FI' -Dtest='*,!ConfigurationLoaderTest'"
+        - CMD="mvn clean integration-test failsafe:verify -DargLine='-Duser.language=fi -Duser.country=FI -Xms1024m -Xmx2048m'"
     # unit tests in French locale (oraclejdk8)
     - jdk: oraclejdk8
       env:
         - DESC="tests fr"
-        - CMD="mvn -X clean integration-test failsafe:verify -DargLine='-Duser.language=fr -Duser.country=FR' -Dtest='*,!ConfigurationLoaderTest'"
+        - CMD="mvn clean integration-test failsafe:verify -DargLine='-Duser.language=fr -Duser.country=FR -Xms1024m -Xmx2048m'"
     # unit tests in Chinese locale (oraclejdk8)
     - jdk: oraclejdk8
       env:
         - DESC="tests zh"
-        - CMD="mvn -X clean integration-test failsafe:verify -DargLine='-Duser.language=zh -Duser.country=CN' -Dtest='*,!ConfigurationLoaderTest'"
+        - CMD="mvn clean integration-test failsafe:verify -DargLine='-Duser.language=zh -Duser.country=CN -Xms1024m -Xmx2048m'"
     # unit tests in Japanese locale (oraclejdk8)
     - jdk: oraclejdk8
       env:
         - DESC="tests ja"
-        - CMD="mvn -X clean integration-test failsafe:verify -DargLine='-Duser.language=ja -Duser.country=JP' -Dtest='*,!ConfigurationLoaderTest'"
+        - CMD="mvn clean integration-test failsafe:verify -DargLine='-Duser.language=ja -Duser.country=JP -Xms1024m -Xmx2048m'"
     # unit tests in Portuguese locale (oraclejdk8)
     - jdk: oraclejdk8
       env:
         - DESC="tests pt"
-        - CMD="mvn -X clean integration-test failsafe:verify -DargLine='-Duser.language=pt -Duser.country=PT' -Dtest='*,!ConfigurationLoaderTest'"
+        - CMD="mvn clean integration-test failsafe:verify -DargLine='-Duser.language=pt -Duser.country=PT -Xms1024m -Xmx2048m'"
     # unit tests in Turkish locale (oraclejdk8)
     - jdk: oraclejdk8
       env:
         - DESC="tests tr"
-        - CMD="mvn -X clean integration-test failsafe:verify -DargLine='-Duser.language=tr -Duser.country=TR' -Dtest='*,!ConfigurationLoaderTest'"
+        - CMD="mvn clean integration-test failsafe:verify -DargLine='-Duser.language=tr -Duser.country=TR -Xms1024m -Xmx2048m'"
 
     # assembly (oraclejdk8)
     - jdk: oraclejdk8
@@ -169,7 +169,7 @@ matrix:
         - CMD="./.ci/travis/travis.sh no-error-test-sbe"
 
 script:
-  - SKIP_FILES=".github|appveyor.yml|circle.yml|distelli-manifest.yml|fast-forward-merge.sh|LICENSE|LICENSE.apache20|README.md|release.sh|RIGHTS.antlr|shippable.yml|wercker.yml"
+  - SKIP_FILES=".github|appveyor.yml|circle.yml|distelli-manifest.yml|fast-forward-merge.sh|LICENSE|LICENSE.apache20|README.md|release.sh|RIGHTS.antlr|shippable.yml|wercker.yml|intellij-idea-inspections.xml"
   - SKIP_CI=$(if [[ $(git diff --name-only HEAD HEAD~1 | grep -vE "$SKIP_FILES" | cat | wc -c | sed 's/^ *//' ) > 0 ]]; then echo false; else echo true; fi;)
   - echo "SKIP_CI="$SKIP_CI
   - |

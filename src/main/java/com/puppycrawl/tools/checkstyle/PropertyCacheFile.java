@@ -35,6 +35,7 @@ import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 
@@ -183,8 +184,7 @@ final class PropertyCacheFile {
      */
     public boolean isInCache(String uncheckedFileName, long timestamp) {
         final String lastChecked = details.getProperty(uncheckedFileName);
-        return lastChecked != null
-            && lastChecked.equals(Long.toString(timestamp));
+        return Objects.equals(lastChecked, Long.toString(timestamp));
     }
 
     /**
@@ -220,18 +220,9 @@ final class PropertyCacheFile {
      */
     private static String getHashCodeBasedOnObjectContent(Serializable object) {
         try {
-            // im-memory serialization of Configuration
-
             final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            ObjectOutputStream oos = null;
-            try {
-                oos = new ObjectOutputStream(outputStream);
-                oos.writeObject(object);
-            }
-            finally {
-                flushAndCloseOutStream(oos);
-            }
-
+            // in-memory serialization of Configuration
+            serialize(object, outputStream);
             // Instead of hexEncoding outputStream.toByteArray() directly we
             // use a message digest here to keep the length of the
             // hashcode reasonable
@@ -244,6 +235,23 @@ final class PropertyCacheFile {
         catch (final IOException | NoSuchAlgorithmException ex) {
             // rethrow as unchecked exception
             throw new IllegalStateException("Unable to calculate hashcode.", ex);
+        }
+    }
+
+    /**
+     * Serializes object to output stream.
+     * @param object object to be erialized
+     * @param outputStream serialization stream
+     * @throws IOException if an error occurs
+     */
+    private static void serialize(Serializable object,
+                                  OutputStream outputStream) throws IOException {
+        final ObjectOutputStream oos = new ObjectOutputStream(outputStream);
+        try {
+            oos.writeObject(object);
+        }
+        finally {
+            flushAndCloseOutStream(oos);
         }
     }
 

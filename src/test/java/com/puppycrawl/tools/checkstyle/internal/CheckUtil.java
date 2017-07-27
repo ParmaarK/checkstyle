@@ -169,6 +169,7 @@ public final class CheckUtil {
         return classPath.getTopLevelClassesRecursive(packageName).stream()
                 .map(ClassPath.ClassInfo::load)
                 .filter(ModuleReflectionUtils::isCheckstyleModule)
+                .filter(cls -> !cls.getName().endsWith("Stub"))
                 .filter(cls -> !cls.getCanonicalName()
                         .startsWith("com.puppycrawl.tools.checkstyle.packageobjectfactory"))
                 .collect(Collectors.toSet());
@@ -237,7 +238,7 @@ public final class CheckUtil {
             final MessageFormat formatter = new MessageFormat(pr.getProperty(messageKey), locale);
             checkMessage = formatter.format(arguments);
         }
-        catch (IOException ex) {
+        catch (IOException ignored) {
             checkMessage = null;
         }
         return checkMessage;

@@ -60,7 +60,7 @@ public class BlockCommentPositionTest {
                     new File(getPath(metadata.getFileName()))
             );
             final int matches = getJavadocsCount(ast, metadata.getAssertion());
-            assertEquals(metadata.getMatchesNum(), matches);
+            assertEquals("Invalid javadoc count", metadata.getMatchesNum(), matches);
         }
     }
 
@@ -93,7 +93,7 @@ public class BlockCommentPositionTest {
         private final Function<DetailAST, Boolean> assertion;
         private final int matchesNum;
 
-        private BlockCommentPositionTestMetadata(String fileName, Function<DetailAST,
+        BlockCommentPositionTestMetadata(String fileName, Function<DetailAST,
                 Boolean> assertion, int matchesNum) {
             this.fileName = fileName;
             this.assertion = assertion;

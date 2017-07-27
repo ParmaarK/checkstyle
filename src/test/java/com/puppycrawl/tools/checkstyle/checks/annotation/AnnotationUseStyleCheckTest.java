@@ -27,24 +27,18 @@ import static com.puppycrawl.tools.checkstyle.checks.annotation.AnnotationUseSty
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
+import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
 
-public class AnnotationUseStyleCheckTest extends BaseCheckTestSupport {
+public class AnnotationUseStyleCheckTest extends AbstractModuleTestSupport {
     @Override
-    protected String getPath(String filename) throws IOException {
-        return super.getPath("checks" + File.separator
-                + "annotation" + File.separator
-                + "annotationusestyle" + File.separator
-                + filename);
+    protected String getPackageLocation() {
+        return "com/puppycrawl/tools/checkstyle/checks/annotation/annotationusestyle";
     }
 
     /* Additional test for jacoco, since valueOf()
@@ -261,7 +255,7 @@ public class AnnotationUseStyleCheckTest extends BaseCheckTestSupport {
         final AnnotationUseStyleCheck constantNameCheckObj = new AnnotationUseStyleCheck();
         final int[] actual = constantNameCheckObj.getAcceptableTokens();
         final int[] expected = {TokenTypes.ANNOTATION };
-        Assert.assertArrayEquals(expected, actual);
+        Assert.assertArrayEquals("Invalid acceptable tokens", expected, actual);
     }
 
     @Test

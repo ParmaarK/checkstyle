@@ -24,6 +24,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -72,7 +73,7 @@ import org.junit.Test;
 public class CommitValidationTest {
 
     private static final List<String> USERS_EXCLUDED_FROM_VALIDATION =
-            Collections.singletonList("Roman Ivanov");
+            Arrays.asList("Roman Ivanov", "rnveach");
 
     private static final String ISSUE_COMMIT_MESSAGE_REGEX_PATTERN = "^Issue #\\d+: .*$";
     private static final String PR_COMMIT_MESSAGE_REGEX_PATTERN = "^Pull #\\d+: .*$";
@@ -209,7 +210,7 @@ public class CommitValidationTest {
     private static RevCommitsPair resolveRevCommitsPair(Repository repo) {
         RevCommitsPair revCommitIteratorPair;
 
-        try (RevWalk revWalk = new RevWalk(repo)) {
+        try (RevWalk revWalk = new RevWalk(repo); Git git = new Git(repo)) {
             final Iterator<RevCommit> first;
             final Iterator<RevCommit> second;
             final ObjectId headId = repo.resolve(Constants.HEAD);
@@ -218,16 +219,11 @@ public class CommitValidationTest {
             if (isMergeCommit(headCommit)) {
                 final RevCommit firstParent = headCommit.getParent(0);
                 final RevCommit secondParent = headCommit.getParent(1);
-
-                try (Git git = new Git(repo)) {
-                    first = git.log().add(firstParent).call().iterator();
-                    second = git.log().add(secondParent).call().iterator();
-                }
+                first = git.log().add(firstParent).call().iterator();
+                second = git.log().add(secondParent).call().iterator();
             }
             else {
-                try (Git git = new Git(repo)) {
-                    first = git.log().call().iterator();
-                }
+                first = git.log().call().iterator();
                 second = Collections.emptyIterator();
             }
 
@@ -235,7 +231,7 @@ public class CommitValidationTest {
                     new RevCommitsPair(new OmitMergeCommitsIterator(first),
                             new OmitMergeCommitsIterator(second));
         }
-        catch (GitAPIException | IOException ex) {
+        catch (GitAPIException | IOException ignored) {
             revCommitIteratorPair = new RevCommitsPair();
         }
 

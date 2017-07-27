@@ -43,8 +43,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.commons.beanutils.PropertyUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -71,6 +69,11 @@ public class XdocsPagesTest {
     private static final String LINK_TEMPLATE =
             "(?s).*<a href=\"config_\\w+\\.html#%1$s\">%1$s</a>.*";
 
+    private static final Pattern VERSION = Pattern.compile("\\d+\\.\\d+(\\.\\d+)?");
+
+    private static final Pattern DESCRIPTION_VERSION = Pattern
+            .compile("^Since Checkstyle \\d+\\.\\d+(\\.\\d+)?");
+
     private static final List<String> XML_FILESET_LIST = Arrays.asList(
             "TreeWalker",
             "name=\"Checker\"",
@@ -78,8 +81,6 @@ public class XdocsPagesTest {
             "name=\"Translation\"",
             "name=\"SeverityMatchFilter\"",
             "name=\"SuppressionFilter\"",
-            "name=\"SuppressionCommentFilter\"",
-            "name=\"SuppressWithNearbyCommentFilter\"",
             "name=\"SuppressWarningsFilter\"",
             "name=\"BeforeExecutionExclusionFileFilter\"",
             "name=\"RegexpHeader\"",
@@ -154,13 +155,19 @@ public class XdocsPagesTest {
                     continue;
                 }
 
-                buildAndValidateXml(fileName, unserializedSource);
+                final String code = buildXml(unserializedSource);
+                // validate only
+                XmlUtil.getRawXml(fileName, code, unserializedSource);
+
+                // can't test ant structure, or old and outdated checks
+                Assert.assertTrue(fileName.startsWith("anttask")
+                        || fileName.startsWith("releasenotes")
+                        || isValidCheckstyleXml(fileName, code, unserializedSource));
             }
         }
     }
 
-    private static void buildAndValidateXml(String fileName, String unserializedSource)
-            throws IOException, ParserConfigurationException, CheckstyleException {
+    private static String buildXml(String unserializedSource) throws IOException {
         // not all examples come with the full xml structure
         String code = unserializedSource
             // don't corrupt our own cachefile
@@ -181,14 +188,7 @@ public class XdocsPagesTest {
                     + "\"-//Puppy Crawl//DTD Check Configuration 1.3//EN\" \"" + dtdPath + "\">\n"
                     + code;
         }
-
-        // validate only
-        XmlUtil.getRawXml(fileName, code, unserializedSource);
-
-        // can't test ant structure, or old and outdated checks
-        if (!fileName.startsWith("anttask") && !fileName.startsWith("releasenotes")) {
-            validateCheckstyleXml(fileName, code, unserializedSource);
-        }
+        return code;
     }
 
     private static boolean hasFileSetClass(String xml) {
@@ -204,8 +204,9 @@ public class XdocsPagesTest {
         return found;
     }
 
-    private static void validateCheckstyleXml(String fileName, String code,
-            String unserializedSource) throws IOException, CheckstyleException {
+    private static boolean isValidCheckstyleXml(String fileName, String code,
+                                                String unserializedSource)
+            throws IOException, CheckstyleException {
         // can't process non-existent examples, or out of context snippets
         if (!code.contains("com.mycompany") && !code.contains("checkstyle-packages")
                 && !code.contains("MethodLimit") && !code.contains("<suppress ")
@@ -238,6 +239,7 @@ public class XdocsPagesTest {
                         + ex.getMessage() + "): " + unserializedSource, ex);
             }
         }
+        return true;
     }
 
     @Test
@@ -284,6 +286,10 @@ public class XdocsPagesTest {
         }
     }
 
+    /**
+     * Test contains asserts in callstack, but idea does not see them
+     * @noinspection JUnitTestMethodWithNoAssertions
+     */
     @Test
     public void testAllCheckSectionsEx() throws Exception {
         final ModuleFactory moduleFactory = TestUtils.getPackageObjectFactory();
@@ -346,6 +352,7 @@ public class XdocsPagesTest {
 
             switch (subSectionPos) {
                 case 0:
+                    validateSinceDescriptionSection(fileName, sectionName, subSection);
                     break;
                 case 1:
                     validatePropertySection(fileName, sectionName, subSection, instance);
@@ -370,6 +377,14 @@ public class XdocsPagesTest {
 
             subSectionPos++;
         }
+    }
+
+    private static void validateSinceDescriptionSection(String fileName, String sectionName,
+            Node subSection) {
+        Assert.assertTrue(fileName + " section '" + sectionName
+                + "' should have a valid version at the start of the description like:\n"
+                + DESCRIPTION_VERSION.pattern(),
+                DESCRIPTION_VERSION.matcher(subSection.getTextContent().trim()).find());
     }
 
     private static Object getSubSectionName(int subSectionPos) {
@@ -487,14 +502,34 @@ public class XdocsPagesTest {
         boolean didTokens = false;
 
         for (Node row : XmlUtil.getChildrenElements(XmlUtil.getFirstChildElement(subSection))) {
+            final List<Node> columns = new ArrayList<>(XmlUtil.getChildrenElements(row));
+
+            Assert.assertEquals(fileName + " section '" + sectionName
+                    + "' should have the requested columns", 5, columns.size());
+
             if (skip) {
+                Assert.assertEquals(fileName + " section '" + sectionName
+                        + "' should have the specific title", "name", columns.get(0)
+                        .getTextContent());
+                Assert.assertEquals(fileName + " section '" + sectionName
+                        + "' should have the specific title", "description", columns.get(1)
+                        .getTextContent());
+                Assert.assertEquals(fileName + " section '" + sectionName
+                        + "' should have the specific title", "type", columns.get(2)
+                        .getTextContent());
+                Assert.assertEquals(fileName + " section '" + sectionName
+                        + "' should have the specific title", "default value", columns.get(3)
+                        .getTextContent());
+                Assert.assertEquals(fileName + " section '" + sectionName
+                        + "' should have the specific title", "since", columns.get(4)
+                        .getTextContent());
+
                 skip = false;
                 continue;
             }
+
             Assert.assertFalse(fileName + " section '" + sectionName
                     + "' should have token properties last", didTokens);
-
-            final List<Node> columns = new ArrayList<>(XmlUtil.getChildrenElements(row));
 
             final String propertyName = columns.get(0).getTextContent();
             Assert.assertTrue(fileName + " section '" + sectionName
@@ -515,39 +550,53 @@ public class XdocsPagesTest {
                 Assert.assertFalse(fileName + " section '" + sectionName
                         + "' should have javadoc token properties next to last, before tokens",
                         didJavadocTokens);
-                Assert.assertFalse(fileName + " section '" + sectionName
-                        + "' should have a description for " + propertyName, columns.get(1)
-                        .getTextContent().trim().isEmpty());
 
-                final String actualTypeName = columns.get(2).getTextContent().replace("\n", "")
+                validatePropertySectionPropertyEx(fileName, sectionName, instance, columns,
+                        propertyName);
+            }
+
+            Assert.assertFalse(fileName + " section '" + sectionName
+                    + "' should have a version for " + propertyName, columns.get(4)
+                    .getTextContent().trim().isEmpty());
+            Assert.assertTrue(fileName + " section '" + sectionName
+                    + "' should have a valid version for " + propertyName,
+                    VERSION.matcher(columns.get(4).getTextContent().trim()).matches());
+        }
+    }
+
+    private static void validatePropertySectionPropertyEx(String fileName, String sectionName,
+            Object instance, List<Node> columns, String propertyName) throws Exception {
+        Assert.assertFalse(fileName + " section '" + sectionName
+                + "' should have a description for " + propertyName, columns.get(1)
+                .getTextContent().trim().isEmpty());
+
+        final String actualTypeName = columns.get(2).getTextContent().replace("\n", "")
+                .replace("\r", "").replaceAll(" +", " ").trim();
+
+        Assert.assertFalse(fileName + " section '" + sectionName + "' should have a type for "
+                + propertyName, actualTypeName.isEmpty());
+
+        final PropertyDescriptor descriptor = PropertyUtils.getPropertyDescriptor(instance,
+                propertyName);
+        final Class<?> clss = descriptor.getPropertyType();
+        final String expectedTypeName = getModulePropertyExpectedTypeName(clss, instance,
+                propertyName);
+
+        if (expectedTypeName != null) {
+            final String expectedValue = getModulePropertyExpectedValue(clss, instance,
+                    propertyName);
+
+            Assert.assertEquals(fileName + " section '" + sectionName
+                    + "' should have the type for " + propertyName, expectedTypeName,
+                    actualTypeName);
+
+            if (expectedValue != null) {
+                final String actualValue = columns.get(3).getTextContent().replace("\n", "")
                         .replace("\r", "").replaceAll(" +", " ").trim();
 
-                Assert.assertFalse(fileName + " section '" + sectionName
-                        + "' should have a type for " + propertyName, actualTypeName.isEmpty());
-
-                final PropertyDescriptor descriptor = PropertyUtils.getPropertyDescriptor(instance,
-                        propertyName);
-                final Class<?> clss = descriptor.getPropertyType();
-                final String expectedTypeName =
-                        getModulePropertyExpectedTypeName(clss, instance, propertyName);
-
-                if (expectedTypeName != null) {
-                    final String expectedValue = getModulePropertyExpectedValue(clss, instance,
-                            propertyName);
-
-                    Assert.assertEquals(fileName + " section '" + sectionName
-                            + "' should have the type for " + propertyName, expectedTypeName,
-                            actualTypeName);
-
-                    if (expectedValue != null) {
-                        final String actualValue = columns.get(3).getTextContent().replace("\n", "")
-                                .replace("\r", "").replaceAll(" +", " ").trim();
-
-                        Assert.assertEquals(fileName + " section '" + sectionName
-                                + "' should have the value for " + propertyName, expectedValue,
-                                actualValue);
-                    }
-                }
+                Assert.assertEquals(fileName + " section '" + sectionName
+                        + "' should have the value for " + propertyName, expectedValue,
+                        actualValue);
             }
         }
     }
@@ -715,7 +764,7 @@ public class XdocsPagesTest {
                 result = clss.getDeclaredField(propertyName);
                 result.setAccessible(true);
             }
-            catch (NoSuchFieldException ex) {
+            catch (NoSuchFieldException ignored) {
                 result = getField(clss.getSuperclass(), propertyName);
             }
         }

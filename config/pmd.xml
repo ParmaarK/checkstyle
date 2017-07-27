@@ -72,6 +72,12 @@
       <property name="violationSuppressXPath" value="//MethodDeclaration[@Name='getDetails' and ../../..[@Image='RightCurlyCheck']]"/>
     </properties>
   </rule>
+  <rule ref="rulesets/java/codesize.xml/ExcessiveParameterList">
+    <properties>
+      <!-- LocalizedMessage class has constructor with many parameters -->
+      <property name="violationSuppressXPath" value="//ClassOrInterfaceDeclaration[@Image='LocalizedMessage']"/>
+    </properties>
+  </rule>
 
   <rule ref="rulesets/java/comments.xml">
     <!-- <exclude name="CommentRequired"/> -->
@@ -181,18 +187,19 @@
     or @Image='AbstractCheck' or @Image='AbstractJavadocCheck']"/>
     </properties>
   </rule>
-  <rule ref="rulesets/java/design.xml/AbstractClassWithoutAnyMethod">
-    <properties>
-     <!-- Can not change API -->
-    <property name="violationSuppressXPath" value="//ClassOrInterfaceDeclaration[@Image='Check']"/>
-    </properties>
-  </rule>
 
   <rule ref="rulesets/java/design.xml/AvoidDeeplyNestedIfStmts">
     <properties>
       <!-- default is 3 but we try to use single point of exit from method and that require extra IFs -->
       <property name="problemDepth" value="4"/>
       <property name="violationSuppressXPath" value="//ClassOrInterfaceDeclaration[@Image='ClassResolver']//MethodDeclarator[@Image='resolve']"/>
+    </properties>
+  </rule>
+
+  <rule ref="rulesets/java/design.xml/AvoidSynchronizedAtMethodLevel">
+    <properties>
+      <!-- UniqueProperties#put overloads synchronized method, so it should have synchronized modifier -->
+      <property name="violationSuppressXPath" value="//ClassOrInterfaceDeclaration[@Image='UniqueProperties']//MethodDeclarator[@Image='put']"/>
     </properties>
   </rule>
 
@@ -257,7 +264,7 @@
   <rule ref="rulesets/java/naming.xml/AbstractNaming">
     <properties>
      <!-- We can not brake compatibility with previous versions -->
-     <property name="violationSuppressXPath" value="//ClassOrInterfaceDeclaration[@Image='Check' or @Image='AbstractClassNameCheck']"/>
+     <property name="violationSuppressXPath" value="//ClassOrInterfaceDeclaration[@Image='AbstractClassNameCheck']"/>
     </properties>
   </rule>
   <rule ref="rulesets/java/naming.xml/LongVariable">
@@ -315,15 +322,5 @@
   <rule ref="rulesets/java/typeresolution.xml"/>
   <rule ref="rulesets/java/unnecessary.xml"/>
   <rule ref="rulesets/java/unusedcode.xml"/>
-  <rule ref="rulesets/java/unusedcode.xml/UnusedPrivateMethod">
-    <properties>
-      <!-- generates false-positives on private methods called within a file -->
-      <property name="violationSuppressXPath"
-                value="//MethodDeclaration[@Name='countTokens' and ../../..[@Image='DescendantTokenCheck']]"/>
-      <!-- generates false-positives on private methods called within a file -->
-      <property name="violationSuppressXPath"
-                value="//MethodDeclaration[@Name='getHashCodeBasedOnObjectContent' and ../../..[@Image='PropertyCacheFile']]"/>
-    </properties>
-  </rule>
 
 </ruleset>

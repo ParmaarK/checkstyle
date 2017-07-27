@@ -5,8 +5,7 @@ set -e
 case $1 in
 
 nondex)
-  # exclude ConfigurationLoaderTest till https://github.com/TestingResearchIllinois/NonDex/issues/112
-  mvn --fail-never clean nondex:nondex -Dtest='*,!ConfigurationLoaderTest'
+  mvn --fail-never clean nondex:nondex -DargLine='-Xms1024m -Xmx2048m'
   cat `grep -RlE 'td class=.x' .nondex/ | cat` < /dev/null > output.txt
   RESULT=$(cat output.txt | wc -c)
   cat output.txt
@@ -183,13 +182,23 @@ no-exception-test-alot-of-project1)
   ;;
 
 cobertura-check)
-  mvn clean compile cobertura:check cobertura:cobertura
+  set +e
+  mvn clean compile cobertura:cobertura cobertura:check -DargLine='-Xms1024m -Xmx2048m' > mvn-log.log
+  cat mvn-log.log
+  set -e
+  echo "Grep for hidden errors (due to quiet=true mode in pom.xml):"
+  grep -R "<td class=\"nbHitsUncovered\"" target/site/cobertura/* --exclude=*grammars* | cat > mvn-log-grep.log
+  cat mvn-log-grep.log
+  if [[ $(cat mvn-log-grep.log | wc -l) -gt 0 ]]; then
+    exit 1
+  fi
+  echo "Checking that all classes are covered:"
   xmlstarlet sel -t -m "//class" -v "@name" -n target/site/cobertura/coverage.xml | sed "s/\./\//g" | sed "/^$/d" | sort | uniq > cobertura_classes.log
   find target/classes -type f -name "*.class" | grep -vE ".*\\$.*" | sed "s/target\/classes\///g" | sed "s/.class//g" | sed "/^$/d" | sort | uniq > target_classes.log
   xmlstarlet sel -N pom=http://maven.apache.org/POM/4.0.0 -t -m "//pom:instrumentation/pom:excludes" -v "pom:exclude" -n pom.xml | sed "s/*//g" | sed "s/.class//g" | sed "/^$/d" | sort | uniq > cobertura_excluded_classes.log
-  # xmlstarlet has an issue. It concatenates these two lines and removes new line character,
+  # xmlstarlet has an issue. It concatenates this line with the previous one and removes new line character,
   # so we need to split them apart. We use the command till update of xmlstarlet to higher version.
-  sed -i'' "s/com\/puppycrawl\/tools\/checkstyle\/grammars\/javadoc\/com\/puppycrawl\/tools\/checkstyle\/gui\/BaseCellEditor/com\/puppycrawl\/tools\/checkstyle\/grammars\/javadoc\/\ncom\/puppycrawl\/tools\/checkstyle\/gui\/BaseCellEditor/" cobertura_excluded_classes.log
+  sed -i'' "s/com\/puppycrawl\/tools\/checkstyle\/gui\/BaseCellEditor/\ncom\/puppycrawl\/tools\/checkstyle\/gui\/BaseCellEditor/" cobertura_excluded_classes.log
   grep -Fxvf cobertura_classes.log target_classes.log > missed_classes_with_excludes.log
   grep -Fvf cobertura_excluded_classes.log missed_classes_with_excludes.log > missed_classes_without_excludes.log | cat > output.log
   echo "output.log"

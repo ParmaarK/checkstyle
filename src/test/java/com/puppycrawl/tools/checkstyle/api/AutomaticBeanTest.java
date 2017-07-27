@@ -28,7 +28,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 import org.apache.commons.beanutils.ConversionException;
+import org.apache.commons.beanutils.ConvertUtilsBean;
+import org.apache.commons.beanutils.Converter;
 import org.junit.Test;
+import org.powermock.reflect.Whitebox;
 
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.DefaultContext;
@@ -44,8 +47,10 @@ public class AutomaticBeanTest {
             testBean.configure(conf);
         }
         catch (CheckstyleException ex) {
-            assertNull(ex.getCause());
-            assertTrue(ex.getMessage().startsWith("Property '" + "NonExisting" + "' in module "));
+            final String expected = "Property 'NonExisting' in module ";
+            assertNull("Exceptions cause should be null", ex.getCause());
+            assertTrue("Invalid exception message, should start with: " + expected,
+                    ex.getMessage().startsWith(expected));
         }
     }
 
@@ -58,15 +63,28 @@ public class AutomaticBeanTest {
             testBean.configure(conf);
         }
         catch (CheckstyleException ex) {
-            assertNull(ex.getCause());
-            assertTrue(ex.getMessage().startsWith("Property '" + "privateField" + "' in module "));
+            final String expected = "Property 'privateField' in module ";
+            assertNull("Exceptions cause should be null", ex.getCause());
+            assertTrue("Invalid exception message, should start with: " + expected,
+                    ex.getMessage().startsWith(expected));
         }
     }
 
     @Test
     public void testSetupChildFromBaseClass() throws CheckstyleException {
         final TestBean testBean = new TestBean();
+        testBean.configure(new DefaultConfiguration("bean config"));
         testBean.setupChild(null);
+        try {
+            testBean.setupChild(new DefaultConfiguration("dummy"));
+            fail("Exception expected");
+        }
+        catch (CheckstyleException ex) {
+            final String expectedMessage = "dummy is not allowed as a child in bean config. "
+                    + "Please review 'Parent Module' section for this Check"
+                    + " in web documentation if Check is standard.";
+            assertEquals("Invalid exception message", expectedMessage, ex.getMessage());
+        }
     }
 
     @Test
@@ -100,8 +118,11 @@ public class AutomaticBeanTest {
             fail("InvocationTargetException is expected");
         }
         catch (CheckstyleException ex) {
-            assertTrue(ex.getCause() instanceof InvocationTargetException);
-            assertTrue(ex.getMessage().startsWith("Cannot set property "));
+            final String expected = "Cannot set property ";
+            assertTrue("Invalid exception cause, should be: InvocationTargetException",
+                    ex.getCause() instanceof InvocationTargetException);
+            assertTrue("Invalid exception message, should start with: " + expected,
+                    ex.getMessage().startsWith(expected));
         }
     }
 
@@ -115,8 +136,11 @@ public class AutomaticBeanTest {
             fail("InvocationTargetException is expected");
         }
         catch (CheckstyleException ex) {
-            assertTrue(ex.getCause() instanceof ConversionException);
-            assertTrue(ex.getMessage().startsWith("illegal value "));
+            final String expected = "illegal value ";
+            assertTrue("Invalid exception cause, should be: ConversionException",
+                    ex.getCause() instanceof ConversionException);
+            assertTrue("Invalid exception message, should start with: " + expected,
+                    ex.getMessage().startsWith(expected));
         }
     }
 
@@ -130,7 +154,31 @@ public class AutomaticBeanTest {
             fail("exception expected");
         }
         catch (IllegalStateException ex) {
-            assertEquals("null,wrongVal,0,someValue", ex.getMessage());
+            assertEquals("Invalid exception message",
+                    "null,wrongVal,0,someValue", ex.getMessage());
+        }
+    }
+
+    @Test
+    public void testRegisterIntegralTypes() throws Exception {
+        final ConvertUtilsBeanStub convertUtilsBean = new ConvertUtilsBeanStub();
+        Whitebox.invokeMethod(AutomaticBean.class, "registerIntegralTypes", convertUtilsBean);
+        assertEquals("Number of converters registered differs from expected",
+                81, convertUtilsBean.getRegisterCount());
+    }
+
+    private static class ConvertUtilsBeanStub extends ConvertUtilsBean {
+
+        private int registerCount;
+
+        @Override
+        public void register(Converter converter, Class<?> clazz) {
+            super.register(converter, clazz);
+            registerCount++;
+        }
+
+        public int getRegisterCount() {
+            return registerCount;
         }
     }
 

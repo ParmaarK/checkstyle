@@ -42,15 +42,17 @@ public class AbstractFileSetCheckTest {
         final DummyFileSetCheck check = new DummyFileSetCheck();
         check.configure(new DefaultConfiguration("filesetcheck"));
         check.setFileExtensions("tmp");
-        final List<String> lines = Arrays.asList("key=value", "ext=tmp");
+        final File firstFile = new File("inputAbstractFileSetCheck.tmp");
         final SortedSet<LocalizedMessage> firstFileMessages =
-            check.process(new File("inputAbstractFileSetCheck.tmp"), Collections.emptyList());
+            check.process(firstFile, new FileText(firstFile, Collections.emptyList()));
+        final File secondFile = new File("inputAbstractFileSetCheck.txt");
+        final List<String> lines = Arrays.asList("key=value", "ext=tmp");
         final SortedSet<LocalizedMessage> secondFileMessages =
-            check.process(new File("inputAbstractFileSetCheck.txt"), lines);
+            check.process(secondFile, new FileText(secondFile, lines));
 
-        assertEquals("File should not be empty.",
+        assertEquals("Invalid message", "File should not be empty.",
             firstFileMessages.first().getMessage());
-        assertTrue(secondFileMessages.isEmpty());
+        assertTrue("Message should be empty, but was not", secondFileMessages.isEmpty());
     }
 
     @Test
@@ -59,11 +61,16 @@ public class AbstractFileSetCheckTest {
         check.setFileExtensions("tmp", ".java");
         final String[] expectedExtentions = {".tmp", ".java"};
 
-        Assert.assertArrayEquals(expectedExtentions, check.getFileExtensions());
+        Assert.assertArrayEquals("Invalid extensions",
+                expectedExtentions, check.getFileExtensions());
     }
 
+    /**
+     * This javadoc exists only to suppress Intellij Idea inspection
+     * @throws Exception it happens
+     * @noinspection NullArgumentToVariableArgMethod
+     */
     @Test
-    @SuppressWarnings("NullArgumentToVariableArgMethod")
     public void testSetExtentionThrowsExceptionWhenTheyAreNull() throws Exception {
         final DummyFileSetCheck check = new DummyFileSetCheck();
         try {
@@ -71,7 +78,8 @@ public class AbstractFileSetCheckTest {
             fail("Expected exception.");
         }
         catch (IllegalArgumentException exception) {
-            assertEquals("Extensions array can not be null", exception.getMessage());
+            assertEquals("Invalid exception message",
+                    "Extensions array can not be null", exception.getMessage());
         }
     }
 
@@ -81,15 +89,15 @@ public class AbstractFileSetCheckTest {
         final Checker checker = new Checker();
         check.setMessageDispatcher(checker);
 
-        assertEquals(checker, check.getMessageDispatcher());
+        assertEquals("Invalid message dispatcher", checker, check.getMessageDispatcher());
     }
 
     private static class DummyFileSetCheck extends AbstractFileSetCheck {
         private static final String MSG_KEY = "File should not be empty.";
 
         @Override
-        protected void processFiltered(File file, List<String> lines) throws CheckstyleException {
-            if (lines.isEmpty()) {
+        protected void processFiltered(File file, FileText fileText) throws CheckstyleException {
+            if (fileText.size() == 0) {
                 log(1, MSG_KEY);
             }
         }

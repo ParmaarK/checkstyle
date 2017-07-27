@@ -26,23 +26,17 @@ import static com.puppycrawl.tools.checkstyle.checks.sizes.MethodCountCheck.MSG_
 import static com.puppycrawl.tools.checkstyle.checks.sizes.MethodCountCheck.MSG_PUBLIC_METHODS;
 import static org.junit.Assert.assertArrayEquals;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.junit.Test;
 
-import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
+import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
 
-public class MethodCountCheckTest extends BaseCheckTestSupport {
+public class MethodCountCheckTest extends AbstractModuleTestSupport {
     @Override
-    protected String getPath(String filename) throws IOException {
-        return super.getPath("checks" + File.separator
-                + "sizes" + File.separator
-                + "methodcount" + File.separator
-                + filename);
+    protected String getPackageLocation() {
+        return "com/puppycrawl/tools/checkstyle/checks/sizes/methodcount";
     }
 
     @Test
@@ -63,6 +57,7 @@ public class MethodCountCheckTest extends BaseCheckTestSupport {
             TokenTypes.ENUM_CONSTANT_DEF,
             TokenTypes.ENUM_DEF,
             TokenTypes.INTERFACE_DEF,
+            TokenTypes.ANNOTATION_DEF,
             TokenTypes.METHOD_DEF,
         };
 
@@ -130,5 +125,38 @@ public class MethodCountCheckTest extends BaseCheckTestSupport {
         };
 
         verify(checkConfig, getPath("InputMethodCount3.java"), expected);
+    }
+
+    @Test
+    public void testOnInterfaceDefinitionWithField() throws Exception {
+        final DefaultConfiguration checkConfig =
+                createCheckConfig(MethodCountCheck.class);
+
+        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+
+        verify(checkConfig, getPath("InputMethodCount4.java"), expected);
+    }
+
+    @Test
+    public void testWithInterfaceDefinitionInClass() throws Exception {
+        final DefaultConfiguration checkConfig = createCheckConfig(MethodCountCheck.class);
+        checkConfig.addAttribute("maxTotal", "1");
+
+        final String[] expected = {
+            "1: " + getCheckMessage(MSG_MANY_METHODS, 2, 1),
+        };
+
+        verify(checkConfig, getPath("InputMethodCount5.java"), expected);
+    }
+
+    @Test
+    public void testPartialTokens() throws Exception {
+        final DefaultConfiguration checkConfig = createCheckConfig(MethodCountCheck.class);
+        checkConfig.addAttribute("maxTotal", "1");
+        checkConfig.addAttribute("tokens", "ENUM_DEF");
+
+        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+
+        verify(checkConfig, getPath("InputMethodCount6.java"), expected);
     }
 }

@@ -27,6 +27,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableList;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.DetailNode;
@@ -38,7 +39,7 @@ public class CodeSelectorPresentationTest {
 
     private DetailAST tree;
 
-    private List<Integer> linesToPosition;
+    private ImmutableList<Integer> linesToPosition;
 
     @Before
     public void loadFile() throws CheckstyleException {
@@ -46,7 +47,7 @@ public class CodeSelectorPresentationTest {
         model.setParseMode(ParseMode.JAVA_WITH_JAVADOC_AND_COMMENTS);
         model.openFile(new File(getPath("InputJavadocAttributesAndMethods.java")));
         tree = ((DetailAST) model.getParseTreeTableModel().getRoot()).getFirstChild();
-        linesToPosition = convertLinesToPosition(model.getLinesToPosition());
+        linesToPosition = ImmutableList.copyOf(convertLinesToPosition(model.getLinesToPosition()));
     }
 
     private static String getPath(String filename) {
@@ -74,8 +75,8 @@ public class CodeSelectorPresentationTest {
         final CodeSelectorPresentation selector = new CodeSelectorPresentation(tree,
                 linesToPosition);
         selector.findSelectionPositions();
-        Assert.assertEquals(23, selector.getSelectionStart());
-        Assert.assertEquals(212, selector.getSelectionEnd());
+        Assert.assertEquals("Invalid selection start", 23, selector.getSelectionStart());
+        Assert.assertEquals("Invalid selection end", 212, selector.getSelectionEnd());
     }
 
     @Test
@@ -84,8 +85,8 @@ public class CodeSelectorPresentationTest {
         final CodeSelectorPresentation selector = new CodeSelectorPresentation(leaf,
                 linesToPosition);
         selector.findSelectionPositions();
-        Assert.assertEquals(62, selector.getSelectionStart());
-        Assert.assertEquals(63, selector.getSelectionEnd());
+        Assert.assertEquals("Invalid selection start", 62, selector.getSelectionStart());
+        Assert.assertEquals("Invalid selection end", 63, selector.getSelectionEnd());
     }
 
     @Test
@@ -94,8 +95,8 @@ public class CodeSelectorPresentationTest {
         final CodeSelectorPresentation selector = new CodeSelectorPresentation(leaf,
                 linesToPosition);
         selector.findSelectionPositions();
-        Assert.assertEquals(23, selector.getSelectionStart());
-        Assert.assertEquals(23, selector.getSelectionEnd());
+        Assert.assertEquals("Invalid selection start", 23, selector.getSelectionStart());
+        Assert.assertEquals("Invalid selection end", 23, selector.getSelectionEnd());
     }
 
     @Test
@@ -105,8 +106,8 @@ public class CodeSelectorPresentationTest {
         final CodeSelectorPresentation selector = new CodeSelectorPresentation(javadoc,
                 linesToPosition);
         selector.findSelectionPositions();
-        Assert.assertEquals(3, selector.getSelectionStart());
-        Assert.assertEquals(25, selector.getSelectionEnd());
+        Assert.assertEquals("Invalid selection start", 3, selector.getSelectionStart());
+        Assert.assertEquals("Invalid selection end", 25, selector.getSelectionEnd());
     }
 
     @Test
@@ -117,8 +118,8 @@ public class CodeSelectorPresentationTest {
         final CodeSelectorPresentation selector = new CodeSelectorPresentation(javadocLeaf,
                 linesToPosition);
         selector.findSelectionPositions();
-        Assert.assertEquals(5, selector.getSelectionStart());
-        Assert.assertEquals(19, selector.getSelectionEnd());
+        Assert.assertEquals("Invalid selection start", 5, selector.getSelectionStart());
+        Assert.assertEquals("Invalid selection end", 19, selector.getSelectionEnd());
     }
 
 }

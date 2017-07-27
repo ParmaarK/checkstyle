@@ -5,7 +5,7 @@
 package com.puppycrawl.tools.checkstyle.checks.imports.unusedimports;
 
 import com.puppycrawl.tools.checkstyle.checks.imports.*;
-                                     import com.puppycrawl.tools.checkstyle.checks.imports.InputImportBug;
+                                     import com.puppycrawl.tools.checkstyle.checks.imports.unusedimports.InputUnusedImportsBug;
 import java.io.*;
 import java.lang.*;
 import java.lang.String;
@@ -38,7 +38,7 @@ import com.puppycrawl.tools.checkstyle.Checker;
 import com.puppycrawl.tools.checkstyle.CheckerTest;
 import com.puppycrawl.tools.checkstyle.BaseFileSetCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.Definitions;
-import com.puppycrawl.tools.checkstyle.checks.Input15Extensions;
+import com.puppycrawl.tools.checkstyle.checks.imports.unusedimports.Input15Extensions;
 import com.puppycrawl.tools.checkstyle.ConfigurationLoaderTest;
 import com.puppycrawl.tools.checkstyle.PackageNamesLoader;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;

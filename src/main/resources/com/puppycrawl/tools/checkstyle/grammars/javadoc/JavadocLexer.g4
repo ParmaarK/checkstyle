@@ -37,8 +37,9 @@ import java.util.*;
 
 }
 
-LEADING_ASTERISK : ( (' '|'\t') {_tokenStartCharPositionInLine == 0}? ) (' '|'\t')* '*'
-      | '*' {_tokenStartCharPositionInLine == 0}?
+LEADING_ASTERISK : ( (' '|'\t') {_tokenStartCharPositionInLine == 0
+                                    || previousTokenType == NEWLINE}? ) (' '|'\t')* '*'
+      | '*' {_tokenStartCharPositionInLine == 0 || previousTokenType == NEWLINE}?
       ;
 
 HTML_COMMENT_START : '<!--' {recognizeXmlTags}?
@@ -48,18 +49,18 @@ CDATA       :   '<![CDATA[' .*? ']]>' {recognizeXmlTags}?;
 
 WS      :   (' '|'\t')+ ;
 
-OPEN: '<' {recognizeXmlTags && (Character.isLetter(_input.LA(1)) || _input.LA(1) == '/')}?
+START: '<' {recognizeXmlTags && (Character.isLetter(_input.LA(1)) || _input.LA(1) == '/')}?
       -> pushMode(xmlTagDefinition)
       ;
 
-//PRE_TAG_OPEN: ('<pre>' | '<PRE>') {!insidePreTag}?
+//PRE_TAG_START: ('<pre>' | '<PRE>') {!insidePreTag}?
 //     {insidePreTag=true; recognizeXmlTags=false;}
 //      ;
-//PRE_TAG_CLOSE: ('</pre>' | '</PRE>') {insidePreTag}?
+//PRE_TAG_END: ('</pre>' | '</PRE>') {insidePreTag}?
 //      {insidePreTag=false; recognizeXmlTags=true;}
 //      ;
 
-NEWLINE: '\n' | '\r\n';
+NEWLINE: '\n' | '\r\n' | '\r';
 
 AUTHOR_LITERAL : '@author' {isJavadocTagAvailable}?;
 DEPRECATED_LITERAL : '@deprecated' {isJavadocTagAvailable}?;
@@ -117,7 +118,7 @@ Newline5: NEWLINE
       }
       -> type(NEWLINE);
 Leading_asterisk3: LEADING_ASTERISK -> type(LEADING_ASTERISK);
-XmlTagOpen1: '<' -> type(OPEN), pushMode(xmlTagDefinition);
+XmlTagOpen1: '<' -> type(START), pushMode(xmlTagDefinition);
 STRING: '"' .*? '"' {referenceCatched = false;} -> mode(DEFAULT_MODE);
 PACKAGE: [a-z_$] ([a-z0-9_$] | '.')+ [a-z0-9_$] {referenceCatched = true;};
 DOT: '.';
@@ -271,8 +272,8 @@ Char10: .
 //////////////////////////////////////////////////////////////////////////////////////
 mode xmlTagDefinition;
 
-CLOSE       :   '>' {htmlTagNameCatched = false;} -> mode(DEFAULT_MODE) ;
-SLASH_CLOSE :   '/>' {htmlTagNameCatched = false;} -> mode(DEFAULT_MODE) ;
+END       :   '>' {htmlTagNameCatched = false;} -> mode(DEFAULT_MODE) ;
+SLASH_END :   '/>' {htmlTagNameCatched = false;} -> mode(DEFAULT_MODE) ;
 SLASH       :   '/' ;
 EQUALS      :   '=' -> mode(htmlAttr);
 

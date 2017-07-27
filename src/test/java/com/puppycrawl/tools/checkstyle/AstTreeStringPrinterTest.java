@@ -33,14 +33,11 @@ import antlr.NoViableAltException;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.FileText;
 
-public class AstTreeStringPrinterTest {
+public class AstTreeStringPrinterTest extends AbstractTreeTestSupport {
 
-    private static String getNonCompilablePath(String filename) {
-        return "src/test/resources-noncompilable/com/puppycrawl/tools/checkstyle/" + filename;
-    }
-
-    private static String getPath(String filename) {
-        return "src/test/resources/com/puppycrawl/tools/checkstyle/astprinter/" + filename;
+    @Override
+    protected String getPackageLocation() {
+        return "com/puppycrawl/tools/checkstyle/astprinter";
     }
 
     @Test
@@ -56,18 +53,17 @@ public class AstTreeStringPrinterTest {
             Assert.fail("exception expected");
         }
         catch (CheckstyleException ex) {
-            Assert.assertSame(NoViableAltException.class, ex.getCause().getClass());
-            Assert.assertEquals("unexpected token: classD", ex.getCause().getMessage());
+            Assert.assertSame("Invalid class",
+                    NoViableAltException.class, ex.getCause().getClass());
+            Assert.assertEquals("Invalid exception message",
+                    "unexpected token: classD", ex.getCause().getMessage());
         }
     }
 
     @Test
     public void testParseFile() throws Exception {
-        final String actual = AstTreeStringPrinter.printFileAst(
-            new File(getPath("InputAstTreeStringPrinterComments.java")), false);
-        final String expected = new String(Files.readAllBytes(Paths.get(
-            getPath("expectedInputAstTreeStringPrinter.txt"))), StandardCharsets.UTF_8);
-        Assert.assertEquals(expected, actual);
+        verifyAst(getPath("expectedInputAstTreeStringPrinter.txt"),
+                getPath("InputAstTreeStringPrinterComments.java"), false);
     }
 
     @Test
@@ -79,54 +75,38 @@ public class AstTreeStringPrinterTest {
         final String expected = new String(Files.readAllBytes(Paths.get(
                 getPath("expectedInputAstTreeStringPrinter.txt"))), StandardCharsets.UTF_8);
 
-        Assert.assertEquals(expected, actual);
+        Assert.assertEquals("Print AST output is invalid", expected, actual);
     }
 
     @Test
     public void testParseFileWithComments() throws Exception {
-        final String actual = AstTreeStringPrinter.printFileAst(
-            new File(getPath("InputAstTreeStringPrinterComments.java")), true)
-                .replaceAll("\\\\r\\\\n", "\\\\n");
-        final String expected = new String(Files.readAllBytes(Paths.get(
-                getPath("expectedInputAstTreeStringPrinterComments.txt"))), StandardCharsets.UTF_8)
-                .replaceAll("\\\\r\\\\n", "\\\\n");
-        Assert.assertEquals(expected, actual);
+        verifyAst(getPath("expectedInputAstTreeStringPrinterComments.txt"),
+                getPath("InputAstTreeStringPrinterComments.java"), true);
     }
 
     @Test
     public void testParseFileWithJavadoc1() throws Exception {
-        final String actual = AstTreeStringPrinter.printJavaAndJavadocTree(
-                new File(getPath("InputAstTreeStringPrinterJavadoc.java")))
-                .replaceAll("\\\\r\\\\n", "\\\\n");
-        final String expected = new String(Files.readAllBytes(Paths.get(
-                getPath("expectedInputAstTreeStringPrinterJavadoc.txt"))),
-                        StandardCharsets.UTF_8)
-                .replaceAll("\\\\r\\\\n", "\\\\n");
-        Assert.assertEquals(expected, actual);
+        verifyJavaAndJavadocAst(getPath("expectedInputAstTreeStringPrinterJavadoc.txt"),
+                getPath("InputAstTreeStringPrinterJavadoc.java"));
     }
 
     @Test
     public void testParseFileWithJavadoc2() throws Exception {
-        final String actual = AstTreeStringPrinter.printJavaAndJavadocTree(
-                new File(getPath("InputAstTreeStringPrinterJavaAndJavadoc.java")))
-                .replaceAll("\\\\r\\\\n", "\\\\n");
-        final String expected = new String(Files.readAllBytes(Paths.get(
-                getPath("expectedInputAstTreeStringPrinterJavaAndJavadoc.txt"))),
-                        StandardCharsets.UTF_8)
-                .replaceAll("\\\\r\\\\n", "\\\\n");
-        Assert.assertEquals(expected, actual);
+        verifyJavaAndJavadocAst(getPath("expectedInputAstTreeStringPrinterJavaAndJavadoc.txt"),
+                getPath("InputAstTreeStringPrinterJavaAndJavadoc.java"));
     }
 
     @Test
     public void testParseFileWithJavadoc3() throws Exception {
-        final String actual = AstTreeStringPrinter.printJavaAndJavadocTree(
-                new File(getPath("InputAstTreeStringPrinterAttributesAndMethodsJavadoc.java")))
-                .replaceAll("\\\\r\\\\n", "\\\\n");
-        final String expected = new String(Files.readAllBytes(Paths.get(
-                getPath("expectedInputAstTreeStringPrinterAttributesAndMethodsJavadoc.txt"))),
-                        StandardCharsets.UTF_8)
-                .replaceAll("\\\\r\\\\n", "\\\\n");
-        Assert.assertEquals(expected, actual);
+        verifyJavaAndJavadocAst(
+                getPath("expectedInputAstTreeStringPrinterAttributesAndMethodsJavadoc.txt"),
+                getPath("InputAstTreeStringPrinterAttributesAndMethodsJavadoc.java")
+        );
     }
 
+    @Test
+    public void testJavadocPosition() throws Exception {
+        verifyJavaAndJavadocAst(getPath("expectedJavadocPosition.txt"),
+                getPath("InputJavadocPosition.java"));
+    }
 }

@@ -35,6 +35,7 @@ import com.puppycrawl.tools.checkstyle.api.AuditListener;
 import com.puppycrawl.tools.checkstyle.api.AutomaticBean;
 import com.puppycrawl.tools.checkstyle.api.BeforeExecutionFileFilter;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+import com.puppycrawl.tools.checkstyle.api.FileText;
 import com.puppycrawl.tools.checkstyle.api.Filter;
 import com.puppycrawl.tools.checkstyle.api.RootModule;
 
@@ -65,52 +66,55 @@ public class ModuleReflectionUtilsTest {
     @Test
     public void testIsCheckstyleCheck() {
         assertTrue(ModuleReflectionUtils.isCheckstyleCheck(CheckClass.class));
-        assertFalse(ModuleReflectionUtils.isCheckstyleCheck(Foo.class));
+        assertFalse(ModuleReflectionUtils.isCheckstyleCheck(NotCheckstyleCheck.class));
     }
 
     @Test
     public void testIsFileSetModule() {
         assertTrue(ModuleReflectionUtils.isFileSetModule(FileSetModuleClass.class));
-        assertFalse(ModuleReflectionUtils.isFileSetModule(Foo.class));
+        assertFalse(ModuleReflectionUtils.isFileSetModule(NotCheckstyleCheck.class));
     }
 
     @Test
     public void testIsFilterModule() {
         assertTrue(ModuleReflectionUtils.isFilterModule(FilterClass.class));
-        assertFalse(ModuleReflectionUtils.isFilterModule(Foo.class));
+        assertFalse(ModuleReflectionUtils.isFilterModule(NotCheckstyleCheck.class));
     }
 
     @Test
     public void testIsFileFilterModule() {
         assertTrue(ModuleReflectionUtils.isFileFilterModule(FileFilterModuleClass.class));
-        assertFalse(ModuleReflectionUtils.isFileFilterModule(Foo.class));
+        assertFalse(ModuleReflectionUtils.isFileFilterModule(NotCheckstyleCheck.class));
     }
 
     @Test
     public void testIsRootModule() {
         assertTrue(ModuleReflectionUtils.isRootModule(RootModuleClass.class));
-        assertFalse(ModuleReflectionUtils.isRootModule(Foo.class));
+        assertFalse(ModuleReflectionUtils.isRootModule(NotCheckstyleCheck.class));
     }
 
     private static class ValidCheckstyleClass extends AutomaticBean {
         protected ValidCheckstyleClass() {
+            //keep pmd calm and happy
         }
     }
 
     private static class InvalidNonAutomaticBeanClass {
         protected InvalidNonAutomaticBeanClass() {
+            //keep pmd calm and happy
         }
     }
 
-    private static class Bar extends AbstractInvalidClass {
-        @Override
-        public void method() {
-            //dummy method
-        }
-    }
-
+    /** @noinspection AbstractClassWithOnlyOneDirectInheritor */
     private abstract static class AbstractInvalidClass extends AutomaticBean {
         public abstract void method();
+    }
+
+    private static class DummyClass extends AbstractInvalidClass {
+        @Override
+        public void method() {
+            //keep pmd calm and happy
+        }
     }
 
     private static class CheckClass extends AbstractCheck {
@@ -118,11 +122,21 @@ public class ModuleReflectionUtilsTest {
         public int[] getDefaultTokens() {
             return new int[] {0};
         }
+
+        @Override
+        public int[] getAcceptableTokens() {
+            return getDefaultTokens();
+        }
+
+        @Override
+        public int[] getRequiredTokens() {
+            return getDefaultTokens();
+        }
     }
 
     private static class FileSetModuleClass extends AbstractFileSetCheck {
         @Override
-        protected void processFiltered(File file, List<String> lines) throws CheckstyleException {
+        protected void processFiltered(File file, FileText fileText) throws CheckstyleException {
             //dummy method
         }
     }
@@ -164,8 +178,9 @@ public class ModuleReflectionUtilsTest {
         }
     }
 
-    private static class Foo {
-        protected Foo() {
+    private static class NotCheckstyleCheck {
+        protected NotCheckstyleCheck() {
+            //keep pmd calm and happy
         }
     }
 }
