@@ -227,7 +227,7 @@ class SpecialCasesInForLoop
 	}
 
         // bug 895072
-	// avoid confilct between ParenPad(space) and NoWhiteSpace before ';'
+	// avoid conflict between ParenPad(space) and NoWhiteSpace before ';'
 	int i = 0;
 	for ( ; i < 5; i++ ) {
 	//   ^ whitespace
@@ -285,5 +285,14 @@ class SpecialCasesInForLoop
     }
 
     public static void testNoWhitespaceBeforeEllipses(String ... args) {
+    }
+    @ interface BAD{}
+    @   interface BAD2{}
+    @
+    interface BAD3{}
+    @interface Ok{}
+
+    static {
+        int[]err = new int [50];
     }
 }

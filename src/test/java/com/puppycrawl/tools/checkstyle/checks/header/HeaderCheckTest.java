@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -24,7 +24,7 @@ import static com.puppycrawl.tools.checkstyle.checks.header.HeaderCheck.MSG_MISS
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyObject;
+import static org.mockito.ArgumentMatchers.any;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,30 +40,26 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
-import com.puppycrawl.tools.checkstyle.BaseFileSetCheckTestSupport;
-import com.puppycrawl.tools.checkstyle.Checker;
+import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ HeaderCheck.class, HeaderCheckTest.class, AbstractHeaderCheck.class })
-public class HeaderCheckTest extends BaseFileSetCheckTestSupport {
+public class HeaderCheckTest extends AbstractModuleTestSupport {
 
     @Rule
     public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Override
-    protected String getPath(String filename) throws IOException {
-        return super.getPath("checks" + File.separator
-                + "header" + File.separator
-                + "header" + File.separator
-                + filename);
+    protected String getPackageLocation() {
+        return "com/puppycrawl/tools/checkstyle/checks/header/header";
     }
 
     @Test
     public void testStaticHeader() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(HeaderCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(HeaderCheck.class);
         checkConfig.addAttribute("headerFile", getPath("InputHeaderjava.header"));
         checkConfig.addAttribute("ignoreLines", "");
         final String[] expected = {
@@ -74,37 +70,27 @@ public class HeaderCheckTest extends BaseFileSetCheckTestSupport {
 
     @Test
     public void testNoHeader() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(HeaderCheck.class);
-        try {
-            createChecker(checkConfig);
-            final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
-            verify(checkConfig, getPath("InputHeaderRegexp.java"), expected);
-        }
-        catch (CheckstyleException ex) {
-            // Exception is not expected
-            fail("Exception is not expected");
-        }
+        final DefaultConfiguration checkConfig = createModuleConfig(HeaderCheck.class);
+
+        createChecker(checkConfig);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
+        verify(checkConfig, getPath("InputHeaderRegexp.java"), expected);
     }
 
     @Test
     public void testWhitespaceHeader() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(HeaderCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(HeaderCheck.class);
         checkConfig.addAttribute("header", "\n    \n");
-        try {
-            createChecker(checkConfig);
-            final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
-            verify(checkConfig, getPath("InputHeaderRegexp.java"), expected);
-        }
-        catch (CheckstyleException ex) {
-            // Exception is not expected
-            fail("Exception is not expected");
-        }
+
+        createChecker(checkConfig);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
+        verify(checkConfig, getPath("InputHeaderRegexp.java"), expected);
     }
 
     @Test
-    public void testNonExistingHeaderFile() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(HeaderCheck.class);
-        checkConfig.addAttribute("headerFile", getPath("nonExisting.file"));
+    public void testNonExistentHeaderFile() throws Exception {
+        final DefaultConfiguration checkConfig = createModuleConfig(HeaderCheck.class);
+        checkConfig.addAttribute("headerFile", getPath("nonExistent.file"));
         try {
             createChecker(checkConfig);
             fail("CheckstyleException is expected");
@@ -124,7 +110,7 @@ public class HeaderCheckTest extends BaseFileSetCheckTestSupport {
 
     @Test
     public void testInvalidCharset() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(HeaderCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(HeaderCheck.class);
         checkConfig.addAttribute("headerFile", getPath("InputHeaderjava.header"));
         checkConfig.addAttribute("charset", "XSO-8859-1");
         try {
@@ -142,7 +128,7 @@ public class HeaderCheckTest extends BaseFileSetCheckTestSupport {
 
     @Test
     public void testEmptyFilename() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(HeaderCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(HeaderCheck.class);
         checkConfig.addAttribute("headerFile", "");
         try {
             createChecker(checkConfig);
@@ -159,7 +145,7 @@ public class HeaderCheckTest extends BaseFileSetCheckTestSupport {
 
     @Test
     public void testNullFilename() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(HeaderCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(HeaderCheck.class);
         checkConfig.addAttribute("headerFile", null);
         try {
             createChecker(checkConfig);
@@ -176,7 +162,7 @@ public class HeaderCheckTest extends BaseFileSetCheckTestSupport {
 
     @Test
     public void testNotMatch() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(HeaderCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(HeaderCheck.class);
         checkConfig.addAttribute("headerFile", getPath("InputHeaderjava.header"));
         checkConfig.addAttribute("ignoreLines", "");
         final String[] expected = {
@@ -188,10 +174,10 @@ public class HeaderCheckTest extends BaseFileSetCheckTestSupport {
 
     @Test
     public void testIgnore() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(HeaderCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(HeaderCheck.class);
         checkConfig.addAttribute("headerFile", getPath("InputHeaderjava.header"));
         checkConfig.addAttribute("ignoreLines", "2");
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputHeaderjava2.header"), expected);
     }
 
@@ -213,7 +199,7 @@ public class HeaderCheckTest extends BaseFileSetCheckTestSupport {
     public void testIoExceptionWhenLoadingHeader() throws Exception {
         final HeaderCheck check = PowerMockito.spy(new HeaderCheck());
         PowerMockito.doThrow(new IOException("expected exception")).when(check, "loadHeader",
-                anyObject());
+                any());
 
         try {
             check.setHeader("header");
@@ -229,9 +215,9 @@ public class HeaderCheckTest extends BaseFileSetCheckTestSupport {
     public void testIoExceptionWhenLoadingHeaderFile() throws Exception {
         final HeaderCheck check = PowerMockito.spy(new HeaderCheck());
         PowerMockito.doThrow(new IOException("expected exception")).when(check, "loadHeader",
-                anyObject());
+                any());
 
-        check.setHeaderFile(CommonUtils.getUriByFilename(getPath("InputHeaderRegexp.java")));
+        check.setHeaderFile(CommonUtil.getUriByFilename(getPath("InputHeaderRegexp.java")));
 
         final Method loadHeaderFile = AbstractHeaderCheck.class.getDeclaredMethod("loadHeaderFile");
         loadHeaderFile.setAccessible(true);
@@ -248,55 +234,44 @@ public class HeaderCheckTest extends BaseFileSetCheckTestSupport {
 
     @Test
     public void testCacheHeaderFile() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(HeaderCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(HeaderCheck.class);
         checkConfig.addAttribute("headerFile", getPath("InputHeaderjava.header"));
 
-        final DefaultConfiguration checkerConfig = new DefaultConfiguration("checkstyle_checks");
-        checkerConfig.addChild(checkConfig);
-        checkerConfig.addAttribute("cacheFile", temporaryFolder.newFile().getPath());
-
-        final Checker checker = new Checker();
-        checker.setModuleClassLoader(Thread.currentThread().getContextClassLoader());
-        checker.configure(checkerConfig);
-        checker.addListener(getBriefUtLogger());
+        final DefaultConfiguration checkerConfig = createRootConfig(checkConfig);
+        final File cacheFile = temporaryFolder.newFile();
+        checkerConfig.addAttribute("cacheFile", cacheFile.getPath());
 
         final String[] expected = {
             "1: " + getCheckMessage(MSG_MISSING),
         };
 
-        verify(checker, getPath("InputHeader.java"), expected);
+        verify(checkerConfig, getPath("InputHeader.java"), expected);
         // One more time to use cache.
-        verify(checker, getPath("InputHeader.java"), expected);
-
+        verify(checkerConfig, getPath("InputHeader.java"), expected);
     }
 
     @Test
     public void testCacheHeaderWithoutFile() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(HeaderCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(HeaderCheck.class);
         checkConfig.addAttribute("header", "Test");
 
-        final DefaultConfiguration checkerConfig = new DefaultConfiguration("checkstyle_checks");
-        checkerConfig.addChild(checkConfig);
-        checkerConfig.addAttribute("cacheFile", temporaryFolder.newFile().getPath());
-
-        final Checker checker = new Checker();
-        checker.setModuleClassLoader(Thread.currentThread().getContextClassLoader());
-        checker.configure(checkerConfig);
-        checker.addListener(getBriefUtLogger());
+        final DefaultConfiguration checkerConfig = createRootConfig(checkConfig);
+        final File cacheFile = temporaryFolder.newFile();
+        checkerConfig.addAttribute("cacheFile", cacheFile.getPath());
 
         final String[] expected = {
             "1: " + getCheckMessage(MSG_MISMATCH, "Test"),
         };
 
-        verify(checker, getPath("InputHeader.java"), expected);
+        verify(checkerConfig, getPath("InputHeader.java"), expected);
     }
 
     @Test
     public void testIgnoreLinesSorted() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(HeaderCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(HeaderCheck.class);
         checkConfig.addAttribute("headerFile", getPath("InputHeaderjava.header"));
         checkConfig.addAttribute("ignoreLines", "4,2,3");
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputHeaderjava3.header"), expected);
     }
 
@@ -312,5 +287,19 @@ public class HeaderCheckTest extends BaseFileSetCheckTestSupport {
             assertEquals("Invalid exception message", "header has already been set - "
                     + "set either header or headerFile, not both", ex.getMessage());
         }
+    }
+
+    @Test
+    public void testHeaderIsValidWithBlankLines() throws Exception {
+        final DefaultConfiguration checkConfig = createModuleConfig(HeaderCheck.class);
+        checkConfig.addAttribute("headerFile", getPath("InputHeaderjava.blank-lines.header"));
+        verify(checkConfig, getPath("InputHeaderBlankLines.java"));
+    }
+
+    @Test
+    public void testHeaderIsValidWithBlankLinesBlockStyle() throws Exception {
+        final DefaultConfiguration checkConfig = createModuleConfig(HeaderCheck.class);
+        checkConfig.addAttribute("headerFile", getPath("InputHeaderjava.blank-lines2.header"));
+        verify(checkConfig, getPath("InputHeaderBlankLines2.java"));
     }
 }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,6 +20,7 @@
 package com.puppycrawl.tools.checkstyle.utils;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.Arrays;
@@ -28,11 +29,19 @@ import java.util.function.Function;
 
 import org.junit.Test;
 
+import com.puppycrawl.tools.checkstyle.AbstractPathTestSupport;
+import com.puppycrawl.tools.checkstyle.JavaParser;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.internal.TestUtils;
+import com.puppycrawl.tools.checkstyle.internal.utils.TestUtil;
 
-public class BlockCommentPositionTest {
+public class BlockCommentPositionTest extends AbstractPathTestSupport {
+
+    @Test
+    public void testPrivateConstr() throws Exception {
+        assertTrue("Constructor is not private",
+                TestUtil.isUtilsClassHasPrivateConstructor(BlockCommentPosition.class, true));
+    }
 
     @Test
     public void testJavaDocsRecognition() throws Exception {
@@ -40,7 +49,7 @@ public class BlockCommentPositionTest {
                 new BlockCommentPositionTestMetadata("InputBlockCommentPositionOnClass.java",
                         BlockCommentPosition::isOnClass, 3),
                 new BlockCommentPositionTestMetadata("InputBlockCommentPositionOnMethod.java",
-                        BlockCommentPosition::isOnMethod, 3),
+                        BlockCommentPosition::isOnMethod, 4),
                 new BlockCommentPositionTestMetadata("InputBlockCommentPositionOnField.java",
                         BlockCommentPosition::isOnField, 3),
                 new BlockCommentPositionTestMetadata("InputBlockCommentPositionOnEnum.java",
@@ -52,13 +61,15 @@ public class BlockCommentPositionTest {
                 new BlockCommentPositionTestMetadata("InputBlockCommentPositionOnAnnotation.java",
                         BlockCommentPosition::isOnAnnotationDef, 3),
                 new BlockCommentPositionTestMetadata("InputBlockCommentPositionOnEnumMember.java",
-                        BlockCommentPosition::isOnEnumConstant, 2)
+                        BlockCommentPosition::isOnEnumConstant, 2),
+                new BlockCommentPositionTestMetadata(
+                        "InputBlockCommentPositionOnAnnotationField.java",
+                        BlockCommentPosition::isOnAnnotationField, 4)
         );
 
         for (BlockCommentPositionTestMetadata metadata : metadataList) {
-            final DetailAST ast = TestUtils.parseFile(
-                    new File(getPath(metadata.getFileName()))
-            );
+            final DetailAST ast = JavaParser.parseFile(new File(getPath(metadata.getFileName())),
+                JavaParser.Options.WITH_COMMENTS);
             final int matches = getJavadocsCount(ast, metadata.getAssertion());
             assertEquals("Invalid javadoc count", metadata.getMatchesNum(), matches);
         }
@@ -70,7 +81,7 @@ public class BlockCommentPositionTest {
         DetailAST node = detailAST;
         while (node != null) {
             if (node.getType() == TokenTypes.BLOCK_COMMENT_BEGIN
-                    && JavadocUtils.isJavadocComment(node)) {
+                    && JavadocUtil.isJavadocComment(node)) {
                 if (!assertion.apply(node)) {
                     throw new IllegalStateException("Position of comment is defined correctly");
                 }
@@ -82,9 +93,9 @@ public class BlockCommentPositionTest {
         return matchFound;
     }
 
-    private static String getPath(String filename) {
-        return "src/test/resources/com/puppycrawl/tools/checkstyle/utils/blockcommentposition/"
-                + filename;
+    @Override
+    protected String getPackageLocation() {
+        return "com/puppycrawl/tools/checkstyle/utils/blockcommentposition";
     }
 
     private static final class BlockCommentPositionTestMetadata {
@@ -111,5 +122,7 @@ public class BlockCommentPositionTest {
         public int getMatchesNum() {
             return matchesNum;
         }
+
     }
+
 }

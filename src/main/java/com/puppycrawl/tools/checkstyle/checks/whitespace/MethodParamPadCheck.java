@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,10 +21,11 @@ package com.puppycrawl.tools.checkstyle.checks.whitespace;
 
 import java.util.Locale;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * <p>
@@ -61,9 +62,9 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
  *     &lt;property name="allowLineBreaks" value="true"/&gt;
  * &lt;/module&gt;
  * </pre>
- * @author Rick Giles
  */
 
+@StatelessCheck
 public class MethodParamPadCheck
     extends AbstractCheck {
 
@@ -113,7 +114,7 @@ public class MethodParamPadCheck
 
     @Override
     public int[] getRequiredTokens() {
-        return CommonUtils.EMPTY_INT_ARRAY;
+        return CommonUtil.EMPTY_INT_ARRAY;
     }
 
     @Override
@@ -129,7 +130,7 @@ public class MethodParamPadCheck
 
         if (parenAST != null) {
             final String line = getLines()[parenAST.getLineNo() - 1];
-            if (CommonUtils.hasWhitespaceBefore(parenAST.getColumnNo(), line)) {
+            if (CommonUtil.hasWhitespaceBefore(parenAST.getColumnNo(), line)) {
                 if (!allowLineBreaks) {
                     log(parenAST, MSG_LINE_PREVIOUS, parenAST.getText());
                 }
@@ -170,4 +171,5 @@ public class MethodParamPadCheck
             throw new IllegalArgumentException("unable to parse " + optionStr, iae);
         }
     }
+
 }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,8 +25,6 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * This metric measures the number of instantiations of other classes
  * within the given class.
  *
- * @author <a href="mailto:simon@redhillconsulting.com.au">Simon Harris</a>
- * @author o_sukhodolsky
  */
 public final class ClassDataAbstractionCouplingCheck
     extends AbstractClassCouplingCheck {
@@ -43,7 +41,6 @@ public final class ClassDataAbstractionCouplingCheck
     /** Creates bew instance of the check. */
     public ClassDataAbstractionCouplingCheck() {
         super(DEFAULT_MAX);
-        setTokens("LITERAL_NEW");
     }
 
     @Override
@@ -60,14 +57,7 @@ public final class ClassDataAbstractionCouplingCheck
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {
-            TokenTypes.PACKAGE_DEF,
-            TokenTypes.IMPORT,
-            TokenTypes.CLASS_DEF,
-            TokenTypes.INTERFACE_DEF,
-            TokenTypes.ENUM_DEF,
-            TokenTypes.LITERAL_NEW,
-        };
+        return getRequiredTokens();
     }
 
     // -@cs[SimpleAccessorNameNotation] Overrides method from the base class.
@@ -76,4 +66,5 @@ public final class ClassDataAbstractionCouplingCheck
     protected String getLogMessageId() {
         return MSG_KEY;
     }
+
 }

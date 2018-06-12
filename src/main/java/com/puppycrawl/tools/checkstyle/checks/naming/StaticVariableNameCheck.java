@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,15 +21,35 @@ package com.puppycrawl.tools.checkstyle.checks.naming;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.ScopeUtils;
+import com.puppycrawl.tools.checkstyle.utils.ScopeUtil;
 
 /**
  * <p>
- * Checks that static, non-final variable names conform to a format specified
- * by the format property. The format is a
- * {@link java.util.regex.Pattern regular expression} and defaults to
- * <strong>^[a-z][a-zA-Z0-9]*$</strong>.
+ * Checks that {@code static}, non-{@code final} variable names conform to a format specified
+ * by the format property.
  * </p>
+ * <ul>
+ * <li>
+ * Property {@code format} - Specifies valid identifiers. Default value is
+ * {@code "^[a-z][a-zA-Z0-9]*$"}.
+ * </li>
+ * <li>
+ * Property {@code applyToPublic} - Controls whether to apply the check to public member.
+ * Default value is {@code true}.
+ * </li>
+ * <li>
+ * Property {@code applyToProtected} - Controls whether to apply the check to protected member.
+ * Default value is {@code true}.
+ * </li>
+ * <li>
+ * Property {@code applyToPackage} - Controls whether to apply the check to package-private member.
+ * Default value is {@code true}.
+ * </li>
+ * <li>
+ * Property {@code applyToPrivate} - Controls whether to apply the check to private member.
+ * Default value is {@code true}.
+ * </li>
+ * </ul>
  * <p>
  * An example of how to configure the check is:
  * </p>
@@ -42,13 +62,15 @@ import com.puppycrawl.tools.checkstyle.utils.ScopeUtils;
  * </p>
  * <pre>
  * &lt;module name="StaticVariableName"&gt;
- *    &lt;property name="format" value="^[a-z](_?[a-zA-Z0-9]+)*$"/&gt;
+ *   &lt;property name="format" value="^[a-z](_?[a-zA-Z0-9]+)*$"/&gt;
  * &lt;/module&gt;
  * </pre>
- * @author Rick Giles
+ *
+ * @since 3.0
  */
 public class StaticVariableNameCheck
     extends AbstractAccessControlNameCheck {
+
     /** Creates a new {@code StaticVariableNameCheck} instance. */
     public StaticVariableNameCheck() {
         super("^[a-z][a-zA-Z0-9]*$");
@@ -56,29 +78,30 @@ public class StaticVariableNameCheck
 
     @Override
     public int[] getDefaultTokens() {
-        return getAcceptableTokens();
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {TokenTypes.VARIABLE_DEF};
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getAcceptableTokens();
+        return new int[] {TokenTypes.VARIABLE_DEF};
     }
 
     @Override
     protected final boolean mustCheckName(DetailAST ast) {
         final DetailAST modifiersAST =
             ast.findFirstToken(TokenTypes.MODIFIERS);
-        final boolean isStatic = modifiersAST.branchContains(TokenTypes.LITERAL_STATIC);
-        final boolean isFinal = modifiersAST.branchContains(TokenTypes.FINAL);
+        final boolean isStatic = modifiersAST.findFirstToken(TokenTypes.LITERAL_STATIC) != null;
+        final boolean isFinal = modifiersAST.findFirstToken(TokenTypes.FINAL) != null;
 
         return isStatic
                 && !isFinal
                 && shouldCheckInScope(modifiersAST)
-                && !ScopeUtils.isInInterfaceOrAnnotationBlock(ast);
+                && !ScopeUtil.isInInterfaceOrAnnotationBlock(ast);
     }
+
 }

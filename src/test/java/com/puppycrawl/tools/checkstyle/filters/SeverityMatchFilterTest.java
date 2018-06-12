@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,16 +20,19 @@
 package com.puppycrawl.tools.checkstyle.filters;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
+import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.LocalizedMessage;
 import com.puppycrawl.tools.checkstyle.api.SeverityLevel;
 
-/** Tests SeverityMatchFilter. */
 public class SeverityMatchFilterTest {
+
     private final SeverityMatchFilter filter = new SeverityMatchFilter();
 
     @Test
@@ -87,4 +90,11 @@ public class SeverityMatchFilterTest {
         final AuditEvent ev3 = new AuditEvent(this, "ATest.java", infoMessage);
         assertFalse("level:" + infoLevel, filter.accept(ev3));
     }
+
+    @Test
+    public void testConfigure() throws CheckstyleException {
+        filter.configure(new DefaultConfiguration("test"));
+        assertNotNull("object exists", filter);
+    }
+
 }

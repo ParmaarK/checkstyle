@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -33,6 +33,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 public class ThrowsCountCheckTest extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/design/throwscount";
@@ -40,7 +41,7 @@ public class ThrowsCountCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testDefault() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(ThrowsCountCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(ThrowsCountCheck.class);
 
         final String[] expected = {
             "17:20: " + getCheckMessage(MSG_KEY, 5, 4),
@@ -54,7 +55,7 @@ public class ThrowsCountCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testMax() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(ThrowsCountCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(ThrowsCountCheck.class);
         checkConfig.addAttribute("max", "5");
 
         final String[] expected = {
@@ -96,7 +97,7 @@ public class ThrowsCountCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testNotIgnorePrivateMethod() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(ThrowsCountCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(ThrowsCountCheck.class);
         checkConfig.addAttribute("ignorePrivateMethods", "false");
         final String[] expected = {
             "17:20: " + getCheckMessage(MSG_KEY, 5, 4),
@@ -107,4 +108,14 @@ public class ThrowsCountCheckTest extends AbstractModuleTestSupport {
         };
         verify(checkConfig, getPath("InputThrowsCount.java"), expected);
     }
+
+    @Test
+    public void testMethodWithAnnotation() throws Exception {
+        final DefaultConfiguration checkConfig = createModuleConfig(ThrowsCountCheck.class);
+        final String[] expected = {
+            "18:26: " + getCheckMessage(MSG_KEY, 5, 4),
+        };
+        verify(checkConfig, getPath("InputThrowsCountMethodWithAnnotation.java"), expected);
+    }
+
 }

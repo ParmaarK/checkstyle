@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,10 +19,11 @@
 
 package com.puppycrawl.tools.checkstyle.checks.annotation;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * Check location of annotation on language elements.
@@ -156,9 +157,10 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
  * }
  * }
  *
- * @author maxvetrenko
  */
+@StatelessCheck
 public class AnnotationLocationCheck extends AbstractCheck {
+
     /**
      * A key is pointing to the warning message text in "messages.properties"
      * file.
@@ -255,7 +257,7 @@ public class AnnotationLocationCheck extends AbstractCheck {
 
     @Override
     public int[] getRequiredTokens() {
-        return CommonUtils.EMPTY_INT_ARRAY;
+        return CommonUtil.EMPTY_INT_ARRAY;
     }
 
     @Override
@@ -408,7 +410,7 @@ public class AnnotationLocationCheck extends AbstractCheck {
      * @param allowedPositions an array of allowed annotation positions.
      * @return true if position of annotation is allowed.
      */
-    public static boolean isAllowedPosition(DetailAST annotation, int... allowedPositions) {
+    private static boolean isAllowedPosition(DetailAST annotation, int... allowedPositions) {
         boolean allowed = false;
         for (int position : allowedPositions) {
             if (isInSpecificCodeBlock(annotation, position)) {
@@ -436,4 +438,5 @@ public class AnnotationLocationCheck extends AbstractCheck {
         }
         return returnValue;
     }
+
 }

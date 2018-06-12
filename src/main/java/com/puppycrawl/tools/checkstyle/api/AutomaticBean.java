@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -46,21 +46,48 @@ import org.apache.commons.beanutils.converters.LongConverter;
 import org.apache.commons.beanutils.converters.ShortConverter;
 
 import com.puppycrawl.tools.checkstyle.checks.naming.AccessModifier;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * A Java Bean that implements the component lifecycle interfaces by
  * calling the bean's setters for all configuration attributes.
- * @author lkuehne
  */
-public class AutomaticBean
+// -@cs[AbstractClassName] We can not brake compatibility with previous versions.
+public abstract class AutomaticBean
     implements Configurable, Contextualizable {
+
+    /**
+     * Enum to specify behaviour regarding ignored modules.
+     */
+    public enum OutputStreamOptions {
+
+        /**
+         * Close stream in the end.
+         */
+        CLOSE,
+
+        /**
+         * Do nothing in the end.
+         */
+        NONE
+
+    }
 
     /** Comma separator for StringTokenizer. */
     private static final String COMMA_SEPARATOR = ",";
 
     /** The configuration of this bean. */
     private Configuration configuration;
+
+    /**
+     * Provides a hook to finish the part of this component's setup that
+     * was not handled by the bean introspection.
+     * <p>
+     * The default implementation does nothing.
+     * </p>
+     * @throws CheckstyleException if there is a configuration error.
+     */
+    protected abstract void finishLocalSetup() throws CheckstyleException;
 
     /**
      * Creates a BeanUtilsBean that is configured to use
@@ -182,7 +209,6 @@ public class AutomaticBean
      */
     private void tryCopyProperty(String moduleName, String key, Object value, boolean recheck)
             throws CheckstyleException {
-
         final BeanUtilsBean beanUtils = createBeanUtilsBean();
 
         try {
@@ -225,7 +251,6 @@ public class AutomaticBean
     @Override
     public final void contextualize(Context context)
             throws CheckstyleException {
-
         final Collection<String> attributes = context.getAttributeNames();
 
         for (final String key : attributes) {
@@ -241,18 +266,6 @@ public class AutomaticBean
      */
     protected final Configuration getConfiguration() {
         return configuration;
-    }
-
-    /**
-     * Provides a hook to finish the part of this component's setup that
-     * was not handled by the bean introspection.
-     * <p>
-     * The default implementation does nothing.
-     * </p>
-     * @throws CheckstyleException if there is a configuration error.
-     */
-    protected void finishLocalSetup() throws CheckstyleException {
-        // No code by default, should be overridden only by demand at subclasses
     }
 
     /**
@@ -278,42 +291,49 @@ public class AutomaticBean
 
     /** A converter that converts strings to patterns. */
     private static class PatternConverter implements Converter {
+
         @SuppressWarnings({"unchecked", "rawtypes"})
         @Override
         public Object convert(Class type, Object value) {
-            return CommonUtils.createPattern(value.toString());
+            return CommonUtil.createPattern(value.toString());
         }
+
     }
 
     /** A converter that converts strings to severity level. */
     private static class SeverityLevelConverter implements Converter {
+
         @SuppressWarnings({"unchecked", "rawtypes"})
         @Override
         public Object convert(Class type, Object value) {
             return SeverityLevel.getInstance(value.toString());
         }
+
     }
 
     /** A converter that converts strings to scope. */
     private static class ScopeConverter implements Converter {
+
         @SuppressWarnings({"unchecked", "rawtypes"})
         @Override
         public Object convert(Class type, Object value) {
             return Scope.getInstance(value.toString());
         }
+
     }
 
     /** A converter that converts strings to uri. */
     private static class UriConverter implements Converter {
+
         @SuppressWarnings({"unchecked", "rawtypes"})
         @Override
         public Object convert(Class type, Object value) {
             final String url = value.toString();
             URI result = null;
 
-            if (!CommonUtils.isBlank(url)) {
+            if (!CommonUtil.isBlank(url)) {
                 try {
-                    result = CommonUtils.getUriByFilename(url);
+                    result = CommonUtil.getUriByFilename(url);
                 }
                 catch (CheckstyleException ex) {
                     throw new IllegalArgumentException(ex);
@@ -322,6 +342,7 @@ public class AutomaticBean
 
             return result;
         }
+
     }
 
     /**
@@ -330,6 +351,7 @@ public class AutomaticBean
      * with this characters.
      */
     private static class RelaxedStringArrayConverter implements Converter {
+
         @SuppressWarnings({"unchecked", "rawtypes"})
         @Override
         public Object convert(Class type, Object value) {
@@ -345,6 +367,7 @@ public class AutomaticBean
 
             return result.toArray(new String[result.size()]);
         }
+
     }
 
     /**
@@ -369,5 +392,7 @@ public class AutomaticBean
 
             return result.toArray(new AccessModifier[result.size()]);
         }
+
     }
+
 }

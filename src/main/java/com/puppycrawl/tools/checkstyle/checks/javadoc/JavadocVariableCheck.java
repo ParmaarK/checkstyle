@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,19 +21,20 @@ package com.puppycrawl.tools.checkstyle.checks.javadoc;
 
 import java.util.regex.Pattern;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.Scope;
 import com.puppycrawl.tools.checkstyle.api.TextBlock;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.ScopeUtils;
+import com.puppycrawl.tools.checkstyle.utils.ScopeUtil;
 
 /**
  * Checks that a variable has Javadoc comment. Ignores {@code serialVersionUID} fields.
  *
- * @author Oliver Burn
  */
+@StatelessCheck
 public class JavadocVariableCheck
     extends AbstractCheck {
 
@@ -131,15 +132,15 @@ public class JavadocVariableCheck
      */
     private boolean shouldCheck(final DetailAST ast) {
         boolean result = false;
-        if (!ScopeUtils.isInCodeBlock(ast) && !isIgnored(ast)) {
+        if (!ScopeUtil.isInCodeBlock(ast) && !isIgnored(ast)) {
             Scope customScope = Scope.PUBLIC;
             if (ast.getType() != TokenTypes.ENUM_CONSTANT_DEF
-                    && !ScopeUtils.isInInterfaceOrAnnotationBlock(ast)) {
+                    && !ScopeUtil.isInInterfaceOrAnnotationBlock(ast)) {
                 final DetailAST mods = ast.findFirstToken(TokenTypes.MODIFIERS);
-                customScope = ScopeUtils.getScopeFromMods(mods);
+                customScope = ScopeUtil.getScopeFromMods(mods);
             }
 
-            final Scope surroundingScope = ScopeUtils.getSurroundingScope(ast);
+            final Scope surroundingScope = ScopeUtil.getSurroundingScope(ast);
             result = customScope.isIn(scope) && surroundingScope.isIn(scope)
                 && (excludeScope == null
                     || !customScope.isIn(excludeScope)
@@ -147,4 +148,5 @@ public class JavadocVariableCheck
         }
         return result;
     }
+
 }

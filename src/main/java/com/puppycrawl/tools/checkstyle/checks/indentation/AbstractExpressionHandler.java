@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,14 +23,14 @@ import java.util.Arrays;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * Abstract base class for all handlers.
  *
- * @author jrichard
  */
 public abstract class AbstractExpressionHandler {
+
     /**
      * The instance of {@code IndentationCheck} using this handler.
      */
@@ -77,6 +77,7 @@ public abstract class AbstractExpressionHandler {
      * value is returned.
      *
      * @return the expected indentation amount
+     * @noinspection WeakerAccess
      */
     public final IndentLevel getIndent() {
         if (indent == null) {
@@ -102,6 +103,7 @@ public abstract class AbstractExpressionHandler {
      *                  type)
      *
      * @return suggested indentation for child
+     * @noinspection WeakerAccess
      */
     public IndentLevel getSuggestedChildIndent(AbstractExpressionHandler child) {
         return new IndentLevel(getIndent(), getBasicOffset());
@@ -181,6 +183,7 @@ public abstract class AbstractExpressionHandler {
      * @param ast2   the second expression
      *
      * @return true if they are, false otherwise
+     * @noinspection WeakerAccess
      */
     public static boolean areOnSameLine(DetailAST ast1, DetailAST ast2) {
         return ast1.getLineNo() == ast2.getLineNo();
@@ -191,6 +194,7 @@ public abstract class AbstractExpressionHandler {
      * which represents first symbol for this sub-tree in file.
      * @param ast a root of sub-tree in which the search should be performed.
      * @return a token which occurs first in the file.
+     * @noinspection WeakerAccess
      */
     public static DetailAST getFirstToken(DetailAST ast) {
         DetailAST first = ast;
@@ -241,7 +245,7 @@ public abstract class AbstractExpressionHandler {
         while (Character.isWhitespace(line.charAt(index))) {
             index++;
         }
-        return CommonUtils.lengthExpandedTabs(
+        return CommonUtil.lengthExpandedTabs(
             line, index, indentCheck.getIndentationTabWidth());
     }
 
@@ -353,7 +357,8 @@ public abstract class AbstractExpressionHandler {
     protected void checkWrappingIndentation(DetailAST firstNode, DetailAST lastNode,
             int wrappedIndentLevel, int startIndent, boolean ignoreFirstLine) {
         indentCheck.getLineWrappingHandler().checkIndentation(firstNode, lastNode,
-                wrappedIndentLevel, startIndent, ignoreFirstLine);
+                wrappedIndentLevel, startIndent,
+                LineWrappingHandler.LineWrappingOptions.ofBoolean(ignoreFirstLine));
     }
 
     /**
@@ -444,7 +449,7 @@ public abstract class AbstractExpressionHandler {
         final String line =
             indentCheck.getLine(ast.getLineNo() - 1);
 
-        return CommonUtils.lengthExpandedTabs(line, ast.getColumnNo(),
+        return CommonUtil.lengthExpandedTabs(line, ast.getColumnNo(),
             indentCheck.getIndentationTabWidth());
     }
 
@@ -570,4 +575,5 @@ public abstract class AbstractExpressionHandler {
             logError(lparen, "lparen", expandedTabsColumnNo(lparen));
         }
     }
+
 }

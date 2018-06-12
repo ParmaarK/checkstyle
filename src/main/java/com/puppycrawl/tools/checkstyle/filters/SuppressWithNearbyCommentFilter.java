@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -33,7 +33,7 @@ import com.puppycrawl.tools.checkstyle.TreeWalkerFilter;
 import com.puppycrawl.tools.checkstyle.api.AutomaticBean;
 import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.TextBlock;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * <p>
@@ -67,7 +67,6 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
  *
  * <p>See {@link SuppressionCommentFilter} for usage notes.
  *
- * @author Mick Killianey
  */
 public class SuppressWithNearbyCommentFilter
     extends AutomaticBean
@@ -110,8 +109,8 @@ public class SuppressWithNearbyCommentFilter
      * References the current FileContents for this filter.
      * Since this is a weak reference to the FileContents, the FileContents
      * can be reclaimed as soon as the strong references in TreeWalker
-     * and FileContentsHolder are reassigned to the next FileContents,
-     * at which time filtering for the current FileContents is finished.
+     * are reassigned to the next FileContents, at which time filtering for
+     * the current FileContents is finished.
      */
     private WeakReference<FileContents> fileContentsReference = new WeakReference<>(null);
 
@@ -127,13 +126,14 @@ public class SuppressWithNearbyCommentFilter
      * Returns FileContents for this filter.
      * @return the FileContents for this filter.
      */
-    public FileContents getFileContents() {
+    private FileContents getFileContents() {
         return fileContentsReference.get();
     }
 
     /**
      * Set the FileContents for this filter.
      * @param fileContents the FileContents for this filter.
+     * @noinspection WeakerAccess
      */
     public void setFileContents(FileContents fileContents) {
         fileContentsReference = new WeakReference<>(fileContents);
@@ -179,6 +179,11 @@ public class SuppressWithNearbyCommentFilter
      */
     public void setCheckC(boolean checkC) {
         this.checkC = checkC;
+    }
+
+    @Override
+    protected void finishLocalSetup() {
+        // No code by default
     }
 
     @Override
@@ -277,6 +282,7 @@ public class SuppressWithNearbyCommentFilter
      * A Tag holds a suppression comment and its location.
      */
     public static class Tag {
+
         /** The text of the tag. */
         private final String text;
 
@@ -306,21 +312,21 @@ public class SuppressWithNearbyCommentFilter
             //Does not intern Patterns with Utils.getPattern()
             String format = "";
             try {
-                format = CommonUtils.fillTemplateWithStringsByRegexp(
+                format = CommonUtil.fillTemplateWithStringsByRegexp(
                         filter.checkFormat, text, filter.commentFormat);
                 tagCheckRegexp = Pattern.compile(format);
                 if (filter.messageFormat == null) {
                     tagMessageRegexp = null;
                 }
                 else {
-                    format = CommonUtils.fillTemplateWithStringsByRegexp(
+                    format = CommonUtil.fillTemplateWithStringsByRegexp(
                             filter.messageFormat, text, filter.commentFormat);
                     tagMessageRegexp = Pattern.compile(format);
                 }
-                format = CommonUtils.fillTemplateWithStringsByRegexp(
+                format = CommonUtil.fillTemplateWithStringsByRegexp(
                         filter.influenceFormat, text, filter.commentFormat);
 
-                if (CommonUtils.startsWithChar(format, '+')) {
+                if (CommonUtil.startsWithChar(format, '+')) {
                     format = format.substring(1);
                 }
                 final int influence = parseInfluence(format, filter.influenceFormat, text);
@@ -418,5 +424,7 @@ public class SuppressWithNearbyCommentFilter
                     + ", tagMessageRegexp=" + tagMessageRegexp
                     + ']';
         }
+
     }
+
 }

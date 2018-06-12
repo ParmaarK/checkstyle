@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,7 @@ package com.puppycrawl.tools.checkstyle.checks.imports;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FullIdent;
@@ -58,10 +59,8 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * <p>The optional "allowStaticMemberImports" when set to true will allow
  * starred static member imports but will not affect class imports.
  *
- * @author Oliver Burn
- * @author <a href="bschneider@vecna.com">Bill Schneider</a>
- * @author Travis Schneeberger
  */
+@StatelessCheck
 public class AvoidStarImportCheck
     extends AbstractCheck {
 
@@ -85,12 +84,12 @@ public class AvoidStarImportCheck
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[] {TokenTypes.IMPORT, TokenTypes.STATIC_IMPORT};
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {TokenTypes.IMPORT, TokenTypes.STATIC_IMPORT};
+        return getRequiredTokens();
     }
 
     @Override
@@ -114,8 +113,6 @@ public class AvoidStarImportCheck
      *     where star imports are ok.
      */
     public void setExcludes(String... excludesParam) {
-        excludes.clear();
-
         for (final String exclude : excludesParam) {
             if (exclude.endsWith(STAR_IMPORT_SUFFIX)) {
                 excludes.add(exclude);

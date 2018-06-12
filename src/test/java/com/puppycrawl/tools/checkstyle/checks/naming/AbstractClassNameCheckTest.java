@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -30,6 +30,7 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 public class AbstractClassNameCheckTest extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/naming/abstractclassname";
@@ -38,7 +39,7 @@ public class AbstractClassNameCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testIllegalAbstractClassName() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(AbstractClassNameCheck.class);
+            createModuleConfig(AbstractClassNameCheck.class);
         checkConfig.addAttribute("ignoreName", "false");
         checkConfig.addAttribute("ignoreModifier", "true");
 
@@ -59,19 +60,18 @@ public class AbstractClassNameCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testCustomFormat() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(AbstractClassNameCheck.class);
+            createModuleConfig(AbstractClassNameCheck.class);
         checkConfig.addAttribute("ignoreName", "false");
         checkConfig.addAttribute("ignoreModifier", "true");
-        final String pattern = "^NonAbstract.+$";
-        checkConfig.addAttribute("format", pattern);
+        checkConfig.addAttribute("format", "^NonAbstract.+$");
 
         final String[] expected = {
             "3:1: " + getCheckMessage(MSG_ILLEGAL_ABSTRACT_CLASS_NAME, "InputAbstractClassName",
-                pattern),
+                "^NonAbstract.+$"),
             "9:1: " + getCheckMessage(MSG_ILLEGAL_ABSTRACT_CLASS_NAME, "AbstractClassOther",
-                pattern),
+                "^NonAbstract.+$"),
             "21:1: " + getCheckMessage(MSG_ILLEGAL_ABSTRACT_CLASS_NAME, "AbstractClassName2",
-                pattern),
+                "^NonAbstract.+$"),
         };
 
         verify(checkConfig, getPath("InputAbstractClassName.java"), expected);
@@ -79,7 +79,7 @@ public class AbstractClassNameCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testIllegalClassType() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(AbstractClassNameCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(AbstractClassNameCheck.class);
         checkConfig.addAttribute("ignoreName", "true");
         checkConfig.addAttribute("ignoreModifier", "false");
 
@@ -93,7 +93,7 @@ public class AbstractClassNameCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testAllVariants() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(AbstractClassNameCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(AbstractClassNameCheck.class);
         checkConfig.addAttribute("ignoreName", "false");
         checkConfig.addAttribute("ignoreModifier", "false");
 
@@ -115,7 +115,7 @@ public class AbstractClassNameCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testFalsePositive() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(AbstractClassNameCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(AbstractClassNameCheck.class);
 
         final String[] expected = {
             "9:5: " + getCheckMessage(MSG_NO_ABSTRACT_CLASS_MODIFIER, "AbstractClass"),
@@ -131,7 +131,7 @@ public class AbstractClassNameCheckTest extends AbstractModuleTestSupport {
         final int[] expected = {
             TokenTypes.CLASS_DEF,
         };
-        Assert.assertArrayEquals("Invalid accaptable tokens", expected, actual);
+        Assert.assertArrayEquals("Invalid acceptable tokens", expected, actual);
     }
 
     @Test
@@ -143,4 +143,5 @@ public class AbstractClassNameCheckTest extends AbstractModuleTestSupport {
         };
         Assert.assertArrayEquals("Invalid required tokens", expected, actual);
     }
+
 }

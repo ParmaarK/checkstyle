@@ -6,7 +6,8 @@
 
   <head>
     <title>Headers</title>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"/>
+    <script type="text/javascript"
+            src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"/>
     <script type="text/javascript" src="js/anchors.js"/>
     <script type="text/javascript" src="js/google-analytics.js"/>
     <link rel="icon" href="images/favicon.png" type="image/x-icon" />
@@ -49,7 +50,8 @@ line 5: ////////////////////////////////////////////////////////////////////
 
         <p>
           Since the year information will change over time, you can tell
-          Checkstyle to ignore line 4 by setting property <code>ignoreLines</code> to <code> 4</code>.
+          Checkstyle to ignore line 4 by setting property <code>ignoreLines</code> to
+          <code> 4</code>.
         </p>
       </subsection>
 
@@ -72,7 +74,7 @@ line 5: ////////////////////////////////////////////////////////////////////
           <tr>
             <td>charset</td>
             <td>character encoding to use when reading the headerFile</td>
-            <td><a href="property_types.html#string">string</a></td>
+            <td><a href="property_types.html#string">String</a></td>
             <td>the charset property of the parent
             <a href="config.html#Checker">Checker</a> module</td>
             <td>5.0</td>
@@ -84,7 +86,7 @@ line 5: ////////////////////////////////////////////////////////////////////
               must be separated by the string <code>&quot;\n&quot;</code> (even on platforms with a
               different line separator), see examples below.
             </td>
-            <td><a href="property_types.html#string">string</a></td>
+            <td><a href="property_types.html#string">String</a></td>
             <td><code>null</code></td>
             <td>5.0</td>
           </tr>
@@ -99,7 +101,7 @@ line 5: ////////////////////////////////////////////////////////////////////
             <td>fileExtensions</td>
             <td>file type extension of files to process</td>
             <td><a href="property_types.html#stringSet">String Set</a></td>
-            <td><code>{}</code></td>
+            <td><code>all files</code></td>
             <td>6.9</td>
           </tr>
         </table>
@@ -107,7 +109,8 @@ line 5: ////////////////////////////////////////////////////////////////////
 
       <subsection name="Examples">
           <p>
-              In default configuration the check does not rise any violations. Default values of properties are used.
+              In default configuration the check does not rise any violations.
+              Default values of properties are used.
           </p>
 
           <source>
@@ -115,14 +118,16 @@ line 5: ////////////////////////////////////////////////////////////////////
           </source>
 
         <p>
-          To configure the check to use header file <code>&quot;config/java.header&quot;</code> and ignore lines <code>2</code>, <code>3</code>, and <code> 4</code> and only process Java files:
+          To configure the check to use header file <code>&quot;config/java.header&quot;</code> and
+          ignore lines <code>2</code>, <code>3</code>, and <code> 4</code> and only process Java
+          files:
         </p>
 
         <source>
 &lt;module name=&quot;Header&quot;&gt;
-    &lt;property name=&quot;headerFile&quot; value=&quot;config/java.header&quot;/&gt;
-    &lt;property name=&quot;ignoreLines&quot; value=&quot;2, 3, 4&quot;/&gt;
-    &lt;property name=&quot;fileExtensions&quot; value=&quot;java&quot;/&gt;
+  &lt;property name=&quot;headerFile&quot; value=&quot;config/java.header&quot;/&gt;
+  &lt;property name=&quot;ignoreLines&quot; value=&quot;2, 3, 4&quot;/&gt;
+  &lt;property name=&quot;fileExtensions&quot; value=&quot;java&quot;/&gt;
 &lt;/module&gt;
         </source>
 
@@ -140,8 +145,8 @@ line 5: ////////////////////////////////////////////////////////////////////
         </p>
         <source>
 &lt;module name=&quot;Header&quot;&gt;
-    &lt;property name=&quot;header&quot;
-              value=&quot;// Copyright (C) 2004 MyCompany\n// All rights reserved&quot;/&gt;
+  &lt;property name=&quot;header&quot;
+    value=&quot;// Copyright (C) 2004 MyCompany\n// All rights reserved&quot;/&gt;
 &lt;/module&gt;
         </source>
       </subsection>
@@ -225,7 +230,8 @@ line 14: ^ \*/
           four digit year. Line 5 is an example how to enforce revision
           control keywords in a file header. Lines 12-14 is a template for
           javadoc (line 13 is so complicated to remove conflict with and of
-          javadoc comment).
+          javadoc comment). Lines 7, 9 and 11 will be treated as '^$' and
+          will forcefully expect the line to be empty.
         </p>
 
         <p>
@@ -277,7 +283,7 @@ line 6: ^\W*$
           <tr>
             <td>charset</td>
             <td>character encoding to use when reading the headerFile</td>
-            <td><a href="property_types.html#string">string</a></td>
+            <td><a href="property_types.html#string">String</a></td>
             <td>the charset property of the parent
             <a href="config.html#Checker">Checker</a> module</td>
             <td>5.0</td>
@@ -287,10 +293,11 @@ line 6: ^\W*$
             <td>
               the required header specified inline. Individual header lines
               must be separated by the string <code>&quot;\n&quot;</code> (even on platforms with a
-              different line separator), and regular expressions must not span
-              multiple lines.
+              different line separator). For header lines containing <code>&quot;\n\n&quot;</code>
+              checkstyle will forcefully expect an empty line to exist. See examples
+              below. Regular expressions must not span multiple lines.
             </td>
-            <td><a href="property_types.html#string">string</a></td>
+            <td><a href="property_types.html#string">String</a></td>
             <td><code>null</code></td>
             <td>5.0</td>
           </tr>
@@ -305,7 +312,7 @@ line 6: ^\W*$
             <td>fileExtensions</td>
             <td>file type extension of files to process</td>
             <td><a href="property_types.html#stringSet">String Set</a></td>
-            <td><code>{}</code></td>
+            <td><code>all files</code></td>
             <td>6.9</td>
           </tr>
         </table>
@@ -313,19 +320,21 @@ line 6: ^\W*$
 
       <subsection name="Examples">
           <p>
-              In default configuration the check does not rise any violations. Default values of properties are used.
+              In default configuration the check does not rise any violations.
+              Default values of properties are used.
           </p>
           <source>
 &lt;module name=&quot;RegexpHeader&quot;/&gt;
           </source>
 
         <p>
-          To configure the check to use header file <code>&quot;config/java.header&quot;</code> and <code>10</code> and <code>13</code> multi-lines:
+          To configure the check to use header file <code>&quot;config/java.header&quot;</code> and
+          <code>10</code> and <code>13</code> multi-lines:
         </p>
         <source>
 &lt;module name=&quot;RegexpHeader&quot;&gt;
-    &lt;property name=&quot;headerFile&quot; value=&quot;config/java.header&quot;/&gt;
-    &lt;property name=&quot;multiLines&quot; value=&quot;10, 13&quot;/&gt;
+  &lt;property name=&quot;headerFile&quot; value=&quot;config/java.header&quot;/&gt;
+  &lt;property name=&quot;multiLines&quot; value=&quot;10, 13&quot;/&gt;
 &lt;/module&gt;
         </source>
 
@@ -345,8 +354,36 @@ line 6: ^\W*$
 &lt;module name=&quot;RegexpHeader&quot;&gt;
   &lt;property
     name=&quot;header&quot;
-    value=&quot;^// Copyright \(C\) (\d\d\d\d -)? 2004 MyCompany$\n^// All rights reserved$&quot;/&gt;
+    value=&quot;^// Copyright \(C\) (\d\d\d\d -)? 2004 MyCompany$
+      \n^// All rights reserved$&quot;/&gt;
 &lt;/module&gt;
+        </source>
+
+        <p>
+          For regex containing <code>"\n\n"</code>
+        </p>
+        <source>
+&lt;module name=&quot;RegexpHeader&quot;&gt;
+  &lt;property
+    name=&quot;header&quot;
+    value=&quot;^package .*\n\n.*&quot;/&gt;
+&lt;/module&gt;
+        </source>
+        <p>
+          <code>"\n\n"</code> will be treated as '^$' and will forcefully
+          expect the line to be empty. For example -
+        </p>
+        <source>
+package com.some.package;
+public class ThisWillFail { }
+        </source>
+        <p>
+          would fail for the regex above. Expected -
+        </p>
+        <source>
+package com.some.package;
+
+public class ThisWillPass { }
         </source>
 
         <p>

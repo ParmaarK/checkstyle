@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,14 +22,19 @@ package com.puppycrawl.tools.checkstyle.grammars;
 import org.junit.Assert;
 import org.junit.Test;
 
-/** @noinspection ClassIndependentOfModule */
+/**
+ * GeneratedJavaTokenTypesTest.
+ * @noinspection ClassIndependentOfModule
+ */
 public class GeneratedJavaTokenTypesTest {
+
     /**
      * <p>
      * New tokens must be added onto the end of the list with new numbers, and
      * old tokens must remain and keep their current numbering. Old token
      * numberings are not allowed to change.
      * </p>
+     *
      * <p>
      * The reason behind this is Java inlines static final field values directly
      * into the compiled Java code. This loses all connections with the original
@@ -37,7 +42,9 @@ public class GeneratedJavaTokenTypesTest {
      * up in user-created checks and causes conflicts.
      * </p>
      *
+     * <p>
      * Issue: https://github.com/checkstyle/checkstyle/issues/505
+     * </p>
      */
     @Test
     public void testTokenNumbering() {
@@ -250,4 +257,5 @@ public class GeneratedJavaTokenTypesTest {
                 + " that their old numbering didn't change", 196,
                 GeneratedJavaTokenTypes.class.getDeclaredFields().length);
     }
+
 }

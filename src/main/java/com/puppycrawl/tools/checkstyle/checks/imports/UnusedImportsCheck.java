@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FileContents;
@@ -33,8 +34,8 @@ import com.puppycrawl.tools.checkstyle.api.FullIdent;
 import com.puppycrawl.tools.checkstyle.api.TextBlock;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocTag;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
-import com.puppycrawl.tools.checkstyle.utils.JavadocUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
+import com.puppycrawl.tools.checkstyle.utils.JavadocUtil;
 
 /**
  * <p>
@@ -48,8 +49,8 @@ import com.puppycrawl.tools.checkstyle.utils.JavadocUtils;
  * </pre>
  * Compatible with Java 1.5 source.
  *
- * @author Oliver Burn
  */
+@FileStatefulCheck
 public class UnusedImportsCheck extends AbstractCheck {
 
     /**
@@ -59,18 +60,18 @@ public class UnusedImportsCheck extends AbstractCheck {
     public static final String MSG_KEY = "import.unused";
 
     /** Regex to match class names. */
-    private static final Pattern CLASS_NAME = CommonUtils.createPattern(
+    private static final Pattern CLASS_NAME = CommonUtil.createPattern(
            "((:?[\\p{L}_$][\\p{L}\\p{N}_$]*\\.)*[\\p{L}_$][\\p{L}\\p{N}_$]*)");
     /** Regex to match the first class name. */
-    private static final Pattern FIRST_CLASS_NAME = CommonUtils.createPattern(
+    private static final Pattern FIRST_CLASS_NAME = CommonUtil.createPattern(
            "^" + CLASS_NAME);
     /** Regex to match argument names. */
-    private static final Pattern ARGUMENT_NAME = CommonUtils.createPattern(
+    private static final Pattern ARGUMENT_NAME = CommonUtil.createPattern(
            "[(,]\\s*" + CLASS_NAME.pattern());
 
     /** Regexp pattern to match java.lang package. */
     private static final Pattern JAVA_LANG_PACKAGE_PATTERN =
-        CommonUtils.createPattern("^java\\.lang\\.[a-zA-Z]+$");
+        CommonUtil.createPattern("^java\\.lang\\.[a-zA-Z]+$");
 
     /** Suffix for the star import. */
     private static final String STAR_IMPORT_SUFFIX = ".*";
@@ -114,31 +115,11 @@ public class UnusedImportsCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[] {
-            TokenTypes.IDENT,
-            TokenTypes.IMPORT,
-            TokenTypes.STATIC_IMPORT,
-            // Definitions that may contain Javadoc...
-            TokenTypes.PACKAGE_DEF,
-            TokenTypes.ANNOTATION_DEF,
-            TokenTypes.ANNOTATION_FIELD_DEF,
-            TokenTypes.ENUM_DEF,
-            TokenTypes.ENUM_CONSTANT_DEF,
-            TokenTypes.CLASS_DEF,
-            TokenTypes.INTERFACE_DEF,
-            TokenTypes.METHOD_DEF,
-            TokenTypes.CTOR_DEF,
-            TokenTypes.VARIABLE_DEF,
-        };
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getDefaultTokens();
-    }
-
-    @Override
-    public int[] getAcceptableTokens() {
         return new int[] {
             TokenTypes.IDENT,
             TokenTypes.IMPORT,
@@ -155,6 +136,11 @@ public class UnusedImportsCheck extends AbstractCheck {
             TokenTypes.CTOR_DEF,
             TokenTypes.VARIABLE_DEF,
         };
+    }
+
+    @Override
+    public int[] getAcceptableTokens() {
+        return getRequiredTokens();
     }
 
     @Override
@@ -185,7 +171,7 @@ public class UnusedImportsCheck extends AbstractCheck {
      */
     private boolean isUnusedImport(String imprt) {
         final Matcher javaLangPackageMatcher = JAVA_LANG_PACKAGE_PATTERN.matcher(imprt);
-        return !referenced.contains(CommonUtils.baseClassName(imprt))
+        return !referenced.contains(CommonUtil.baseClassName(imprt))
             || javaLangPackageMatcher.matches();
     }
 
@@ -248,13 +234,15 @@ public class UnusedImportsCheck extends AbstractCheck {
      * @return a set of classes referenced in the javadoc block
      */
     private static Set<String> collectReferencesFromJavadoc(TextBlock textBlock) {
-        final Set<String> references = new HashSet<>();
         final List<JavadocTag> tags = new ArrayList<>();
         // gather all the inline tags, like @link
         // INLINE tags inside BLOCKs get hidden when using ALL
-        tags.addAll(getValidTags(textBlock, JavadocUtils.JavadocTagType.INLINE));
+        tags.addAll(getValidTags(textBlock, JavadocUtil.JavadocTagType.INLINE));
         // gather all the block-level tags, like @throws and @see
-        tags.addAll(getValidTags(textBlock, JavadocUtils.JavadocTagType.BLOCK));
+        tags.addAll(getValidTags(textBlock, JavadocUtil.JavadocTagType.BLOCK));
+
+        final Set<String> references = new HashSet<>();
+
         tags.stream()
             .filter(JavadocTag::canReferenceImports)
             .forEach(tag -> references.addAll(processJavadocTag(tag)));
@@ -268,8 +256,8 @@ public class UnusedImportsCheck extends AbstractCheck {
      * @return the list of tags
      */
     private static List<JavadocTag> getValidTags(TextBlock cmt,
-            JavadocUtils.JavadocTagType tagType) {
-        return JavadocUtils.getJavadocTags(cmt, tagType).getValidTags();
+            JavadocUtil.JavadocTagType tagType) {
+        return JavadocUtil.getJavadocTags(cmt, tagType).getValidTags();
     }
 
     /**
@@ -298,8 +286,28 @@ public class UnusedImportsCheck extends AbstractCheck {
         final Set<String> references = new HashSet<>();
         final Matcher matcher = pattern.matcher(identifier);
         while (matcher.find()) {
-            references.add(matcher.group(1));
+            references.add(topLevelType(matcher.group(1)));
         }
         return references;
     }
+
+    /**
+     * If the given type string contains "." (e.g. "Map.Entry"), returns the
+     * top level type (e.g. "Map"), as that is what must be imported for the
+     * type to resolve. Otherwise, returns the type as-is.
+     * @param type A possibly qualified type name
+     * @return The simple name of the top level type
+     */
+    private static String topLevelType(String type) {
+        final String topLevelType;
+        final int dotIndex = type.indexOf('.');
+        if (dotIndex == -1) {
+            topLevelType = type;
+        }
+        else {
+            topLevelType = type.substring(0, dotIndex);
+        }
+        return topLevelType;
+    }
+
 }

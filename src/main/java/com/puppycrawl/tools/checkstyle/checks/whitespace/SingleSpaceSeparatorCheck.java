@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,9 +19,10 @@
 
 package com.puppycrawl.tools.checkstyle.checks.whitespace;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * <p>
@@ -80,10 +81,10 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
  * &lt;/module&gt;
  * </pre>
  *
- * @author Robert Whitebit
- * @author Richard Veach
  */
+@StatelessCheck
 public class SingleSpaceSeparatorCheck extends AbstractCheck {
+
     /**
      * A key is pointing to the warning message text in "messages.properties"
      * file.
@@ -104,17 +105,17 @@ public class SingleSpaceSeparatorCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return CommonUtils.EMPTY_INT_ARRAY;
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return getDefaultTokens();
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getDefaultTokens();
+        return CommonUtil.EMPTY_INT_ARRAY;
     }
 
     // -@cs[SimpleAccessorNameNotation] Overrides method from base class.
@@ -140,12 +141,17 @@ public class SingleSpaceSeparatorCheck extends AbstractCheck {
         while (sibling != null) {
             final int columnNo = sibling.getColumnNo() - 1;
 
-            if (columnNo >= 0
+            // in such expression: "j  =123", placed at the start of the string index of the second
+            // space character will be: 2 = 0(j) + 1(whitespace) + 1(whitespace). It is a minimal
+            // possible index for the second whitespace between non-whitespace characters.
+            final int minSecondWhitespaceColumnNo = 2;
+
+            if (columnNo >= minSecondWhitespaceColumnNo
                     && !isTextSeparatedCorrectlyFromPrevious(getLine(sibling.getLineNo() - 1),
                             columnNo)) {
                 log(sibling.getLineNo(), columnNo, MSG_KEY);
             }
-            if (sibling.getChildCount() > 0) {
+            if (sibling.getChildCount() >= 1) {
                 visitEachToken(sibling.getFirstChild());
             }
 
@@ -212,8 +218,7 @@ public class SingleSpaceSeparatorCheck extends AbstractCheck {
      *         {@code columnNo}.
      */
     private static boolean isPrecededByMultipleWhitespaces(String line, int columnNo) {
-        return columnNo >= 1
-                && Character.isWhitespace(line.charAt(columnNo))
+        return Character.isWhitespace(line.charAt(columnNo))
                 && Character.isWhitespace(line.charAt(columnNo - 1));
     }
 
@@ -239,7 +244,7 @@ public class SingleSpaceSeparatorCheck extends AbstractCheck {
      *         text on the {@code line}.
      */
     private static boolean isFirstInLine(String line, int columnNo) {
-        return CommonUtils.isBlank(line.substring(0, columnNo + 1));
+        return CommonUtil.isBlank(line.substring(0, columnNo));
     }
 
     /**
@@ -253,4 +258,5 @@ public class SingleSpaceSeparatorCheck extends AbstractCheck {
     private static boolean isBlockCommentEnd(String line, int columnNo) {
         return line.substring(0, columnNo).trim().endsWith("*/");
     }
+
 }

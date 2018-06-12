@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -26,8 +26,6 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * of this has been shown to indicate the amount of maintenance required
  * in functional programs (on a file basis) at least.
  *
- * @author <a href="mailto:simon@redhillconsulting.com.au">Simon Harris</a>
- * @author o_sukhodolsky
  */
 public final class ClassFanOutComplexityCheck extends AbstractClassCouplingCheck {
 
@@ -62,17 +60,7 @@ public final class ClassFanOutComplexityCheck extends AbstractClassCouplingCheck
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {
-            TokenTypes.PACKAGE_DEF,
-            TokenTypes.IMPORT,
-            TokenTypes.CLASS_DEF,
-            TokenTypes.INTERFACE_DEF,
-            TokenTypes.ENUM_DEF,
-            TokenTypes.TYPE,
-            TokenTypes.LITERAL_NEW,
-            TokenTypes.LITERAL_THROWS,
-            TokenTypes.ANNOTATION_DEF,
-        };
+        return getRequiredTokens();
     }
 
     // -@cs[SimpleAccessorNameNotation] Override methods from base class.
@@ -81,4 +69,5 @@ public final class ClassFanOutComplexityCheck extends AbstractClassCouplingCheck
     protected String getLogMessageId() {
         return MSG_KEY;
     }
+
 }

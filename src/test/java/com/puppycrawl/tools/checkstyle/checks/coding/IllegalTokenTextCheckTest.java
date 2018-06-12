@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,7 @@ import static com.puppycrawl.tools.checkstyle.checks.coding.IllegalTokenTextChec
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,10 +31,12 @@ import org.junit.Test;
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.TokenUtils;
+import com.puppycrawl.tools.checkstyle.internal.utils.TestUtil;
+import com.puppycrawl.tools.checkstyle.utils.TokenUtil;
 
 public class IllegalTokenTextCheckTest
     extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/coding/illegaltokentext";
@@ -43,7 +46,7 @@ public class IllegalTokenTextCheckTest
     public void testCaseSensitive()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(IllegalTokenTextCheck.class);
+            createModuleConfig(IllegalTokenTextCheck.class);
         checkConfig.addAttribute("tokens", "STRING_LITERAL");
         checkConfig.addAttribute("format", "a href");
         checkConfig.addAttribute("ignoreCase", "false");
@@ -57,7 +60,7 @@ public class IllegalTokenTextCheckTest
     public void testCaseInSensitive()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(IllegalTokenTextCheck.class);
+            createModuleConfig(IllegalTokenTextCheck.class);
         checkConfig.addAttribute("tokens", "STRING_LITERAL");
         checkConfig.addAttribute("format", "a href");
         checkConfig.addAttribute("ignoreCase", "true");
@@ -72,14 +75,13 @@ public class IllegalTokenTextCheckTest
     public void testCustomMessage()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(IllegalTokenTextCheck.class);
+            createModuleConfig(IllegalTokenTextCheck.class);
         checkConfig.addAttribute("tokens", "STRING_LITERAL");
         checkConfig.addAttribute("format", "a href");
 
-        final String customMessage = "My custom message";
-        checkConfig.addAttribute("message", customMessage);
+        checkConfig.addAttribute("message", "My custom message");
         final String[] expected = {
-            "24:28: " + customMessage,
+            "24:28: " + "My custom message",
         };
         verify(checkConfig, getPath("InputIllegalTokenTextTokens.java"), expected);
     }
@@ -88,7 +90,7 @@ public class IllegalTokenTextCheckTest
     public void testNullCustomMessage()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(IllegalTokenTextCheck.class);
+            createModuleConfig(IllegalTokenTextCheck.class);
         checkConfig.addAttribute("tokens", "STRING_LITERAL");
         checkConfig.addAttribute("format", "a href");
 
@@ -102,9 +104,9 @@ public class IllegalTokenTextCheckTest
     @Test
     public void testTokensNotNull() {
         final IllegalTokenTextCheck check = new IllegalTokenTextCheck();
-        Assert.assertNotNull(check.getAcceptableTokens());
-        Assert.assertNotNull(check.getDefaultTokens());
-        Assert.assertNotNull(check.getRequiredTokens());
+        Assert.assertNotNull("Acceptable tokens should not be null", check.getAcceptableTokens());
+        Assert.assertNotNull("Default tokens should not be null", check.getDefaultTokens());
+        Assert.assertNotNull("Required tokens should not be null", check.getRequiredTokens());
         Assert.assertTrue("Comments are also TokenType token", check.isCommentNodesRequired());
     }
 
@@ -112,7 +114,7 @@ public class IllegalTokenTextCheckTest
     public void testCommentToken()
             throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(IllegalTokenTextCheck.class);
+                createModuleConfig(IllegalTokenTextCheck.class);
         checkConfig.addAttribute("tokens", "COMMENT_CONTENT");
         checkConfig.addAttribute("format", "a href");
 
@@ -124,11 +126,24 @@ public class IllegalTokenTextCheckTest
     }
 
     @Test
+    public void testOrderOfProperties() throws Exception {
+        // pure class must be used as configuration doesn't guarantee order of
+        // attributes
+        final IllegalTokenTextCheck check = new IllegalTokenTextCheck();
+        check.setFormat("test");
+        check.setIgnoreCase(true);
+        final Pattern actual = (Pattern) TestUtil.getClassDeclaredField(
+                IllegalTokenTextCheck.class, "format").get(check);
+        Assert.assertEquals("should match", Pattern.CASE_INSENSITIVE, actual.flags());
+        Assert.assertEquals("should match", "test", actual.pattern());
+    }
+
+    @Test
     public void testAcceptableTokensMakeSense() {
         final int expectedTokenTypesTotalNumber = 169;
         Assert.assertEquals("Total number of TokenTypes has changed, acceptable tokens in"
                 + " IllegalTokenTextCheck need to be reconsidered.",
-            expectedTokenTypesTotalNumber, TokenUtils.getTokenTypesTotalNumber());
+            expectedTokenTypesTotalNumber, TokenUtil.getTokenTypesTotalNumber());
 
         final IllegalTokenTextCheck check = new IllegalTokenTextCheck();
         final int[] allowedTokens = check.getAcceptableTokens();
@@ -143,9 +158,10 @@ public class IllegalTokenTextCheckTest
             TokenTypes.CHAR_LITERAL
         );
         for (int tokenType : allowedTokens) {
-            Assert.assertTrue(TokenUtils.getTokenName(tokenType) + " should not be allowed"
+            Assert.assertTrue(TokenUtil.getTokenName(tokenType) + " should not be allowed"
                 + " in this check as its text is a constant (IllegalTokenCheck should be used for"
                 + " such cases).", tokenTypesWithMutableText.contains(tokenType));
         }
     }
+
 }

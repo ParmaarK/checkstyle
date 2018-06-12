@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,34 +19,21 @@
 
 package com.google.checkstyle.test.chapter2filebasic.rule231filetab;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.junit.Test;
 
-import com.google.checkstyle.test.base.BaseCheckTestSupport;
-import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import com.google.checkstyle.test.base.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 import com.puppycrawl.tools.checkstyle.checks.whitespace.FileTabCharacterCheck;
 
-public class FileTabCharacterTest extends BaseCheckTestSupport {
+public class FileTabCharacterTest extends AbstractModuleTestSupport {
 
     @Override
-    protected String getPath(String fileName) throws IOException {
-        return super.getPath("chapter2filebasic" + File.separator + "rule231filetab"
-                + File.separator + fileName);
-    }
-
-    @Override
-    protected DefaultConfiguration createCheckerConfig(Configuration config) {
-        final DefaultConfiguration dc = new DefaultConfiguration("root");
-        dc.addChild(config);
-        return dc;
+    protected String getPackageLocation() {
+        return "com/google/checkstyle/test/chapter2filebasic/rule231filetab";
     }
 
     @Test
     public void testFileTab() throws Exception {
-
         final String[] expected = {
             "8:25: " + getCheckMessage(FileTabCharacterCheck.class, "containsTab"),
             "51:5: " + getCheckMessage(FileTabCharacterCheck.class, "containsTab"),
@@ -59,10 +46,11 @@ public class FileTabCharacterTest extends BaseCheckTestSupport {
             "134:3: " + getCheckMessage(FileTabCharacterCheck.class, "containsTab"),
         };
 
-        final Configuration checkConfig = getCheckConfig("FileTabCharacter");
+        final Configuration checkConfig = getModuleConfig("FileTabCharacter");
         final String filePath = getPath("InputFileTabCharacter.java");
 
         final Integer[] warnList = getLinesWithWarn(filePath);
         verify(checkConfig, filePath, expected, warnList);
     }
+
 }

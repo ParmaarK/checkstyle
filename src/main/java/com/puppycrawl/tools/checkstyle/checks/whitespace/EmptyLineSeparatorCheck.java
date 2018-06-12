@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,12 +22,13 @@ package com.puppycrawl.tools.checkstyle.checks.whitespace;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
-import com.puppycrawl.tools.checkstyle.utils.JavadocUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
+import com.puppycrawl.tools.checkstyle.utils.JavadocUtil;
 
 /**
  * Checks for empty line separators after header, package, all import declarations,
@@ -185,9 +186,8 @@ import com.puppycrawl.tools.checkstyle.utils.JavadocUtils;
  *     }
  * }
  * </pre>
- * @author maxvetrenko
- * @author <a href="mailto:nesterenko-aleksey@list.ru">Aleksey Nesterenko</a>
  */
+@StatelessCheck
 public class EmptyLineSeparatorCheck extends AbstractCheck {
 
     /**
@@ -279,7 +279,7 @@ public class EmptyLineSeparatorCheck extends AbstractCheck {
 
     @Override
     public int[] getRequiredTokens() {
-        return CommonUtils.EMPTY_INT_ARRAY;
+        return CommonUtil.EMPTY_INT_ARRAY;
     }
 
     @Override
@@ -328,7 +328,7 @@ public class EmptyLineSeparatorCheck extends AbstractCheck {
      */
     private void processMultipleLinesInside(DetailAST ast) {
         final int astType = ast.getType();
-        if (isClassMemberBlock(astType)) {
+        if (astType != TokenTypes.CLASS_DEF && isClassMemberBlock(astType)) {
             final List<Integer> emptyLines = getEmptyLines(ast);
             final List<Integer> emptyLinesToLog = getEmptyLinesToLog(emptyLines);
 
@@ -360,12 +360,14 @@ public class EmptyLineSeparatorCheck extends AbstractCheck {
         final DetailAST lastToken = ast.getLastChild().getLastChild();
         int lastTokenLineNo = 0;
         if (lastToken != null) {
-            lastTokenLineNo = lastToken.getLineNo();
+            // -1 as count starts from 0
+            // -2 as last token line cannot be empty, because it is a RCURLY
+            lastTokenLineNo = lastToken.getLineNo() - 2;
         }
         final List<Integer> emptyLines = new ArrayList<>();
         final FileContents fileContents = getFileContents();
 
-        for (int lineNo = ast.getLineNo(); lineNo < lastTokenLineNo; lineNo++) {
+        for (int lineNo = ast.getLineNo(); lineNo <= lastTokenLineNo; lineNo++) {
             if (fileContents.lineIsBlank(lineNo)) {
                 emptyLines.add(lineNo);
             }
@@ -380,7 +382,7 @@ public class EmptyLineSeparatorCheck extends AbstractCheck {
      */
     private static List<Integer> getEmptyLinesToLog(List<Integer> emptyLines) {
         final List<Integer> emptyLinesToLog = new ArrayList<>();
-        if (emptyLines.size() > 1) {
+        if (emptyLines.size() >= 2) {
             int previousEmptyLineNo = emptyLines.get(0);
             for (int emptyLineNo : emptyLines) {
                 if (previousEmptyLineNo + 1 == emptyLineNo) {
@@ -488,7 +490,7 @@ public class EmptyLineSeparatorCheck extends AbstractCheck {
         final int number = 3;
         if (lineNo >= number) {
             final String prePreviousLine = getLines()[lineNo - number];
-            result = CommonUtils.isBlank(prePreviousLine);
+            result = CommonUtil.isBlank(prePreviousLine);
         }
         return result;
     }
@@ -549,7 +551,7 @@ public class EmptyLineSeparatorCheck extends AbstractCheck {
         if (lineNo != 1) {
             // [lineNo - 2] is the number of the previous line as the numbering starts from zero.
             final String lineBefore = getLines()[lineNo - 2];
-            result = CommonUtils.isBlank(lineBefore);
+            result = CommonUtil.isBlank(lineBefore);
         }
         return result;
     }
@@ -563,7 +565,7 @@ public class EmptyLineSeparatorCheck extends AbstractCheck {
         boolean result = false;
         final DetailAST previous = token.getPreviousSibling();
         if (previous.getType() == TokenTypes.BLOCK_COMMENT_BEGIN
-                && JavadocUtils.isJavadocComment(previous.getFirstChild().getText())) {
+                && JavadocUtil.isJavadocComment(previous.getFirstChild().getText())) {
             result = true;
         }
         return result;
@@ -588,4 +590,5 @@ public class EmptyLineSeparatorCheck extends AbstractCheck {
         final int parentType = variableDef.getParent().getParent().getType();
         return parentType == TokenTypes.CLASS_DEF;
     }
+
 }

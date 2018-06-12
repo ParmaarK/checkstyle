@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -24,11 +24,14 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
  * <p>
- * Checks that class type parameter names conform to a format specified
- * by the format property.  The format is a
- * {@link java.util.regex.Pattern regular expression} and defaults to
- * <strong>^[A-Z]$</strong>.
+ * Checks that method type parameter names conform to a format specified
+ * by the format property.
  * </p>
+ * <ul>
+ * <li>
+ * Property {@code format} - Specifies valid identifiers. Default value is {@code "^[A-Z]$"}.
+ * </li>
+ * </ul>
  * <p>
  * An example of how to configure the check is:
  * </p>
@@ -37,7 +40,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * </pre>
  * <p>
  * An example of how to configure the check for names that are only a single
- * letter is
+ * letter is:
  * </p>
  * <pre>
  * &lt;module name="MethodTypeParameterName"&gt;
@@ -45,10 +48,11 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * &lt;/module&gt;
  * </pre>
  *
- * @author Travis Schneeberger
+ * @since 5.0
  */
 public class MethodTypeParameterNameCheck
     extends AbstractNameCheck {
+
     /** Creates a new {@code MethodTypeParameterNameCheck} instance. */
     public MethodTypeParameterNameCheck() {
         super("^[A-Z]$");
@@ -56,19 +60,19 @@ public class MethodTypeParameterNameCheck
 
     @Override
     public int[] getDefaultTokens() {
-        return getAcceptableTokens();
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {
-            TokenTypes.TYPE_PARAMETER,
-        };
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getAcceptableTokens();
+        return new int[] {
+            TokenTypes.TYPE_PARAMETER,
+        };
     }
 
     @Override
@@ -77,4 +81,5 @@ public class MethodTypeParameterNameCheck
             ast.getParent().getParent();
         return location.getType() == TokenTypes.METHOD_DEF;
     }
+
 }

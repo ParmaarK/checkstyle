@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -30,9 +30,10 @@ import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class BooleanExpressionComplexityCheckTest extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/metrics/booleanexpressioncomplexity";
@@ -41,13 +42,14 @@ public class BooleanExpressionComplexityCheckTest extends AbstractModuleTestSupp
     @Test
     public void test() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(BooleanExpressionComplexityCheck.class);
+            createModuleConfig(BooleanExpressionComplexityCheck.class);
 
         final String[] expected = {
             "13:9: " + getCheckMessage(MSG_KEY, 4, 3),
-            "32:9: " + getCheckMessage(MSG_KEY, 6, 3),
-            "38:34: " + getCheckMessage(MSG_KEY, 4, 3),
-            "40:34: " + getCheckMessage(MSG_KEY, 4, 3),
+            "29:87: " + getCheckMessage(MSG_KEY, 4, 3),
+            "39:9: " + getCheckMessage(MSG_KEY, 6, 3),
+            "45:34: " + getCheckMessage(MSG_KEY, 4, 3),
+            "47:34: " + getCheckMessage(MSG_KEY, 4, 3),
         };
 
         verify(checkConfig, getPath("InputBooleanExpressionComplexity.java"), expected);
@@ -56,11 +58,11 @@ public class BooleanExpressionComplexityCheckTest extends AbstractModuleTestSupp
     @Test
     public void testNoBitwise() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(BooleanExpressionComplexityCheck.class);
+            createModuleConfig(BooleanExpressionComplexityCheck.class);
         checkConfig.addAttribute("max", "5");
         checkConfig.addAttribute("tokens", "BXOR,LAND,LOR");
 
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
         verify(checkConfig, getPath("InputBooleanExpressionComplexity.java"), expected);
     }
@@ -68,9 +70,9 @@ public class BooleanExpressionComplexityCheckTest extends AbstractModuleTestSupp
     @Test
     public void testNullPointerException() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(BooleanExpressionComplexityCheck.class);
+            createModuleConfig(BooleanExpressionComplexityCheck.class);
 
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
         verify(checkConfig, getPath("InputBooleanExpressionComplexityNPE.java"), expected);
     }
@@ -90,4 +92,5 @@ public class BooleanExpressionComplexityCheckTest extends AbstractModuleTestSupp
                 "Unknown type: interface[0x-1]", ex.getMessage());
         }
     }
+
 }

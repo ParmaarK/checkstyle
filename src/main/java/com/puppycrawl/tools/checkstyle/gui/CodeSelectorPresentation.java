@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,16 +21,15 @@ package com.puppycrawl.tools.checkstyle.gui;
 
 import java.util.List;
 
-import com.google.common.collect.ImmutableList;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.DetailNode;
-import com.puppycrawl.tools.checkstyle.utils.TokenUtils;
+import com.puppycrawl.tools.checkstyle.utils.TokenUtil;
 
 /**
  * Presentation model for CodeSelector.
- * @author unknown
  */
 public class CodeSelectorPresentation {
+
     /** DetailAST or DetailNode node. */
     private final Object node;
     /** Mapping. */
@@ -46,7 +45,7 @@ public class CodeSelectorPresentation {
      * @param lines2position list to map lines.
      * @noinspection AssignmentToCollectionOrArrayFieldFromParameter
      */
-    public CodeSelectorPresentation(DetailAST ast, ImmutableList<Integer> lines2position) {
+    public CodeSelectorPresentation(DetailAST ast, List<Integer> lines2position) {
         node = ast;
         this.lines2position = lines2position;
     }
@@ -57,7 +56,7 @@ public class CodeSelectorPresentation {
      * @param lines2position list to map lines.
      * @noinspection AssignmentToCollectionOrArrayFieldFromParameter
      */
-    public CodeSelectorPresentation(DetailNode node, ImmutableList<Integer> lines2position) {
+    public CodeSelectorPresentation(DetailNode node, List<Integer> lines2position) {
         this.node = node;
         this.lines2position = lines2position;
     }
@@ -98,7 +97,7 @@ public class CodeSelectorPresentation {
         selectionStart = lines2position.get(ast.getLineNo()) + ast.getColumnNo();
 
         if (ast.getChildCount() == 0
-                && TokenUtils.getTokenName(ast.getType()).equals(ast.getText())) {
+                && TokenUtil.getTokenName(ast.getType()).equals(ast.getText())) {
             selectionEnd = selectionStart;
         }
         else {
@@ -152,4 +151,5 @@ public class CodeSelectorPresentation {
         }
         return lastPosition;
     }
+
 }

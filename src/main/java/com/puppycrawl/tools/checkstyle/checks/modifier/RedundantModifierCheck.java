@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,10 +22,11 @@ package com.puppycrawl.tools.checkstyle.checks.modifier;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * Checks for redundant modifiers in interface and annotation definitions,
@@ -109,11 +110,8 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
  * }
  * </pre>
  *
- * @author lkuehne
- * @author <a href="mailto:piotr.listkiewicz@gmail.com">liscju</a>
- * @author <a href="mailto:andreyselkin@gmail.com">Andrei Selkin</a>
- * @author Vladislav Lisetskiy
  */
+@StatelessCheck
 public class RedundantModifierCheck
     extends AbstractCheck {
 
@@ -138,7 +136,7 @@ public class RedundantModifierCheck
 
     @Override
     public int[] getRequiredTokens() {
-        return CommonUtils.EMPTY_INT_ARRAY;
+        return CommonUtil.EMPTY_INT_ARRAY;
     }
 
     @Override
@@ -197,8 +195,7 @@ public class RedundantModifierCheck
             final DetailAST modifier =
                     modifiers.findFirstToken(tokenType);
             if (modifier != null) {
-                log(modifier.getLineNo(), modifier.getColumnNo(),
-                        MSG_KEY, modifier.getText());
+                log(modifier, MSG_KEY, modifier.getText());
             }
         }
     }
@@ -209,11 +206,26 @@ public class RedundantModifierCheck
      */
     private void checkEnumConstructorModifiers(DetailAST ast) {
         final DetailAST modifiers = ast.findFirstToken(TokenTypes.MODIFIERS);
-        final DetailAST modifier = modifiers.getFirstChild();
+        final DetailAST modifier = getFirstModifierAst(modifiers);
+
         if (modifier != null) {
-            log(modifier.getLineNo(), modifier.getColumnNo(),
-                    MSG_KEY, modifier.getText());
+            log(modifier, MSG_KEY, modifier.getText());
         }
+    }
+
+    /**
+     * Retrieves the first modifier that is not an annotation.
+     * @param modifiers The ast to examine.
+     * @return The first modifier or {@code null} if none found.
+     */
+    private static DetailAST getFirstModifierAst(DetailAST modifiers) {
+        DetailAST modifier = modifiers.getFirstChild();
+
+        while (modifier != null && modifier.getType() == TokenTypes.ANNOTATION) {
+            modifier = modifier.getNextSibling();
+        }
+
+        return modifier;
     }
 
     /**
@@ -237,7 +249,6 @@ public class RedundantModifierCheck
         final DetailAST modifiers = ast.findFirstToken(TokenTypes.MODIFIERS);
         DetailAST modifier = modifiers.getFirstChild();
         while (modifier != null) {
-
             // javac does not allow final or static in interface methods
             // order annotation fields hence no need to check that this
             // is not a method or annotation field
@@ -250,8 +261,7 @@ public class RedundantModifierCheck
                         && ast.getType() != TokenTypes.CLASS_DEF
                 || type == TokenTypes.FINAL
                         && ast.getType() != TokenTypes.CLASS_DEF) {
-                log(modifier.getLineNo(), modifier.getColumnNo(),
-                        MSG_KEY, modifier.getText());
+                log(modifier, MSG_KEY, modifier.getText());
                 break;
             }
 
@@ -268,19 +278,23 @@ public class RedundantModifierCheck
                         ast.findFirstToken(TokenTypes.MODIFIERS);
         // private method?
         boolean checkFinal =
-            modifiers.branchContains(TokenTypes.LITERAL_PRIVATE);
+            modifiers.findFirstToken(TokenTypes.LITERAL_PRIVATE) != null;
         // declared in a final class?
         DetailAST parent = ast.getParent();
-        while (parent != null) {
+        while (parent != null && !checkFinal) {
             if (parent.getType() == TokenTypes.CLASS_DEF) {
                 final DetailAST classModifiers =
                     parent.findFirstToken(TokenTypes.MODIFIERS);
-                checkFinal = checkFinal || classModifiers.branchContains(TokenTypes.FINAL);
+                checkFinal = classModifiers.findFirstToken(TokenTypes.FINAL) != null;
                 parent = null;
             }
             else if (parent.getType() == TokenTypes.LITERAL_NEW
                     || parent.getType() == TokenTypes.ENUM_CONSTANT_DEF) {
                 checkFinal = true;
+                parent = null;
+            }
+            else if (parent.getType() == TokenTypes.ENUM_DEF) {
+                checkFinal = modifiers.findFirstToken(TokenTypes.LITERAL_STATIC) != null;
                 parent = null;
             }
             else {
@@ -291,7 +305,7 @@ public class RedundantModifierCheck
             checkForRedundantModifier(ast, TokenTypes.FINAL);
         }
 
-        if (!ast.branchContains(TokenTypes.SLIST)) {
+        if (ast.findFirstToken(TokenTypes.SLIST) == null) {
             processAbstractMethodParameters(ast);
         }
     }
@@ -340,8 +354,7 @@ public class RedundantModifierCheck
         DetailAST astModifier = astModifiers.getFirstChild();
         while (astModifier != null) {
             if (astModifier.getType() == modifierType) {
-                log(astModifier.getLineNo(), astModifier.getColumnNo(),
-                        MSG_KEY, astModifier.getText());
+                log(astModifier, MSG_KEY, astModifier.getText());
             }
 
             astModifier = astModifier.getNextSibling();
@@ -356,7 +369,7 @@ public class RedundantModifierCheck
     private static boolean isClassProtected(DetailAST classDef) {
         final DetailAST classModifiers =
                 classDef.findFirstToken(TokenTypes.MODIFIERS);
-        return classModifiers.branchContains(TokenTypes.LITERAL_PROTECTED);
+        return classModifiers.findFirstToken(TokenTypes.LITERAL_PROTECTED) != null;
     }
 
     /**
@@ -368,7 +381,8 @@ public class RedundantModifierCheck
         boolean isAccessibleFromPublic = false;
         final boolean isMostOuterScope = ast.getParent() == null;
         final DetailAST modifiersAst = ast.findFirstToken(TokenTypes.MODIFIERS);
-        final boolean hasPublicModifier = modifiersAst.branchContains(TokenTypes.LITERAL_PUBLIC);
+        final boolean hasPublicModifier =
+                modifiersAst.findFirstToken(TokenTypes.LITERAL_PUBLIC) != null;
 
         if (isMostOuterScope) {
             isAccessibleFromPublic = hasPublicModifier;
@@ -446,4 +460,5 @@ public class RedundantModifierCheck
         }
         return annotationsList;
     }
+
 }

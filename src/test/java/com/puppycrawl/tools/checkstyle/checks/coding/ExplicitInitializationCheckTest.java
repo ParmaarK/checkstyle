@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -28,6 +28,7 @@ import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 
 public class ExplicitInitializationCheckTest extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/coding/explicitinitialization";
@@ -36,7 +37,7 @@ public class ExplicitInitializationCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testDefault() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ExplicitInitializationCheck.class);
+            createModuleConfig(ExplicitInitializationCheck.class);
         final String[] expected = {
             "4:17: " + getCheckMessage(MSG_KEY, "x", 0),
             "5:20: " + getCheckMessage(MSG_KEY, "bar", "null"),
@@ -66,15 +67,15 @@ public class ExplicitInitializationCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testTokensNotNull() {
         final ExplicitInitializationCheck check = new ExplicitInitializationCheck();
-        Assert.assertNotNull(check.getAcceptableTokens());
-        Assert.assertNotNull(check.getDefaultTokens());
-        Assert.assertNotNull(check.getRequiredTokens());
+        Assert.assertNotNull("Acceptable tokens should not be null", check.getAcceptableTokens());
+        Assert.assertNotNull("Default tokens should not be null", check.getDefaultTokens());
+        Assert.assertNotNull("Required tokens should not be null", check.getRequiredTokens());
     }
 
     @Test
-    public void testonlyObjectReferences() throws Exception {
+    public void testOnlyObjectReferences() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ExplicitInitializationCheck.class);
+            createModuleConfig(ExplicitInitializationCheck.class);
         checkConfig.addAttribute("onlyObjectReferences", "true");
         final String[] expected = {
             "5:20: " + getCheckMessage(MSG_KEY, "bar", "null"),
@@ -90,4 +91,5 @@ public class ExplicitInitializationCheckTest extends AbstractModuleTestSupport {
         };
         verify(checkConfig, getPath("InputExplicitInitialization.java"), expected);
     }
+
 }

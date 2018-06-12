@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,26 +23,43 @@ import static com.puppycrawl.tools.checkstyle.checks.sizes.ExecutableStatementCo
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.util.Collection;
+
+import org.junit.Assert;
 import org.junit.Test;
 
 import antlr.CommonHiddenStreamToken;
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import com.puppycrawl.tools.checkstyle.api.Context;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.internal.utils.TestUtil;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class ExecutableStatementCountCheckTest
     extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/sizes/executablestatementcount";
     }
 
     @Test
+    @SuppressWarnings("unchecked")
+    public void testStatefulFieldsClearedOnBeginTree() throws Exception {
+        final DetailAST ast = new DetailAST();
+        ast.setType(TokenTypes.STATIC_INIT);
+        final ExecutableStatementCountCheck check = new ExecutableStatementCountCheck();
+        Assert.assertTrue("Stateful field is not cleared after beginTree",
+                TestUtil.isStatefulFieldClearedDuringBeginTree(check, ast, "contextStack",
+                    contextStack -> ((Collection<Context>) contextStack).isEmpty()));
+    }
+
+    @Test
     public void testMaxZero() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ExecutableStatementCountCheck.class);
+            createModuleConfig(ExecutableStatementCountCheck.class);
 
         checkConfig.addAttribute("max", "0");
 
@@ -65,7 +82,7 @@ public class ExecutableStatementCountCheckTest
     @Test
     public void testMethodDef() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ExecutableStatementCountCheck.class);
+            createModuleConfig(ExecutableStatementCountCheck.class);
 
         checkConfig.addAttribute("max", "0");
         checkConfig.addAttribute("tokens", "METHOD_DEF");
@@ -85,7 +102,7 @@ public class ExecutableStatementCountCheckTest
     @Test
     public void testCtorDef() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ExecutableStatementCountCheck.class);
+            createModuleConfig(ExecutableStatementCountCheck.class);
 
         checkConfig.addAttribute("max", "0");
         checkConfig.addAttribute("tokens", "CTOR_DEF");
@@ -101,7 +118,7 @@ public class ExecutableStatementCountCheckTest
     @Test
     public void testStaticInit() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ExecutableStatementCountCheck.class);
+            createModuleConfig(ExecutableStatementCountCheck.class);
 
         checkConfig.addAttribute("max", "0");
         checkConfig.addAttribute("tokens", "STATIC_INIT");
@@ -116,7 +133,7 @@ public class ExecutableStatementCountCheckTest
     @Test
     public void testInstanceInit() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ExecutableStatementCountCheck.class);
+            createModuleConfig(ExecutableStatementCountCheck.class);
 
         checkConfig.addAttribute("max", "0");
         checkConfig.addAttribute("tokens", "INSTANCE_INIT");
@@ -163,10 +180,11 @@ public class ExecutableStatementCountCheckTest
     @Test
     public void testDefaultConfiguration() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ExecutableStatementCountCheck.class);
+            createModuleConfig(ExecutableStatementCountCheck.class);
 
         createChecker(checkConfig);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputExecutableStatementCount.java"), expected);
     }
+
 }

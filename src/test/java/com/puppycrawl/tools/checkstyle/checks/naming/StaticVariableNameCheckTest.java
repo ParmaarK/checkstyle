@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -27,10 +27,11 @@ import org.junit.Test;
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class StaticVariableNameCheckTest
     extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/naming/staticvariablename";
@@ -48,7 +49,7 @@ public class StaticVariableNameCheckTest
     public void testSpecified()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(StaticVariableNameCheck.class);
+            createModuleConfig(StaticVariableNameCheck.class);
         checkConfig.addAttribute("format", "^s[A-Z][a-zA-Z0-9]*$");
 
         final String pattern = "^s[A-Z][a-zA-Z0-9]*$";
@@ -63,13 +64,13 @@ public class StaticVariableNameCheckTest
     public void testAccessTuning()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(StaticVariableNameCheck.class);
+            createModuleConfig(StaticVariableNameCheck.class);
         checkConfig.addAttribute("format", "^s[A-Z][a-zA-Z0-9]*$");
 
         // allow method names and class names to equal
         checkConfig.addAttribute("applyToPrivate", "false");
 
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputStaticVariableName1.java"), expected);
     }
 
@@ -77,8 +78,8 @@ public class StaticVariableNameCheckTest
     public void testInterfaceOrAnnotationBlock()
             throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(StaticVariableNameCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+                createModuleConfig(StaticVariableNameCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputStaticVariableName.java"), expected);
     }
 
@@ -91,4 +92,5 @@ public class StaticVariableNameCheckTest
         };
         assertArrayEquals("Default acceptable tokens are invalid", expected, actual);
     }
+
 }

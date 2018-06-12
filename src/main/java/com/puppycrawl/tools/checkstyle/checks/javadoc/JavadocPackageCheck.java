@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,16 +20,17 @@
 package com.puppycrawl.tools.checkstyle.checks.javadoc;
 
 import java.io.File;
-import java.util.HashSet;
+import java.io.IOException;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractFileSetCheck;
+import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.FileText;
 
 /**
  * Checks that all packages have a package documentation. See the documentation
  * for more information.
- * @author Oliver Burn
  */
 public class JavadocPackageCheck extends AbstractFileSetCheck {
 
@@ -46,7 +47,7 @@ public class JavadocPackageCheck extends AbstractFileSetCheck {
     public static final String MSG_PACKAGE_INFO = "javadoc.packageInfo";
 
     /** The directories checked. */
-    private final Set<File> directoriesChecked = new HashSet<>();
+    private final Set<File> directoriesChecked = ConcurrentHashMap.newKeySet();
 
     /** Indicates if allow legacy "package.html" file to be used. */
     private boolean allowLegacy;
@@ -67,12 +68,18 @@ public class JavadocPackageCheck extends AbstractFileSetCheck {
     }
 
     @Override
-    protected void processFiltered(File file, FileText fileText) {
+    protected void processFiltered(File file, FileText fileText) throws CheckstyleException {
         // Check if already processed directory
-        final File dir = file.getParentFile();
-        if (!directoriesChecked.contains(dir)) {
-            directoriesChecked.add(dir);
-
+        final File dir;
+        try {
+            dir = file.getCanonicalFile().getParentFile();
+        }
+        catch (IOException ex) {
+            throw new CheckstyleException(
+                    "Exception while getting canonical path to file " + file.getPath(), ex);
+        }
+        final boolean isDirChecked = !directoriesChecked.add(dir);
+        if (!isDirChecked) {
             // Check for the preferred file.
             final File packageInfo = new File(dir, "package-info.java");
             final File packageHtml = new File(dir, "package.html");
@@ -96,4 +103,5 @@ public class JavadocPackageCheck extends AbstractFileSetCheck {
     public void setAllowLegacy(boolean allowLegacy) {
         this.allowLegacy = allowLegacy;
     }
+
 }

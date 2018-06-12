@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,17 +19,14 @@
 
 package com.google.checkstyle.test.chapter3filestructure.rule333orderingandspacing;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.junit.Test;
 
-import com.google.checkstyle.test.base.BaseCheckTestSupport;
+import com.google.checkstyle.test.base.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 import com.puppycrawl.tools.checkstyle.checks.imports.CustomImportOrderCheck;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
-public class CustomImportOrderTest extends BaseCheckTestSupport {
+public class CustomImportOrderTest extends AbstractModuleTestSupport {
 
     /** Shortcuts to make code more compact. */
     private static final String MSG_LINE_SEPARATOR = CustomImportOrderCheck.MSG_LINE_SEPARATOR;
@@ -42,14 +39,12 @@ public class CustomImportOrderTest extends BaseCheckTestSupport {
     private final Class<CustomImportOrderCheck> clazz = CustomImportOrderCheck.class;
 
     @Override
-    protected String getPath(String fileName) throws IOException {
-        return super.getPath("chapter3filestructure" + File.separator + "rule333orderingandspacing"
-                + File.separator + fileName);
+    protected String getPackageLocation() {
+        return "com/google/checkstyle/test/chapter3filestructure/rule333orderingandspacing";
     }
 
     @Test
     public void testCustomImport1() throws Exception {
-
         final String[] expected = {
             "4: " + getCheckMessage(clazz, MSG_LEX, "java.awt.Button.ABORT",
                 "java.io.File.createTempFile"),
@@ -63,7 +58,7 @@ public class CustomImportOrderTest extends BaseCheckTestSupport {
                 "javax.swing.JTable"),
         };
 
-        final Configuration checkConfig = getCheckConfig("CustomImportOrder");
+        final Configuration checkConfig = getModuleConfig("CustomImportOrder");
         final String filePath = getPath("InputCustomImportOrder1.java");
 
         final Integer[] warnList = getLinesWithWarn(filePath);
@@ -72,7 +67,6 @@ public class CustomImportOrderTest extends BaseCheckTestSupport {
 
     @Test
     public void testCustomImport2() throws Exception {
-
         final String[] expected = {
             "4: " + getCheckMessage(clazz, MSG_LEX, "java.awt.Button.ABORT",
                 "java.io.File.createTempFile"),
@@ -82,13 +76,14 @@ public class CustomImportOrderTest extends BaseCheckTestSupport {
             "13: " + getCheckMessage(clazz, MSG_LEX,
                 "com.google.checkstyle.test.chapter2filebasic.rule21filename.*",
                 "java.util.concurrent.AbstractExecutorService"),
-            "14: " + getCheckMessage(clazz, MSG_LEX, "com.sun.xml.internal.xsom.impl.scd.Iterators",
+            "14: " + getCheckMessage(clazz, MSG_LEX,
+                "com.google.checkstyle.test.chapter3filestructure.rule3sourcefile.*",
                 "java.util.concurrent.AbstractExecutorService"),
             "16: " + getCheckMessage(clazz, MSG_LEX, "com.google.common.reflect.*",
                 "java.util.concurrent.AbstractExecutorService"),
         };
 
-        final Configuration checkConfig = getCheckConfig("CustomImportOrder");
+        final Configuration checkConfig = getModuleConfig("CustomImportOrder");
         final String filePath = getPath("InputCustomImportOrder2.java");
 
         final Integer[] warnList = getLinesWithWarn(filePath);
@@ -97,7 +92,6 @@ public class CustomImportOrderTest extends BaseCheckTestSupport {
 
     @Test
     public void testCustomImport3() throws Exception {
-
         final String[] expected = {
             "4: " + getCheckMessage(clazz, MSG_LINE_SEPARATOR, "java.awt.Dialog"),
             "5: " + getCheckMessage(clazz, MSG_NONGROUP_EXPECTED, STATIC,
@@ -106,7 +100,8 @@ public class CustomImportOrderTest extends BaseCheckTestSupport {
                 "com.google.checkstyle.test.chapter2filebasic.rule21filename.*", "java.awt.Dialog"),
             "8: " + getCheckMessage(clazz, MSG_LEX, "com.google.common.reflect.*",
                 "java.awt.Dialog"),
-            "9: " + getCheckMessage(clazz, MSG_LEX, "com.sun.xml.internal.xsom.impl.scd.Iterators",
+            "9: " + getCheckMessage(clazz, MSG_LEX,
+                "com.google.checkstyle.test.chapter3filestructure.rule3sourcefile.*",
                 "java.awt.Dialog"),
             "11: " + getCheckMessage(clazz, MSG_NONGROUP_EXPECTED, STATIC,
                 "java.io.File.createTempFile"),
@@ -115,7 +110,7 @@ public class CustomImportOrderTest extends BaseCheckTestSupport {
                 "java.util.concurrent.AbstractExecutorService"),
         };
 
-        final Configuration checkConfig = getCheckConfig("CustomImportOrder");
+        final Configuration checkConfig = getModuleConfig("CustomImportOrder");
         final String filePath = getPath("InputCustomImportOrder3.java");
 
         final Integer[] warnList = getLinesWithWarn(filePath);
@@ -124,10 +119,9 @@ public class CustomImportOrderTest extends BaseCheckTestSupport {
 
     @Test
     public void testValid() throws Exception {
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
-
-        final Configuration checkConfig = getCheckConfig("CustomImportOrder");
+        final Configuration checkConfig = getModuleConfig("CustomImportOrder");
         final String filePath = getPath("InputCustomImportOrderValid.java");
 
         final Integer[] warnList = getLinesWithWarn(filePath);
@@ -136,12 +130,13 @@ public class CustomImportOrderTest extends BaseCheckTestSupport {
 
     @Test
     public void testValidGoogleStyleOrderOfImports() throws Exception {
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
-        final Configuration checkConfig = getCheckConfig("CustomImportOrder");
+        final Configuration checkConfig = getModuleConfig("CustomImportOrder");
         final String filePath = getPath("InputCustomImportOrderNoImports.java");
 
         final Integer[] warnList = getLinesWithWarn(filePath);
         verify(checkConfig, filePath, expected, warnList);
     }
+
 }

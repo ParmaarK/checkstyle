@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,6 +19,7 @@
 
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -34,8 +35,8 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * Rationale: Some developers find inline conditionals hard to read,
  * so their company's coding standards forbids them.
  *
- * @author lkuehne
  */
+@StatelessCheck
 public class AvoidInlineConditionalsCheck extends AbstractCheck {
 
     /**
@@ -46,17 +47,17 @@ public class AvoidInlineConditionalsCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[] {TokenTypes.QUESTION};
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getDefaultTokens();
+        return new int[] {TokenTypes.QUESTION};
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {TokenTypes.QUESTION};
+        return getRequiredTokens();
     }
 
     @Override
@@ -64,6 +65,7 @@ public class AvoidInlineConditionalsCheck extends AbstractCheck {
         // the only place a QUESTION token can occur is in inline conditionals
         // so no need to do any further tricks here - pretty trivial Check!
 
-        log(ast.getLineNo(), ast.getColumnNo(), MSG_KEY);
+        log(ast, MSG_KEY);
     }
+
 }

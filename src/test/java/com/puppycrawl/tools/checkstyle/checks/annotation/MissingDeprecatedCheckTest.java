@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -29,12 +29,33 @@ import org.junit.Test;
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class MissingDeprecatedCheckTest extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/annotation/missingdeprecated";
+    }
+
+    @Test
+    public void testGetAcceptableTokens() {
+        final MissingDeprecatedCheck missingDeprecatedCheck =
+                new MissingDeprecatedCheck();
+        final int[] expected = {
+            TokenTypes.INTERFACE_DEF,
+            TokenTypes.CLASS_DEF,
+            TokenTypes.ANNOTATION_DEF,
+            TokenTypes.ENUM_DEF,
+            TokenTypes.METHOD_DEF,
+            TokenTypes.CTOR_DEF,
+            TokenTypes.VARIABLE_DEF,
+            TokenTypes.ENUM_CONSTANT_DEF,
+            TokenTypes.ANNOTATION_FIELD_DEF,
+        };
+
+        assertArrayEquals("Default acceptable tokens are invalid",
+                expected, missingDeprecatedCheck.getAcceptableTokens());
     }
 
     @Test
@@ -60,7 +81,7 @@ public class MissingDeprecatedCheckTest extends AbstractModuleTestSupport {
      */
     @Test
     public void testBadDeprecatedAnnotation() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(MissingDeprecatedCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(MissingDeprecatedCheck.class);
 
         final String[] expected = {
             "7: " + getCheckMessage(MSG_KEY_ANNOTATION_MISSING_DEPRECATED),
@@ -82,8 +103,7 @@ public class MissingDeprecatedCheckTest extends AbstractModuleTestSupport {
      */
     @Test
     public void testBadDeprecatedJavadoc() throws Exception {
-
-        final DefaultConfiguration checkConfig = createCheckConfig(MissingDeprecatedCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(MissingDeprecatedCheck.class);
 
         final String[] expected = {
             "5: " + getCheckMessage(MSG_KEY_ANNOTATION_MISSING_DEPRECATED),
@@ -105,8 +125,7 @@ public class MissingDeprecatedCheckTest extends AbstractModuleTestSupport {
      */
     @Test
     public void testSpecialCaseDeprecated() throws Exception {
-
-        final DefaultConfiguration checkConfig = createCheckConfig(MissingDeprecatedCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(MissingDeprecatedCheck.class);
 
         final String[] expected = {
             "5: " + getCheckMessage(MSG_KEY_JAVADOC_DUPLICATE_TAG, "@deprecated"),
@@ -132,18 +151,16 @@ public class MissingDeprecatedCheckTest extends AbstractModuleTestSupport {
      */
     @Test
     public void testGoodDeprecated() throws Exception {
+        final DefaultConfiguration checkConfig = createModuleConfig(MissingDeprecatedCheck.class);
 
-        final DefaultConfiguration checkConfig = createCheckConfig(MissingDeprecatedCheck.class);
-
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
         verify(checkConfig, getPath("InputMissingDeprecatedGood.java"), expected);
     }
 
     @Test
     public void testTwoInJavadocWithoutAnnotation() throws Exception {
-
-        final DefaultConfiguration checkConfig = createCheckConfig(MissingDeprecatedCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(MissingDeprecatedCheck.class);
 
         final String[] expected = {
             "7: " + getCheckMessage(MSG_KEY_JAVADOC_MISSING),
@@ -156,8 +173,7 @@ public class MissingDeprecatedCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testEmptyJavadocLine() throws Exception {
-
-        final DefaultConfiguration checkConfig = createCheckConfig(MissingDeprecatedCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(MissingDeprecatedCheck.class);
 
         final String[] expected = {
             "7: " + getCheckMessage(MSG_KEY_JAVADOC_MISSING),
@@ -169,7 +185,7 @@ public class MissingDeprecatedCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testSkipNoJavadocOption() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(MissingDeprecatedCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(MissingDeprecatedCheck.class);
         checkConfig.addAttribute("skipNoJavadoc", "true");
 
         final String[] expected = {
@@ -179,4 +195,5 @@ public class MissingDeprecatedCheckTest extends AbstractModuleTestSupport {
 
         verify(checkConfig, getPath("InputMissingDeprecatedSkipNoJavadoc.java"), expected);
     }
+
 }

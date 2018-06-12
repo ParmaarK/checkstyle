@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -27,9 +27,10 @@ import org.junit.Test;
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class AtclauseOrderCheckTest extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/javadoc/atclauseorder";
@@ -53,17 +54,17 @@ public class AtclauseOrderCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testCorrect() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(AtclauseOrderCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final DefaultConfiguration checkConfig = createModuleConfig(AtclauseOrderCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
-        verify(checkConfig, getPath("InputAtClauseOrderCorrect.java"), expected);
+        verify(checkConfig, getPath("InputAtclauseOrderCorrect.java"), expected);
     }
 
     @Test
     public void testIncorrect() throws Exception {
         final String tagOrder = "[@author, @version, @param, @return, @throws, @exception, @see,"
                 + " @since, @serial, @serialField, @serialData, @deprecated]";
-        final DefaultConfiguration checkConfig = createCheckConfig(AtclauseOrderCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(AtclauseOrderCheck.class);
         final String[] expected = {
             "9: " + getCheckMessage(MSG_KEY, tagOrder),
             "11: " + getCheckMessage(MSG_KEY, tagOrder),
@@ -106,23 +107,22 @@ public class AtclauseOrderCheckTest extends AbstractModuleTestSupport {
             "278: " + getCheckMessage(MSG_KEY, tagOrder),
             "288: " + getCheckMessage(MSG_KEY, tagOrder),
         };
-        verify(checkConfig, getPath("InputAtClauseOrderIncorrect.java"), expected);
+        verify(checkConfig, getPath("InputAtclauseOrderIncorrect.java"), expected);
     }
 
     @Test
     public void testIncorrectCustom() throws Exception {
-
-        final DefaultConfiguration checkConfig = createCheckConfig(AtclauseOrderCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(AtclauseOrderCheck.class);
         checkConfig.addAttribute("target", "CLASS_DEF");
-        final String customOrder = " @since,  @version, @param,@return,@throws, @exception,"
-                + "@deprecated, @see,@serial,   @serialField,  @serialData,@author";
-        checkConfig.addAttribute("tagOrder", customOrder);
+        checkConfig.addAttribute("tagOrder", " @since,  @version, @param,@return,@throws, "
+                + "@exception,@deprecated, @see,@serial,   @serialField,  @serialData,@author");
 
         final String tagOrder = "[@since, @version, @param, @return, @throws, @exception,"
                 + " @deprecated, @see, @serial, @serialField, @serialData, @author]";
         final String[] expected = {
             "113: " + getCheckMessage(MSG_KEY, tagOrder),
         };
-        verify(checkConfig, getPath("InputAtClauseOrderIncorrect.java"), expected);
+        verify(checkConfig, getPath("InputAtclauseOrderIncorrect.java"), expected);
     }
+
 }

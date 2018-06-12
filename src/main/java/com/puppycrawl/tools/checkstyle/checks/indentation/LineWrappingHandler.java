@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -26,17 +26,46 @@ import java.util.TreeMap;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * This class checks line-wrapping into definitions and expressions. The
  * line-wrapping indentation should be not less then value of the
  * lineWrappingIndentation parameter.
  *
- * @author maxvetrenko
- * @author <a href="mailto:piotr.listkiewicz@gmail.com">liscju</a>
  */
 public class LineWrappingHandler {
+
+    /**
+     * Enum to be used for test if first line's indentation should be checked or not.
+     */
+    public enum LineWrappingOptions {
+
+        /**
+         * First line's indentation should NOT be checked.
+         */
+        IGNORE_FIRST_LINE,
+        /**
+         * First line's indentation should be checked.
+         */
+        NONE;
+
+        /**
+         * Builds enum value from boolean.
+         * @param val value.
+         * @return enum instance.
+         *
+         * @noinspection BooleanParameter
+         */
+        public static LineWrappingOptions ofBoolean(boolean val) {
+            LineWrappingOptions option = NONE;
+            if (val) {
+                option = IGNORE_FIRST_LINE;
+            }
+            return option;
+        }
+
+    }
 
     /**
      * The current instance of {@code IndentationCheck} class using this
@@ -73,8 +102,9 @@ public class LineWrappingHandler {
      * @param lastNode Last node to examine inclusively.
      * @param indentLevel Indentation all wrapped lines should use.
      */
-    public void checkIndentation(DetailAST firstNode, DetailAST lastNode, int indentLevel) {
-        checkIndentation(firstNode, lastNode, indentLevel, -1, true);
+    private void checkIndentation(DetailAST firstNode, DetailAST lastNode, int indentLevel) {
+        checkIndentation(firstNode, lastNode, indentLevel,
+                -1, LineWrappingOptions.IGNORE_FIRST_LINE);
     }
 
     /**
@@ -87,7 +117,7 @@ public class LineWrappingHandler {
      * @param ignoreFirstLine Test if first line's indentation should be checked or not.
      */
     public void checkIndentation(DetailAST firstNode, DetailAST lastNode, int indentLevel,
-            int startIndent, boolean ignoreFirstLine) {
+            int startIndent, LineWrappingOptions ignoreFirstLine) {
         final NavigableMap<Integer, DetailAST> firstNodesOnLines = collectFirstNodes(firstNode,
                 lastNode);
 
@@ -110,7 +140,7 @@ public class LineWrappingHandler {
             }
         }
 
-        if (ignoreFirstLine) {
+        if (ignoreFirstLine == LineWrappingOptions.IGNORE_FIRST_LINE) {
             // First node should be removed because it was already checked before.
             firstNodesOnLines.remove(firstNodesOnLines.firstKey());
         }
@@ -169,7 +199,6 @@ public class LineWrappingHandler {
         DetailAST curNode = firstNode.getFirstChild();
 
         while (curNode != lastNode) {
-
             if (curNode.getType() == TokenTypes.OBJBLOCK
                     || curNode.getType() == TokenTypes.SLIST) {
                 curNode = curNode.getLastChild();
@@ -232,7 +261,8 @@ public class LineWrappingHandler {
             if (isCurrentNodeCloseAnnotationAloneInLine
                     || node.getType() == TokenTypes.AT
                     && (parentNode.getParent().getType() == TokenTypes.MODIFIERS
-                        || parentNode.getParent().getType() == TokenTypes.ANNOTATIONS)) {
+                        || parentNode.getParent().getType() == TokenTypes.ANNOTATIONS)
+                    || node.getLineNo() == atNode.getLineNo()) {
                 logWarningMessage(node, firstNodeIndent);
             }
             else {
@@ -265,9 +295,7 @@ public class LineWrappingHandler {
                     break;
                 default:
                     endOfScope = false;
-
             }
-
         }
         return endOfScope;
     }
@@ -284,7 +312,7 @@ public class LineWrappingHandler {
         final String line =
             indentCheck.getLine(ast.getLineNo() - 1);
 
-        return CommonUtils.lengthExpandedTabs(line, ast.getColumnNo(),
+        return CommonUtil.lengthExpandedTabs(line, ast.getColumnNo(),
             indentCheck.getIndentationTabWidth());
     }
 
@@ -311,7 +339,7 @@ public class LineWrappingHandler {
         while (Character.isWhitespace(line.charAt(index))) {
             index++;
         }
-        return CommonUtils.lengthExpandedTabs(line, index, indentCheck.getIndentationTabWidth());
+        return CommonUtil.lengthExpandedTabs(line, index, indentCheck.getIndentationTabWidth());
     }
 
     /**
@@ -338,4 +366,5 @@ public class LineWrappingHandler {
             }
         }
     }
+
 }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,9 @@
 package com.puppycrawl.tools.checkstyle.checks.metrics;
 
 import static com.puppycrawl.tools.checkstyle.checks.metrics.ClassDataAbstractionCouplingCheck.MSG_KEY;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -32,18 +34,30 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class ClassDataAbstractionCouplingCheckTest extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/metrics/classdataabstractioncoupling";
     }
 
     @Test
+    public void testTokens() {
+        final ClassDataAbstractionCouplingCheck check = new ClassDataAbstractionCouplingCheck();
+        assertNotNull("Required tokens should not be null", check.getRequiredTokens());
+        assertNotNull("Acceptable tokens should not be null", check.getAcceptableTokens());
+        assertArrayEquals("Invalid default tokens", check.getDefaultTokens(),
+                check.getAcceptableTokens());
+        assertArrayEquals("Invalid acceptable tokens", check.getDefaultTokens(),
+                check.getRequiredTokens());
+    }
+
+    @Test
     public void test() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ClassDataAbstractionCouplingCheck.class);
+            createModuleConfig(ClassDataAbstractionCouplingCheck.class);
 
         checkConfig.addAttribute("max", "0");
         checkConfig.addAttribute("excludedClasses", "InnerClass");
@@ -58,14 +72,15 @@ public class ClassDataAbstractionCouplingCheckTest extends AbstractModuleTestSup
     }
 
     @Test
-    public void testExludedPackageDirectPackages() throws Exception {
+    public void testExcludedPackageDirectPackages() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ClassDataAbstractionCouplingCheck.class);
+            createModuleConfig(ClassDataAbstractionCouplingCheck.class);
 
         checkConfig.addAttribute("max", "0");
         checkConfig.addAttribute("excludedPackages",
-            "com.puppycrawl.tools.checkstyle.checks.metrics.inputs.c,"
-                + "com.puppycrawl.tools.checkstyle.checks.metrics.inputs.b");
+            "com.puppycrawl.tools.checkstyle.checks.metrics.classdataabstractioncoupling.inputs.c,"
+                + "com.puppycrawl.tools.checkstyle.checks.metrics.classdataabstractioncoupling."
+                + "inputs.b");
 
         final String[] expected = {
             "8:1: " + getCheckMessage(MSG_KEY, 2, 0, "[AAClass, ABClass]"),
@@ -77,9 +92,9 @@ public class ClassDataAbstractionCouplingCheckTest extends AbstractModuleTestSup
     }
 
     @Test
-    public void testExludedPackageCommonPackages() throws Exception {
+    public void testExcludedPackageCommonPackages() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ClassDataAbstractionCouplingCheck.class);
+            createModuleConfig(ClassDataAbstractionCouplingCheck.class);
 
         checkConfig.addAttribute("max", "0");
         checkConfig.addAttribute("excludedPackages",
@@ -96,9 +111,9 @@ public class ClassDataAbstractionCouplingCheckTest extends AbstractModuleTestSup
     }
 
     @Test
-    public void testExludedPackageWithEndingDot() throws Exception {
+    public void testExcludedPackageWithEndingDot() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ClassDataAbstractionCouplingCheck.class);
+            createModuleConfig(ClassDataAbstractionCouplingCheck.class);
 
         checkConfig.addAttribute("max", "0");
         checkConfig.addAttribute("excludedPackages",
@@ -122,18 +137,22 @@ public class ClassDataAbstractionCouplingCheckTest extends AbstractModuleTestSup
     }
 
     @Test
-    public void testExludedPackageCommonPackagesAllIgnored() throws Exception {
+    public void testExcludedPackageCommonPackagesAllIgnored() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ClassDataAbstractionCouplingCheck.class);
+            createModuleConfig(ClassDataAbstractionCouplingCheck.class);
 
         checkConfig.addAttribute("max", "0");
         checkConfig.addAttribute("excludedPackages",
-            "com.puppycrawl.tools.checkstyle.checks.metrics.inputs.a.aa,"
-                + "com.puppycrawl.tools.checkstyle.checks.metrics.inputs.a.ab,"
-                + "com.puppycrawl.tools.checkstyle.checks.metrics.inputs.b,"
-                + "com.puppycrawl.tools.checkstyle.checks.metrics.inputs.c");
+            "com.puppycrawl.tools.checkstyle.checks.metrics.classdataabstractioncoupling.inputs."
+                    + "a.aa,"
+                + "com.puppycrawl.tools.checkstyle.checks.metrics.classdataabstractioncoupling."
+                    + "inputs.a.ab,"
+                + "com.puppycrawl.tools.checkstyle.checks.metrics.classdataabstractioncoupling."
+                    + "inputs.b,"
+                + "com.puppycrawl.tools.checkstyle.checks.metrics.classdataabstractioncoupling."
+                    + "inputs.c");
 
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig,
             getPath("InputClassDataAbstractionCouplingExcludedPackagesAllIgnored.java"), expected);
     }
@@ -141,10 +160,10 @@ public class ClassDataAbstractionCouplingCheckTest extends AbstractModuleTestSup
     @Test
     public void testDefaultConfiguration() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ClassDataAbstractionCouplingCheck.class);
+            createModuleConfig(ClassDataAbstractionCouplingCheck.class);
 
         createChecker(checkConfig);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputClassDataAbstractionCoupling.java"), expected);
     }
 
@@ -167,7 +186,7 @@ public class ClassDataAbstractionCouplingCheckTest extends AbstractModuleTestSup
     @Test
     public void testRegularExpression() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(ClassDataAbstractionCouplingCheck.class);
+                createModuleConfig(ClassDataAbstractionCouplingCheck.class);
 
         checkConfig.addAttribute("max", "0");
         checkConfig.addAttribute("excludedClasses", "InnerClass");
@@ -184,7 +203,7 @@ public class ClassDataAbstractionCouplingCheckTest extends AbstractModuleTestSup
     @Test
     public void testEmptyRegularExpression() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(ClassDataAbstractionCouplingCheck.class);
+                createModuleConfig(ClassDataAbstractionCouplingCheck.class);
 
         checkConfig.addAttribute("max", "0");
         checkConfig.addAttribute("excludedClasses", "InnerClass");
@@ -198,4 +217,5 @@ public class ClassDataAbstractionCouplingCheckTest extends AbstractModuleTestSup
 
         verify(checkConfig, getPath("InputClassDataAbstractionCoupling.java"), expected);
     }
+
 }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,15 +23,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public abstract class AbstractTreeTestSupport extends AbstractPathTestSupport {
-
-    protected static final String LF_REGEX = "\\\\n";
-
-    protected static final String CLRF_REGEX = "\\\\r\\\\n";
 
     /**
      * Returns canonical path for the file with the given file name.
@@ -55,11 +48,12 @@ public abstract class AbstractTreeTestSupport extends AbstractPathTestSupport {
      * @throws Exception if exception occurs during verification.
      */
     protected static void verifyAst(String expectedTextPrintFileName, String actualJavaFileName,
-                                    boolean withComments) throws Exception {
+                                    JavaParser.Options withComments)
+            throws Exception {
         final String expectedContents = readFile(expectedTextPrintFileName);
 
         final String actualContents = AstTreeStringPrinter.printFileAst(
-                new File(actualJavaFileName), withComments).replaceAll(CLRF_REGEX, LF_REGEX);
+                new File(actualJavaFileName), withComments).replaceAll(CRLF_REGEX, LF_REGEX);
 
         assertEquals("Generated AST from Java file should match pre-defined AST", expectedContents,
                 actualContents);
@@ -67,7 +61,8 @@ public abstract class AbstractTreeTestSupport extends AbstractPathTestSupport {
 
     /**
      * Performs verification of the given text ast tree representation.
-     * This implementation uses {@link BaseCheckTestSupport#verifyAst(String, String, boolean)}
+     * This implementation uses
+     * {@link AbstractTreeTestSupport#verifyAst(String, String, JavaParser.Options)}
      * method inside.
      * @param expectedTextPrintFileName expected text ast tree representation.
      * @param actualJavaFileName actual text ast tree representation.
@@ -75,7 +70,8 @@ public abstract class AbstractTreeTestSupport extends AbstractPathTestSupport {
      */
     protected static void verifyAst(String expectedTextPrintFileName, String actualJavaFileName)
             throws Exception {
-        verifyAst(expectedTextPrintFileName, actualJavaFileName, false);
+        verifyAst(expectedTextPrintFileName, actualJavaFileName,
+                JavaParser.Options.WITHOUT_COMMENTS);
     }
 
     /**
@@ -87,11 +83,10 @@ public abstract class AbstractTreeTestSupport extends AbstractPathTestSupport {
      */
     protected static void verifyJavaAndJavadocAst(String expectedTextPrintFilename,
                                                   String actualJavaFilename) throws Exception {
-
         final String expectedContents = readFile(expectedTextPrintFilename);
 
         final String actualContents = AstTreeStringPrinter.printJavaAndJavadocTree(
-                new File(actualJavaFilename)).replaceAll(CLRF_REGEX, LF_REGEX);
+                new File(actualJavaFilename)).replaceAll(CRLF_REGEX, LF_REGEX);
 
         assertEquals("Generated AST from the java file should match the pre-defined AST",
                 expectedContents, actualContents);
@@ -106,24 +101,13 @@ public abstract class AbstractTreeTestSupport extends AbstractPathTestSupport {
      */
     protected static void verifyJavadocTree(String expectedTextPrintFilename,
                                             String actualJavadocFilename) throws Exception {
-
         final String expectedContents = readFile(expectedTextPrintFilename);
 
         final String actualContents = DetailNodeTreeStringPrinter.printFileAst(
-                new File(actualJavadocFilename)).replaceAll(CLRF_REGEX, LF_REGEX);
+                new File(actualJavadocFilename)).replaceAll(CRLF_REGEX, LF_REGEX);
 
         assertEquals("Generated tree from the javadoc file should match the pre-defined tree",
                 expectedContents, actualContents);
     }
 
-    /** Reads the contents of a file.
-     * @param filename the name of the file whose contents are to be read
-     * @return contents of the file with all {@code \r\n} replaced by {@code \n}
-     * @throws IOException if I/O exception occurs while reading
-     */
-    protected static String readFile(String filename) throws IOException {
-        return new String(Files.readAllBytes(
-                Paths.get(filename)), StandardCharsets.UTF_8)
-                .replaceAll(CLRF_REGEX, LF_REGEX);
-    }
 }

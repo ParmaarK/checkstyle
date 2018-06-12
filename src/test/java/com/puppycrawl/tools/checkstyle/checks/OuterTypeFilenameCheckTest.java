@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -27,12 +27,13 @@ import org.junit.Test;
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class OuterTypeFilenameCheckTest extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
-        return "com/puppycrawl/tools/checkstyle/checks/misc/outertypefilename";
+        return "com/puppycrawl/tools/checkstyle/checks/outertypefilename";
     }
 
     @Test
@@ -51,16 +52,16 @@ public class OuterTypeFilenameCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testGood1() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(OuterTypeFilenameCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+            createModuleConfig(OuterTypeFilenameCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputOuterTypeFilenameIllegalTokens.java"), expected);
     }
 
     @Test
     public void testGood2() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(OuterTypeFilenameCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+            createModuleConfig(OuterTypeFilenameCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputOuterTypeFilename15Extensions.java"), expected);
     }
 
@@ -80,28 +81,35 @@ public class OuterTypeFilenameCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testNestedClass() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(OuterTypeFilenameCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final DefaultConfiguration checkConfig = createModuleConfig(OuterTypeFilenameCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputOuterTypeFilename1.java"), expected);
     }
 
     @Test
     public void testFinePublic() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(OuterTypeFilenameCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final DefaultConfiguration checkConfig = createModuleConfig(OuterTypeFilenameCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputOuterTypeFilename2.java"), expected);
     }
 
     @Test
+    public void testPublicClassIsNotFirst() throws Exception {
+        final DefaultConfiguration checkConfig = createModuleConfig(OuterTypeFilenameCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
+        verify(checkConfig, getPath("InputOuterTypeFilenameCheckPublic.java"), expected);
+    }
+
+    @Test
     public void testFineDefault() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(OuterTypeFilenameCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final DefaultConfiguration checkConfig = createModuleConfig(OuterTypeFilenameCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputOuterTypeFilename3.java"), expected);
     }
 
     @Test
     public void testWrongDefault() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(OuterTypeFilenameCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(OuterTypeFilenameCheck.class);
         final String[] expected = {
             "4: " + getCheckMessage(MSG_KEY),
         };
@@ -110,10 +118,11 @@ public class OuterTypeFilenameCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testPackageAnnotation() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(OuterTypeFilenameCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(OuterTypeFilenameCheck.class);
 
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
         verify(checkConfig, getNonCompilablePath("package-info.java"), expected);
     }
+
 }

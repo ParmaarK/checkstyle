@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -26,13 +26,10 @@ import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
-/**
- * The unit-test for the {@code NestedForDepthCheck}-checkstyle enhancement.
- * @see NestedForDepthCheck
- */
 public class NestedForDepthCheckTest extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/coding/nestedfordepth";
@@ -50,12 +47,13 @@ public class NestedForDepthCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testNestedTooDeep() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(NestedForDepthCheck.class);
+            createModuleConfig(NestedForDepthCheck.class);
         checkConfig.addAttribute("max", "2");
 
         final String[] expected = {
             "43:11: " + getCheckMessage(MSG_KEY, 3, 2),
             "44:13: " + getCheckMessage(MSG_KEY, 4, 2),
+            "47:13: " + getCheckMessage(MSG_KEY, 4, 2),
         };
 
         verify(checkConfig, getPath("InputNestedForDepth.java"),
@@ -75,10 +73,10 @@ public class NestedForDepthCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testNestedOk() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(NestedForDepthCheck.class);
+            createModuleConfig(NestedForDepthCheck.class);
         checkConfig.addAttribute("max", "4");
 
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
         verify(checkConfig, getPath("InputNestedForDepth.java"),
                expected);
@@ -87,8 +85,9 @@ public class NestedForDepthCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testTokensNotNull() {
         final NestedForDepthCheck check = new NestedForDepthCheck();
-        Assert.assertNotNull(check.getAcceptableTokens());
-        Assert.assertNotNull(check.getDefaultTokens());
-        Assert.assertNotNull(check.getRequiredTokens());
+        Assert.assertNotNull("Acceptable tokens should not be null", check.getAcceptableTokens());
+        Assert.assertNotNull("Default tokens should not be null", check.getDefaultTokens());
+        Assert.assertNotNull("Required tokens should not be null", check.getRequiredTokens());
     }
+
 }

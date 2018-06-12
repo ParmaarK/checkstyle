@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,8 +19,6 @@
 
 package com.puppycrawl.tools.checkstyle.internal;
 
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -40,7 +38,7 @@ import java.util.stream.Stream;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
+import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.Checker;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.ModuleFactory;
@@ -48,9 +46,15 @@ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 import com.puppycrawl.tools.checkstyle.checks.imports.ImportControlCheck;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.internal.utils.CheckUtil;
+import com.puppycrawl.tools.checkstyle.internal.utils.ConfigurationUtil;
+import com.puppycrawl.tools.checkstyle.internal.utils.TestUtil;
+import com.puppycrawl.tools.checkstyle.internal.utils.XdocUtil;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
+import com.puppycrawl.tools.checkstyle.utils.ModuleReflectionUtil;
 
-public class AllChecksTest extends BaseCheckTestSupport {
+public class AllChecksTest extends AbstractModuleTestSupport {
+
     private static final Locale[] ALL_LOCALES = {
         Locale.GERMAN,
         new Locale("es"),
@@ -159,6 +163,7 @@ public class AllChecksTest extends BaseCheckTestSupport {
         CHECKSTYLE_TOKENS_IN_CONFIG_TO_IGNORE.put("WhitespaceAround", Stream.of(
                 // we prefer no spaces on one side or both for these tokens
                 "ARRAY_INIT",
+                "ELLIPSIS",
                 // these are covered by GenericWhitespaceCheck
                 "WILDCARD_TYPE", "GENERIC_END", "GENERIC_START").collect(Collectors.toSet()));
         CHECKSTYLE_TOKENS_IN_CONFIG_TO_IGNORE.put("RightCurly", Stream.of(
@@ -210,6 +215,8 @@ public class AllChecksTest extends BaseCheckTestSupport {
         GOOGLE_TOKENS_IN_CONFIG_TO_IGNORE.put("WhitespaceAround", Stream.of(
                 //  allowed via '4.8.3 Arrays'
                 "ARRAY_INIT",
+                //  '...' is almost same as '[]' by meaning
+                "ELLIPSIS",
                 // google prefers no spaces on one side or both for these tokens
                 "GENERIC_START", "GENERIC_END", "WILDCARD_TYPE")
                 .collect(Collectors.toSet()));
@@ -230,43 +237,35 @@ public class AllChecksTest extends BaseCheckTestSupport {
         GOOGLE_TOKENS_IN_CONFIG_TO_IGNORE.put("RightCurly", Stream.of(
                 // Until https://github.com/checkstyle/checkstyle/issues/4178
                 "LAMBDA").collect(Collectors.toSet()));
+        GOOGLE_TOKENS_IN_CONFIG_TO_IGNORE.put("NoWhitespaceBefore", Stream.of(
+                // google uses GenericWhitespace for this behavior
+                "GENERIC_START", "GENERIC_END").collect(Collectors.toSet()));
     }
 
     @Override
-    protected String getPath(String filename) throws IOException {
-        return super.getPath("internal" + File.separator + filename);
+    protected String getPackageLocation() {
+        return "com/puppycrawl/tools/checkstyle/internal/allchecks";
     }
 
     @Test
-    public void testAllChecksWithDefaultConfiguration() throws Exception {
+    public void testAllModulesWithDefaultConfiguration() throws Exception {
         final String inputFilePath = getPath("InputAllChecksDefaultConfig.java");
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
-        for (Class<?> check : CheckUtil.getCheckstyleChecks()) {
-            final DefaultConfiguration checkConfig = createCheckConfig(check);
+        for (Class<?> module : CheckUtil.getCheckstyleModules()) {
+            if (ModuleReflectionUtil.isRootModule(module)) {
+                continue;
+            }
+
+            final DefaultConfiguration moduleConfig = createModuleConfig(module);
             final Checker checker;
-            if (AbstractCheck.class.isAssignableFrom(check)) {
-                // Checks which have Check as a parent.
-                if (check.equals(ImportControlCheck.class)) {
-                    // ImportControlCheck must have the import control configuration file to avoid
-                    // violation.
-                    checkConfig.addAttribute("file", getPath(
-                            "InputAllChecksImport-control_complete.xml"));
-                }
-                checker = createChecker(checkConfig);
+            if (module.equals(ImportControlCheck.class)) {
+                // ImportControlCheck must have the import control configuration file to avoid
+                // violation.
+                moduleConfig.addAttribute("file", getPath(
+                        "InputAllChecksImportControl.xml"));
             }
-            else {
-                // Checks which have TreeWalker as a parent.
-                final BaseCheckTestSupport testSupport = new BaseCheckTestSupport() {
-                    @Override
-                    protected DefaultConfiguration createCheckerConfig(Configuration config) {
-                        final DefaultConfiguration dc = new DefaultConfiguration("root");
-                        dc.addChild(checkConfig);
-                        return dc;
-                    }
-                };
-                checker = testSupport.createChecker(checkConfig);
-            }
+            checker = createChecker(moduleConfig);
             verify(checker, inputFilePath, expected);
         }
     }
@@ -361,7 +360,7 @@ public class AllChecksTest extends BaseCheckTestSupport {
 
     private static void validateAllCheckTokensAreReferencedInConfigFile(String configName,
             Configuration configuration, Map<String, Set<String>> tokensToIgnore) throws Exception {
-        final ModuleFactory moduleFactory = TestUtils.getPackageObjectFactory();
+        final ModuleFactory moduleFactory = TestUtil.getPackageObjectFactory();
         final Set<Configuration> configChecks = ConfigurationUtil.getChecks(configuration);
 
         final Map<String, Set<String>> configCheckTokens = new HashMap<>();
@@ -442,8 +441,9 @@ public class AllChecksTest extends BaseCheckTestSupport {
     @Test
     public void testAllCheckstyleModulesInCheckstyleConfig() throws Exception {
         final Set<String> configChecks = CheckUtil.getConfigCheckStyleModules();
+        final Set<String> moduleNames = CheckUtil.getSimpleNames(CheckUtil.getCheckstyleModules());
 
-        for (String moduleName : CheckUtil.getSimpleNames(CheckUtil.getCheckstyleModules())) {
+        for (String moduleName : moduleNames) {
             Assert.assertTrue("checkstyle_checks.xml is missing module: " + moduleName,
                     configChecks.contains(moduleName));
         }
@@ -454,16 +454,9 @@ public class AllChecksTest extends BaseCheckTestSupport {
         for (Class<?> module : CheckUtil.getCheckstyleChecks()) {
             final String name = module.getSimpleName();
 
-            if ("FileContentsHolder".equals(name)) {
-                Assert.assertTrue(name
-                        + " should not have any 'MSG_*' field for error messages", CheckUtil
-                        .getCheckMessages(module).isEmpty());
-            }
-            else {
-                Assert.assertFalse(name
-                        + " should have at least one 'MSG_*' field for error messages", CheckUtil
-                        .getCheckMessages(module).isEmpty());
-            }
+            Assert.assertFalse(name
+                    + " should have at least one 'MSG_*' field for error messages", CheckUtil
+                    .getCheckMessages(module).isEmpty());
         }
     }
 
@@ -550,6 +543,7 @@ public class AllChecksTest extends BaseCheckTestSupport {
      * Checks that an array is a subset of other array.
      * @param array to check whether it is a subset.
      * @param arrayToCheckIn array to check in.
+     * @return {@code true} if all elements in {@code array} are in {@code arrayToCheckIn}.
      */
     private static boolean isSubset(int[] array, int... arrayToCheckIn) {
         Arrays.sort(arrayToCheckIn);
@@ -562,4 +556,5 @@ public class AllChecksTest extends BaseCheckTestSupport {
         }
         return result;
     }
+
 }

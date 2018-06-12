@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,26 +21,21 @@ package com.google.checkstyle.test.chapter4formatting.rule412nonemptyblocks;
 
 import static com.puppycrawl.tools.checkstyle.checks.blocks.LeftCurlyCheck.MSG_KEY_LINE_PREVIOUS;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.junit.Test;
 
-import com.google.checkstyle.test.base.BaseCheckTestSupport;
+import com.google.checkstyle.test.base.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 import com.puppycrawl.tools.checkstyle.checks.blocks.LeftCurlyCheck;
 
-public class LeftCurlyTest extends BaseCheckTestSupport {
+public class LeftCurlyTest extends AbstractModuleTestSupport {
 
     @Override
-    protected String getPath(String fileName) throws IOException {
-        return super.getPath("chapter4formatting" + File.separator + "rule412nonemptyblocks"
-                + File.separator + fileName);
+    protected String getPackageLocation() {
+        return "com/google/checkstyle/test/chapter4formatting/rule412nonemptyblocks";
     }
 
     @Test
     public void testLeftCurlyBraces() throws Exception {
-
         final String[] expected = {
             "4:1: " + getCheckMessage(LeftCurlyCheck.class, MSG_KEY_LINE_PREVIOUS, "{", 1),
             "7:5: " + getCheckMessage(LeftCurlyCheck.class, MSG_KEY_LINE_PREVIOUS, "{", 5),
@@ -51,7 +46,7 @@ public class LeftCurlyTest extends BaseCheckTestSupport {
             "97:5: " + getCheckMessage(LeftCurlyCheck.class, MSG_KEY_LINE_PREVIOUS, "{", 5),
         };
 
-        final Configuration checkConfig = getCheckConfig("LeftCurly");
+        final Configuration checkConfig = getModuleConfig("LeftCurly");
         final String filePath = getPath("InputLeftCurlyBraces.java");
 
         final Integer[] warnList = getLinesWithWarn(filePath);
@@ -60,7 +55,6 @@ public class LeftCurlyTest extends BaseCheckTestSupport {
 
     @Test
     public void testLeftCurlyAnnotations() throws Exception {
-
         final String[] expected = {
             "10:1: " + getCheckMessage(LeftCurlyCheck.class, MSG_KEY_LINE_PREVIOUS, "{", 1),
             "14:5: " + getCheckMessage(LeftCurlyCheck.class, MSG_KEY_LINE_PREVIOUS, "{", 5),
@@ -69,7 +63,7 @@ public class LeftCurlyTest extends BaseCheckTestSupport {
             "50:5: " + getCheckMessage(LeftCurlyCheck.class, MSG_KEY_LINE_PREVIOUS, "{", 5),
         };
 
-        final Configuration checkConfig = getCheckConfig("LeftCurly");
+        final Configuration checkConfig = getModuleConfig("LeftCurly");
         final String filePath = getPath("InputLeftCurlyAnnotations.java");
 
         final Integer[] warnList = getLinesWithWarn(filePath);
@@ -78,7 +72,6 @@ public class LeftCurlyTest extends BaseCheckTestSupport {
 
     @Test
     public void testLeftCurlyMethods() throws Exception {
-
         final String[] expected = {
             "4:1: " + getCheckMessage(LeftCurlyCheck.class, MSG_KEY_LINE_PREVIOUS, "{", 1),
             "9:5: " + getCheckMessage(LeftCurlyCheck.class, MSG_KEY_LINE_PREVIOUS, "{", 5),
@@ -97,10 +90,11 @@ public class LeftCurlyTest extends BaseCheckTestSupport {
             "76:5: " + getCheckMessage(LeftCurlyCheck.class, MSG_KEY_LINE_PREVIOUS, "{", 5),
         };
 
-        final Configuration checkConfig = getCheckConfig("LeftCurly");
+        final Configuration checkConfig = getModuleConfig("LeftCurly");
         final String filePath = getPath("InputLeftCurlyMethod.java");
 
         final Integer[] warnList = getLinesWithWarn(filePath);
         verify(checkConfig, filePath, expected, warnList);
     }
+
 }

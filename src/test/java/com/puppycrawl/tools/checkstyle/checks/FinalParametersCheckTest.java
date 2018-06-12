@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,18 +25,19 @@ import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class FinalParametersCheckTest extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
-        return "com/puppycrawl/tools/checkstyle/checks/misc/finalparameters";
+        return "com/puppycrawl/tools/checkstyle/checks/finalparameters";
     }
 
     @Test
     public void testDefaultTokens() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(FinalParametersCheck.class);
+            createModuleConfig(FinalParametersCheck.class);
         final String[] expected = {
             "23:26: " + getCheckMessage(MSG_KEY, "s"),
             "38:26: " + getCheckMessage(MSG_KEY, "i"),
@@ -56,7 +57,7 @@ public class FinalParametersCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testCtorToken() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(FinalParametersCheck.class);
+            createModuleConfig(FinalParametersCheck.class);
         checkConfig.addAttribute("tokens", "CTOR_DEF");
         final String[] expected = {
             "23:26: " + getCheckMessage(MSG_KEY, "s"),
@@ -69,7 +70,7 @@ public class FinalParametersCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testMethodToken() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(FinalParametersCheck.class);
+            createModuleConfig(FinalParametersCheck.class);
         checkConfig.addAttribute("tokens", "METHOD_DEF");
         final String[] expected = {
             "53:17: " + getCheckMessage(MSG_KEY, "s"),
@@ -87,7 +88,7 @@ public class FinalParametersCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testCatchToken() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(FinalParametersCheck.class);
+            createModuleConfig(FinalParametersCheck.class);
         checkConfig.addAttribute("tokens", "LITERAL_CATCH");
         final String[] expected = {
             "125:16: " + getCheckMessage(MSG_KEY, "npe"),
@@ -100,7 +101,7 @@ public class FinalParametersCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testForEachClauseToken() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(FinalParametersCheck.class);
+            createModuleConfig(FinalParametersCheck.class);
         checkConfig.addAttribute("tokens", "FOR_EACH_CLAUSE");
         final String[] expected = {
             "152:13: " + getCheckMessage(MSG_KEY, "s"),
@@ -112,7 +113,7 @@ public class FinalParametersCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testIgnorePrimitiveTypesParameters() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(FinalParametersCheck.class);
+            createModuleConfig(FinalParametersCheck.class);
         checkConfig.addAttribute("ignorePrimitiveTypes", "true");
         final String[] expected = {
             "6:22: " + getCheckMessage(MSG_KEY, "k"),
@@ -129,8 +130,9 @@ public class FinalParametersCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testReceiverParameters() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(FinalParametersCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+            createModuleConfig(FinalParametersCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputFinalParametersReceiver.java"), expected);
     }
+
 }

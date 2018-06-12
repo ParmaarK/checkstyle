@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -27,13 +27,13 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.DetailNode;
 import com.puppycrawl.tools.checkstyle.api.JavadocTokenTypes;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.JavadocUtils;
-import com.puppycrawl.tools.checkstyle.utils.TokenUtils;
+import com.puppycrawl.tools.checkstyle.utils.JavadocUtil;
+import com.puppycrawl.tools.checkstyle.utils.TokenUtil;
 
 /**
  * <p>
  * Checks the order of
- * <a href="http://docs.oracle.com/javase/8/docs/technotes/tools/windows/javadoc.html#CHDBEFIF">
+ * <a href="https://docs.oracle.com/javase/8/docs/technotes/tools/windows/javadoc.html#CHDBEFIF">
  * javadoc block-tags or javadoc tags</a>.
  * </p>
  * <p>
@@ -64,7 +64,6 @@ import com.puppycrawl.tools.checkstyle.utils.TokenUtils;
  * &lt;/module&gt;
  * </pre>
  *
- * @author max
  *
  */
 public class AtclauseOrderCheck extends AbstractJavadocCheck {
@@ -111,7 +110,7 @@ public class AtclauseOrderCheck extends AbstractJavadocCheck {
     public void setTarget(String... targets) {
         final List<Integer> customTarget = new ArrayList<>();
         for (String temp : targets) {
-            customTarget.add(TokenUtils.getTokenId(temp.trim()));
+            customTarget.add(TokenUtil.getTokenId(temp.trim()));
         }
         target = customTarget;
     }
@@ -158,7 +157,7 @@ public class AtclauseOrderCheck extends AbstractJavadocCheck {
 
         for (DetailNode node : javadoc.getChildren()) {
             if (node.getType() == JavadocTokenTypes.JAVADOC_TAG) {
-                final String tagText = JavadocUtils.getFirstChild(node).getText();
+                final String tagText = JavadocUtil.getFirstChild(node).getText();
                 final int indexOfCurrentTag = tagOrder.indexOf(tagText);
 
                 if (indexOfCurrentTag != -1) {
@@ -186,4 +185,5 @@ public class AtclauseOrderCheck extends AbstractJavadocCheck {
         }
         return type;
     }
+
 }

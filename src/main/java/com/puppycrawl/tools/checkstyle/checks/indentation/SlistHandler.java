@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -27,7 +27,6 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 /**
  * Handler for a list of statements.
  *
- * @author jrichard
  */
 public class SlistHandler extends BlockParentHandler {
 
@@ -78,14 +77,18 @@ public class SlistHandler extends BlockParentHandler {
         //  ... the case SLIST is followed by a user-created SLIST and
         //  preceded by a switch
 
+        final IndentLevel result;
         // if our parent is a block handler we want to be transparent
         if (getParent() instanceof BlockParentHandler
                 && !(getParent() instanceof SlistHandler)
             || child instanceof SlistHandler
                 && getParent() instanceof CaseHandler) {
-            return getParent().getSuggestedChildIndent(child);
+            result = getParent().getSuggestedChildIndent(child);
         }
-        return super.getSuggestedChildIndent(child);
+        else {
+            result = super.getSuggestedChildIndent(child);
+        }
+        return result;
     }
 
     @Override
@@ -136,4 +139,5 @@ public class SlistHandler extends BlockParentHandler {
         return parentNode.getType() == TokenTypes.CASE_GROUP
             && getMainAst().getLineNo() == parentNode.getLineNo();
     }
+
 }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -26,26 +26,28 @@ import static org.mockito.Mockito.verify;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.internal.util.reflection.Whitebox;
 
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.AbstractPathTestSupport;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
-public class AbstractCheckTest {
-    private static final String INPUT_FOLDER =
-        "src/test/resources/com/puppycrawl/tools/checkstyle/api/abstractcheck/";
+public class AbstractCheckTest extends AbstractPathTestSupport {
+
+    @Override
+    protected String getPackageLocation() {
+        return "com/puppycrawl/tools/checkstyle/api/abstractcheck";
+    }
 
     @Test
     public void testGetRequiredTokens() {
         final AbstractCheck check = new AbstractCheck() {
             @Override
             public int[] getDefaultTokens() {
-                return CommonUtils.EMPTY_INT_ARRAY;
+                return CommonUtil.EMPTY_INT_ARRAY;
             }
 
             @Override
@@ -60,7 +62,7 @@ public class AbstractCheckTest {
         };
         // Eventually it will become clear abstract method
         Assert.assertArrayEquals("Invalid number of tokens, should be empty",
-                CommonUtils.EMPTY_INT_ARRAY, check.getRequiredTokens());
+                CommonUtil.EMPTY_INT_ARRAY, check.getRequiredTokens());
     }
 
     @Test
@@ -68,7 +70,7 @@ public class AbstractCheckTest {
         final AbstractCheck check = new AbstractCheck() {
             @Override
             public int[] getDefaultTokens() {
-                return CommonUtils.EMPTY_INT_ARRAY;
+                return CommonUtil.EMPTY_INT_ARRAY;
             }
 
             @Override
@@ -83,7 +85,7 @@ public class AbstractCheckTest {
         };
         // Eventually it will become clear abstract method
         Assert.assertArrayEquals("Invalid number of tokens, should be empty",
-                CommonUtils.EMPTY_INT_ARRAY, check.getAcceptableTokens());
+                CommonUtil.EMPTY_INT_ARRAY, check.getAcceptableTokens());
     }
 
     @Test
@@ -91,17 +93,17 @@ public class AbstractCheckTest {
         final AbstractCheck check = new AbstractCheck() {
             @Override
             public int[] getDefaultTokens() {
-                return CommonUtils.EMPTY_INT_ARRAY;
+                return CommonUtil.EMPTY_INT_ARRAY;
             }
 
             @Override
             public int[] getAcceptableTokens() {
-                return CommonUtils.EMPTY_INT_ARRAY;
+                return CommonUtil.EMPTY_INT_ARRAY;
             }
 
             @Override
             public int[] getRequiredTokens() {
-                return CommonUtils.EMPTY_INT_ARRAY;
+                return CommonUtil.EMPTY_INT_ARRAY;
             }
         };
         final AbstractCheck checkSpy = spy(check);
@@ -116,7 +118,7 @@ public class AbstractCheckTest {
         final AbstractCheck check = new AbstractCheck() {
             @Override
             public int[] getDefaultTokens() {
-                return CommonUtils.EMPTY_INT_ARRAY;
+                return CommonUtil.EMPTY_INT_ARRAY;
             }
 
             @Override
@@ -130,18 +132,18 @@ public class AbstractCheckTest {
             }
         };
         check.setFileContents(new FileContents(new FileText(
-            new File(INPUT_FOLDER + "InputAbstractCheckTestFileContence.java"),
+            new File(getPath("InputAbstractCheckTestFileContents.java")),
             Charset.defaultCharset().name())));
 
         Assert.assertEquals("Invalid line content", " * I'm a javadoc", check.getLine(3));
     }
 
     @Test
-    public void testGetTabWidth() throws Exception {
+    public void testGetTabWidth() {
         final AbstractCheck check = new AbstractCheck() {
             @Override
             public int[] getDefaultTokens() {
-                return CommonUtils.EMPTY_INT_ARRAY;
+                return CommonUtil.EMPTY_INT_ARRAY;
             }
 
             @Override
@@ -161,11 +163,11 @@ public class AbstractCheckTest {
     }
 
     @Test
-    public void testGetClassLoader() throws Exception {
+    public void testGetClassLoader() {
         final AbstractCheck check = new AbstractCheck() {
             @Override
             public int[] getDefaultTokens() {
-                return CommonUtils.EMPTY_INT_ARRAY;
+                return CommonUtil.EMPTY_INT_ARRAY;
             }
 
             @Override
@@ -185,7 +187,7 @@ public class AbstractCheckTest {
     }
 
     @Test
-    public void testGetAcceptableTokens() throws Exception {
+    public void testGetAcceptableTokens() {
         final int[] defaultTokens = {TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF};
         final int[] acceptableTokens = {TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF};
         final int[] requiredTokens = {TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF};
@@ -215,19 +217,17 @@ public class AbstractCheckTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void testClearMessages() {
         final AbstractCheck check = new DummyAbstractCheck();
 
         check.log(0, "key", "args");
-        final Collection<LocalizedMessage> messages =
-                (Collection<LocalizedMessage>) Whitebox.getInternalState(check, "messages");
-        Assert.assertEquals("Invalid message size", 1, messages.size());
+        Assert.assertEquals("Invalid message size", 1, check.getMessages().size());
         check.clearMessages();
-        Assert.assertEquals("Invalid message size", 0, messages.size());
+        Assert.assertEquals("Invalid message size", 0, check.getMessages().size());
     }
 
     private static final class DummyAbstractCheck extends AbstractCheck {
+
         private static final int[] DUMMY_ARRAY = {6};
 
         @Override
@@ -251,5 +251,7 @@ public class AbstractCheckTest {
             messages.put("key", "value");
             return messages;
         }
+
     }
+
 }

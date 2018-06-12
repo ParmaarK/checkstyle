@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,11 +23,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FullIdent;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * <p>
@@ -59,9 +60,8 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
  * Compatible with Java 1.5 source.
  *
  * </pre>
- * @author Oliver Burn
- * @author Lars Kühne
  */
+@StatelessCheck
 public class IllegalImportCheck
     extends AbstractCheck {
 
@@ -99,12 +99,13 @@ public class IllegalImportCheck
     /**
      * Set the list of illegal packages.
      * @param from array of illegal packages
+     * @noinspection WeakerAccess
      */
     public final void setIllegalPkgs(String... from) {
         illegalPkgs = from.clone();
         illegalPkgsRegexps.clear();
         for (String illegalPkg : illegalPkgs) {
-            illegalPkgsRegexps.add(CommonUtils.createPattern("^" + illegalPkg + "\\..*"));
+            illegalPkgsRegexps.add(CommonUtil.createPattern("^" + illegalPkg + "\\..*"));
         }
     }
 
@@ -114,9 +115,8 @@ public class IllegalImportCheck
      */
     public void setIllegalClasses(String... from) {
         illegalClasses = from.clone();
-        illegalClassesRegexps.clear();
         for (String illegalClass : illegalClasses) {
-            illegalClassesRegexps.add(CommonUtils.createPattern(illegalClass));
+            illegalClassesRegexps.add(CommonUtil.createPattern(illegalClass));
         }
     }
 
@@ -131,17 +131,17 @@ public class IllegalImportCheck
 
     @Override
     public int[] getDefaultTokens() {
-        return getAcceptableTokens();
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {TokenTypes.IMPORT, TokenTypes.STATIC_IMPORT};
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getAcceptableTokens();
+        return new int[] {TokenTypes.IMPORT, TokenTypes.STATIC_IMPORT};
     }
 
     @Override
@@ -155,8 +155,7 @@ public class IllegalImportCheck
                 ast.getFirstChild().getNextSibling());
         }
         if (isIllegalImport(imp.getText())) {
-            log(ast.getLineNo(),
-                ast.getColumnNo(),
+            log(ast,
                 MSG_KEY,
                 imp.getText());
         }
@@ -227,4 +226,5 @@ public class IllegalImportCheck
         }
         return result;
     }
+
 }

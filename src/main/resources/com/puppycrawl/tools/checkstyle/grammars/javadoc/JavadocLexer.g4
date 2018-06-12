@@ -120,9 +120,9 @@ Newline5: NEWLINE
 Leading_asterisk3: LEADING_ASTERISK -> type(LEADING_ASTERISK);
 XmlTagOpen1: '<' -> type(START), pushMode(xmlTagDefinition);
 STRING: '"' .*? '"' {referenceCatched = false;} -> mode(DEFAULT_MODE);
-PACKAGE: [a-z_$] ([a-z0-9_$] | '.')+ [a-z0-9_$] {referenceCatched = true;};
+PACKAGE_CLASS: Identifier ('.' Identifier)* {referenceCatched = true;};
 DOT: '.';
-HASH: '#' {referenceCatched = true;} -> mode(classMemeber);
+HASH: '#' {referenceCatched = true;} -> mode(classMember);
 CLASS: [A-Z] [a-zA-Z0-9_$]* {referenceCatched = true;};
 End20: JAVADOC_INLINE_TAG_END
       {
@@ -140,7 +140,7 @@ Char2: .
       } -> skip, mode(DEFAULT_MODE);
 
 //////////////////////////////////////////////////////////////////////////////////////
-mode classMemeber;
+mode classMember;
 MEMBER: [a-zA-Z0-9_$]+ {!insideReferenceArguments}?;
 LEFT_BRACE: '(' {insideReferenceArguments=true;};
 RIGHT_BRACE: ')' {insideReferenceArguments=false;};
@@ -241,7 +241,7 @@ Char7: .
 //////////////////////////////////////////////////////////////////////////////////////
 mode codeText;
 Leading_asterisk5: LEADING_ASTERISK -> type(LEADING_ASTERISK);
-Skobki: '{' (~[}] | Skobki)* '}' -> type(CHAR);
+Brackets: '{' (~[}] | Brackets)* '}' -> type(CHAR);
 Text: ~[}] -> type(CHAR);
 Char8: .
       {
@@ -250,12 +250,11 @@ Char8: .
 
 //////////////////////////////////////////////////////////////////////////////////////
 mode value;
+Leading_asterisk2: LEADING_ASTERISK -> type(LEADING_ASTERISK);
 Space6: WS -> type(WS);
 Newline4: NEWLINE -> type(NEWLINE);
-Package2: PACKAGE -> type(PACKAGE);
-Dot2: DOT -> type(DOT);
-Class2: CLASS -> type(CLASS);
-Hash2: HASH -> type(HASH), mode(classMemeber);
+Package_Class2: PACKAGE_CLASS -> type(PACKAGE_CLASS);
+Hash2: HASH -> type(HASH), mode(classMember);
 End1: JAVADOC_INLINE_TAG_END
       {insideJavadocInlineTag--; recognizeXmlTags=true;}
       -> type(JAVADOC_INLINE_TAG_END), mode(DEFAULT_MODE)
@@ -264,6 +263,10 @@ Char10: .
       {
             skipCurrentTokenConsuming();
       } -> skip, mode(DEFAULT_MODE);
+
+fragment JavaLetter: [A-Za-z_$];
+fragment JavaLetterOrDigit: [0-9A-Za-z_$];
+fragment Identifier: JavaLetter (JavaLetterOrDigit)*;
 
 
 
@@ -308,20 +311,8 @@ ISINDEX_HTML_TAG_NAME: I S I N D E X {!htmlTagNameCatched}? {htmlTagNameCatched=
 LINK_HTML_TAG_NAME: L I N K {!htmlTagNameCatched}? {htmlTagNameCatched=true;};
 META_HTML_TAG_NAME: M E T A {!htmlTagNameCatched}? {htmlTagNameCatched=true;};
 PARAM_HTML_TAG_NAME: P A R A M {!htmlTagNameCatched}? {htmlTagNameCatched=true;};
-
-// other tag names and attribute names
-HTML_TAG_NAME: NAME_START_CHAR NAME_CHAR* {htmlTagNameCatched=true;};
-
-LeadingLEADING_ASTERISK1: LEADING_ASTERISK -> type(LEADING_ASTERISK);
-Newline1: NEWLINE -> type(NEWLINE);
-WhiteSpace3: WS -> type(WS);
-
-Char11: .
-      {
-            skipCurrentTokenConsuming();
-            htmlTagNameCatched = false;
-      } -> skip, mode(DEFAULT_MODE);
-
+EMBED_HTML_TAG_NAME: E M B E D {!htmlTagNameCatched}? {htmlTagNameCatched=true;};
+KEYGEN_HTML_TAG_NAME: K E Y G E N {!htmlTagNameCatched}? {htmlTagNameCatched=true;};
 
 fragment
 HEXDIGIT    :   [a-fA-F0-9] ;
@@ -404,3 +395,22 @@ LeadingAst: LEADING_ASTERISK -> type(LEADING_ASTERISK);
 Newline6: NEWLINE -> type(NEWLINE);
 WhiteSpace: WS -> type(WS);
 CommentChar: . -> type(CHAR);
+
+mode xmlTagDefinition;
+SOURCE_HTML_TAG_NAME: S O U R C E {!htmlTagNameCatched}? {htmlTagNameCatched=true;};
+TRACK_HTML_TAG_NAME: T R A C K {!htmlTagNameCatched}? {htmlTagNameCatched=true;};
+WBR_HTML_TAG_NAME: W B R {!htmlTagNameCatched}? {htmlTagNameCatched=true;};
+OPTGROUP_HTML_TAG_NAME: O P T G R O U P {!htmlTagNameCatched}? {htmlTagNameCatched=true;};
+
+// other tag names and attribute names
+HTML_TAG_NAME: NAME_START_CHAR NAME_CHAR* {htmlTagNameCatched=true;};
+
+LeadingLEADING_ASTERISK1: LEADING_ASTERISK -> type(LEADING_ASTERISK);
+Newline1: NEWLINE -> type(NEWLINE);
+WhiteSpace3: WS -> type(WS);
+
+Char11: .
+      {
+            skipCurrentTokenConsuming();
+            htmlTagNameCatched = false;
+      } -> skip, mode(DEFAULT_MODE);

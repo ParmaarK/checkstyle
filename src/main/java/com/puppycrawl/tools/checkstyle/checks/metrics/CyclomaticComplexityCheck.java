@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,7 @@ import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -41,10 +42,8 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * block as a single decision point. Default value is <b>false</b>
  *
  *
- * @author <a href="mailto:simon@redhillconsulting.com.au">Simon Harris</a>
- * @author Oliver Burn
- * @author <a href="mailto:andreyselkin@gmail.com">Andrei Selkin</a>
  */
+@FileStatefulCheck
 public class CyclomaticComplexityCheck
     extends AbstractCheck {
 
@@ -174,7 +173,7 @@ public class CyclomaticComplexityCheck
      *
      * @param ast the token being visited
      */
-    protected final void visitTokenHook(DetailAST ast) {
+    private void visitTokenHook(DetailAST ast) {
         if (switchBlockAsSingleDecisionPoint) {
             if (ast.getType() != TokenTypes.LITERAL_CASE) {
                 incrementCurrentValue(BigInteger.ONE);
@@ -203,27 +202,26 @@ public class CyclomaticComplexityCheck
      *
      * @param amount the amount to increment by
      */
-    protected final void incrementCurrentValue(BigInteger amount) {
+    private void incrementCurrentValue(BigInteger amount) {
         currentValue = currentValue.add(amount);
     }
 
     /** Push the current value on the stack. */
-    protected final void pushValue() {
+    private void pushValue() {
         valueStack.push(currentValue);
         currentValue = INITIAL_VALUE;
     }
 
     /**
      * Pops a value off the stack and makes it the current value.
-     * @return pop a value off the stack and make it the current value
      */
-    protected final BigInteger popValue() {
+    private void popValue() {
         currentValue = valueStack.pop();
-        return currentValue;
     }
 
     /** Process the start of the method definition. */
     private void visitMethodDef() {
         pushValue();
     }
+
 }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,6 +19,7 @@
 
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -38,8 +39,8 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * <pre>
  * &lt;module name="SimplifyBooleanExpression"/&gt;
  * </pre>
- * @author lkuehne
  */
+@StatelessCheck
 public class SimplifyBooleanExpressionCheck
         extends AbstractCheck {
 
@@ -51,17 +52,17 @@ public class SimplifyBooleanExpressionCheck
 
     @Override
     public int[] getDefaultTokens() {
-        return getAcceptableTokens();
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {TokenTypes.LITERAL_TRUE, TokenTypes.LITERAL_FALSE};
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getAcceptableTokens();
+        return new int[] {TokenTypes.LITERAL_TRUE, TokenTypes.LITERAL_FALSE};
     }
 
     @Override
@@ -73,11 +74,11 @@ public class SimplifyBooleanExpressionCheck
             case TokenTypes.LNOT:
             case TokenTypes.LOR:
             case TokenTypes.LAND:
-                log(parent.getLineNo(), parent.getColumnNo(),
-                    MSG_KEY);
+                log(parent, MSG_KEY);
                 break;
             default:
                 break;
         }
     }
+
 }

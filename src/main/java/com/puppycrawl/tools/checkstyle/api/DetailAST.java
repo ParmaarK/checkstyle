@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -24,17 +24,16 @@ import java.util.BitSet;
 import antlr.CommonASTWithHiddenTokens;
 import antlr.Token;
 import antlr.collections.AST;
-import com.puppycrawl.tools.checkstyle.utils.TokenUtils;
+import com.puppycrawl.tools.checkstyle.utils.TokenUtil;
 
 /**
  * An extension of the CommonAST that records the line and column number.
  *
- * @author Oliver Burn
- * @author lkuehne
  * @see <a href="http://www.antlr.org/">ANTLR Website</a>
  * @noinspection FieldNotUsedInToString, SerializableHasSerializationMethods
  */
 public final class DetailAST extends CommonASTWithHiddenTokens {
+
     private static final long serialVersionUID = -2580884815577559874L;
 
     /** Constant to indicate if not calculated the child count. */
@@ -199,13 +198,17 @@ public final class DetailAST extends CommonASTWithHiddenTokens {
      * @param parent the parent token
      */
     private void setParent(DetailAST parent) {
-        clearBranchTokenTypes();
-        this.parent = parent;
-        final DetailAST nextSibling = getNextSibling();
-        if (nextSibling != null) {
-            nextSibling.setParent(parent);
-            nextSibling.previousSibling = this;
-        }
+        DetailAST instance = this;
+        do {
+            instance.clearBranchTokenTypes();
+            instance.parent = parent;
+            final DetailAST nextSibling = instance.getNextSibling();
+            if (nextSibling != null) {
+                nextSibling.previousSibling = instance;
+            }
+
+            instance = nextSibling;
+        } while (instance != null);
     }
 
     /**
@@ -301,7 +304,7 @@ public final class DetailAST extends CommonASTWithHiddenTokens {
         DetailAST node = ast;
         while (node != null) {
             // comment node can't be start of any java statement/definition
-            if (TokenUtils.isCommentType(node.getType())) {
+            if (TokenUtil.isCommentType(node.getType())) {
                 node = node.getNextSibling();
             }
             else {
@@ -323,7 +326,7 @@ public final class DetailAST extends CommonASTWithHiddenTokens {
         DetailAST node = ast;
         while (node != null) {
             // comment node can't be start of any java statement/definition
-            if (TokenUtils.isCommentType(node.getType())) {
+            if (TokenUtil.isCommentType(node.getType())) {
                 node = node.getNextSibling();
             }
             else {
@@ -341,7 +344,6 @@ public final class DetailAST extends CommonASTWithHiddenTokens {
     private BitSet getBranchTokenTypes() {
         // lazy init
         if (branchTokenTypes == null) {
-
             branchTokenTypes = new BitSet();
             branchTokenTypes.set(getType());
 
@@ -428,4 +430,5 @@ public final class DetailAST extends CommonASTWithHiddenTokens {
             prevParent = prevParent.parent;
         }
     }
+
 }

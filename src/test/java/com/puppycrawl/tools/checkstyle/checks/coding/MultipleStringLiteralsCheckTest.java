@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,13 +21,20 @@ package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import static com.puppycrawl.tools.checkstyle.checks.coding.MultipleStringLiteralsCheck.MSG_KEY;
 
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableMap;
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class MultipleStringLiteralsCheckTest extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/coding/multiplestringliterals";
@@ -36,7 +43,7 @@ public class MultipleStringLiteralsCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testIt() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(MultipleStringLiteralsCheck.class);
+            createModuleConfig(MultipleStringLiteralsCheck.class);
         checkConfig.addAttribute("allowedDuplicates", "2");
         checkConfig.addAttribute("ignoreStringsRegexp", "");
 
@@ -54,7 +61,7 @@ public class MultipleStringLiteralsCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testItIgnoreEmpty() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(MultipleStringLiteralsCheck.class);
+            createModuleConfig(MultipleStringLiteralsCheck.class);
         checkConfig.addAttribute("allowedDuplicates", "2");
 
         final String[] expected = {
@@ -68,9 +75,31 @@ public class MultipleStringLiteralsCheckTest extends AbstractModuleTestSupport {
     }
 
     @Test
+    public void testMultipleInputs() throws Exception {
+        final DefaultConfiguration checkConfig =
+            createModuleConfig(MultipleStringLiteralsCheck.class);
+        checkConfig.addAttribute("allowedDuplicates", "2");
+
+        final String firstInput = getPath("InputMultipleStringLiterals.java");
+        final String secondInput = getPath("InputMultipleStringLiteralsNoWarnings.java");
+
+        final File[] inputs = {new File(firstInput), new File(secondInput)};
+
+        final List<String> expectedFirstInput = Arrays.asList(
+            "5:16: " + getCheckMessage(MSG_KEY, "\"StringContents\"", 3),
+            "10:23: " + getCheckMessage(MSG_KEY, "\", \"", 3)
+        );
+        final List<String> expectedSecondInput = Arrays.asList(CommonUtil.EMPTY_STRING_ARRAY);
+
+        verify(createChecker(checkConfig), inputs,
+            ImmutableMap.of(firstInput, expectedFirstInput,
+                secondInput, expectedSecondInput));
+    }
+
+    @Test
     public void testItIgnoreEmptyAndComspace() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(MultipleStringLiteralsCheck.class);
+            createModuleConfig(MultipleStringLiteralsCheck.class);
         checkConfig.addAttribute("allowedDuplicates", "2");
         checkConfig.addAttribute("ignoreStringsRegexp", "^((\"\")|(\", \"))$");
 
@@ -86,7 +115,7 @@ public class MultipleStringLiteralsCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testItWithoutIgnoringAnnotations() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(MultipleStringLiteralsCheck.class);
+            createModuleConfig(MultipleStringLiteralsCheck.class);
         checkConfig.addAttribute("allowedDuplicates", "3");
         checkConfig.addAttribute("ignoreOccurrenceContext", "");
 
@@ -102,15 +131,15 @@ public class MultipleStringLiteralsCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testTokensNotNull() {
         final MultipleStringLiteralsCheck check = new MultipleStringLiteralsCheck();
-        Assert.assertNotNull(check.getAcceptableTokens());
-        Assert.assertNotNull(check.getDefaultTokens());
-        Assert.assertNotNull(check.getRequiredTokens());
+        Assert.assertNotNull("Acceptable tokens should not be null", check.getAcceptableTokens());
+        Assert.assertNotNull("Default tokens should not be null", check.getDefaultTokens());
+        Assert.assertNotNull("Required tokens should not be null", check.getRequiredTokens());
     }
 
     @Test
     public void testDefaultConfiguration() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(MultipleStringLiteralsCheck.class);
+            createModuleConfig(MultipleStringLiteralsCheck.class);
         final String[] expected = {
             "5:16: " + getCheckMessage(MSG_KEY, "\"StringContents\"", 3),
             "7:17: " + getCheckMessage(MSG_KEY, "\"DoubleString\"", 2),
@@ -126,7 +155,7 @@ public class MultipleStringLiteralsCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testIgnores() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(MultipleStringLiteralsCheck.class);
+            createModuleConfig(MultipleStringLiteralsCheck.class);
         checkConfig.addAttribute("ignoreStringsRegexp", null);
         checkConfig.addAttribute("ignoreOccurrenceContext", "VARIABLE_DEF");
         final String[] expected = {
@@ -138,4 +167,5 @@ public class MultipleStringLiteralsCheckTest extends AbstractModuleTestSupport {
             getPath("InputMultipleStringLiterals.java"),
             expected);
     }
+
 }

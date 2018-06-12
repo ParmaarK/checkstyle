@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -29,13 +29,12 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.DetailNode;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.puppycrawl.tools.checkstyle.gui.MainFrameModel.ParseMode;
-import com.puppycrawl.tools.checkstyle.utils.JavadocUtils;
-import com.puppycrawl.tools.checkstyle.utils.TokenUtils;
+import com.puppycrawl.tools.checkstyle.utils.JavadocUtil;
+import com.puppycrawl.tools.checkstyle.utils.TokenUtil;
 
 /**
  * The model that backs the parse tree in the GUI.
  *
- * @author Lars Kühne
  */
 public class ParseTreeTablePresentation {
 
@@ -188,7 +187,7 @@ public class ParseTreeTablePresentation {
         else {
             if (parseMode == ParseMode.JAVA_WITH_JAVADOC_AND_COMMENTS
                     && ((AST) parent).getType() == TokenTypes.COMMENT_CONTENT
-                    && JavadocUtils.isJavadocComment(((DetailAST) parent).getParent())) {
+                    && JavadocUtil.isJavadocComment(((DetailAST) parent).getParent())) {
                 //getChildCount return 0 on COMMENT_CONTENT,
                 //but we need to attach javadoc tree, that is separate tree
                 result = 1;
@@ -272,7 +271,7 @@ public class ParseTreeTablePresentation {
         final Object result;
         if (parseMode == ParseMode.JAVA_WITH_JAVADOC_AND_COMMENTS
                 && parent.getType() == TokenTypes.COMMENT_CONTENT
-                && JavadocUtils.isJavadocComment(parent.getParent())) {
+                && JavadocUtil.isJavadocComment(parent.getParent())) {
             result = getJavadocTree(parent.getParent());
         }
         else {
@@ -303,7 +302,7 @@ public class ParseTreeTablePresentation {
                 value = null;
                 break;
             case 1:
-                value = JavadocUtils.getTokenName(node.getType());
+                value = JavadocUtil.getTokenName(node.getType());
                 break;
             case 2:
                 value = node.getLineNumber();
@@ -335,7 +334,7 @@ public class ParseTreeTablePresentation {
                 value = null;
                 break;
             case 1:
-                value = TokenUtils.getTokenName(ast.getType());
+                value = TokenUtil.getTokenName(ast.getType());
                 break;
             case 2:
                 value = ast.getLineNo();
@@ -366,4 +365,5 @@ public class ParseTreeTablePresentation {
         }
         return javadocTree;
     }
+
 }

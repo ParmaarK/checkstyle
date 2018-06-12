@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -30,23 +30,23 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.puppycrawl.tools.checkstyle.JavadocDetailNodeParser;
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.Scope;
 import com.puppycrawl.tools.checkstyle.api.TextBlock;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CheckUtils;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
-import com.puppycrawl.tools.checkstyle.utils.ScopeUtils;
+import com.puppycrawl.tools.checkstyle.utils.CheckUtil;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
+import com.puppycrawl.tools.checkstyle.utils.ScopeUtil;
 
 /**
  * Custom Checkstyle Check to validate Javadoc.
  *
- * @author Chris Stillwell
- * @author Daniel Grenner
- * @author Travis Schneeberger
  */
+@StatelessCheck
 public class JavadocStyleCheck
     extends AbstractCheck {
 
@@ -63,7 +63,7 @@ public class JavadocStyleCheck
     public static final String MSG_INCOMPLETE_TAG = "javadoc.incompleteTag";
 
     /** Message property key for the Unclosed HTML message. */
-    public static final String MSG_UNCLOSED_HTML = "javadoc.unclosedHtml";
+    public static final String MSG_UNCLOSED_HTML = JavadocDetailNodeParser.MSG_UNCLOSED_HTML_TAG;
 
     /** Message property key for the Extra HTML message. */
     public static final String MSG_EXTRA_HTML = "javadoc.extraHtml";
@@ -136,7 +136,7 @@ public class JavadocStyleCheck
 
     @Override
     public int[] getRequiredTokens() {
-        return CommonUtils.EMPTY_INT_ARRAY;
+        return CommonUtil.EMPTY_INT_ARRAY;
     }
 
     @Override
@@ -164,17 +164,17 @@ public class JavadocStyleCheck
         if (ast.getType() == TokenTypes.PACKAGE_DEF) {
             check = getFileContents().inPackageInfo();
         }
-        else if (!ScopeUtils.isInCodeBlock(ast)) {
+        else if (!ScopeUtil.isInCodeBlock(ast)) {
             final Scope customScope;
 
-            if (ScopeUtils.isInInterfaceOrAnnotationBlock(ast)
+            if (ScopeUtil.isInInterfaceOrAnnotationBlock(ast)
                     || ast.getType() == TokenTypes.ENUM_CONSTANT_DEF) {
                 customScope = Scope.PUBLIC;
             }
             else {
-                customScope = ScopeUtils.getScopeFromMods(ast.findFirstToken(TokenTypes.MODIFIERS));
+                customScope = ScopeUtil.getScopeFromMods(ast.findFirstToken(TokenTypes.MODIFIERS));
             }
-            final Scope surroundingScope = ScopeUtils.getSurroundingScope(ast);
+            final Scope surroundingScope = ScopeUtil.getSurroundingScope(ast);
 
             check = customScope.isIn(scope)
                     && (surroundingScope == null || surroundingScope.isIn(scope))
@@ -260,7 +260,7 @@ public class JavadocStyleCheck
      * @return a comment text String.
      */
     private static String getCommentText(String... comments) {
-        final StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder(1024);
         for (final String line : comments) {
             final int textStart = findTextStart(line);
 
@@ -342,6 +342,7 @@ public class JavadocStyleCheck
      * @param ast the node with the Javadoc
      * @param comment the {@code TextBlock} which represents
      *                 the Javadoc comment.
+     * @noinspection MethodWithMultipleReturnPoints
      */
     // -@cs[ReturnCount] Too complex to break apart.
     private void checkHtmlTags(final DetailAST ast, final TextBlock comment) {
@@ -389,7 +390,7 @@ public class JavadocStyleCheck
         // Identify any tags left on the stack.
         // Skip multiples, like <b>...<b>
         String lastFound = "";
-        final List<String> typeParameters = CheckUtils.getTypeParameterNames(ast);
+        final List<String> typeParameters = CheckUtil.getTypeParameterNames(ast);
         for (final HtmlTag htmlTag : htmlStack) {
             if (!isSingleTag(htmlTag)
                 && !htmlTag.getId().equals(lastFound)
@@ -538,4 +539,5 @@ public class JavadocStyleCheck
     public void setCheckEmptyJavadoc(boolean flag) {
         checkEmptyJavadoc = flag;
     }
+
 }

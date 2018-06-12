@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,6 +19,7 @@
 
 package com.puppycrawl.tools.checkstyle.checks;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -29,9 +30,10 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * and some like C-style: public static void main(String args[])
  *
  * <p>By default the Check enforces Java style.
- * @author lkuehne
  */
+@StatelessCheck
 public class ArrayTypeStyleCheck extends AbstractCheck {
+
     /**
      * A key is pointing to the warning message text in "messages.properties"
      * file.
@@ -43,17 +45,17 @@ public class ArrayTypeStyleCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return getAcceptableTokens();
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {TokenTypes.ARRAY_DECLARATOR};
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getAcceptableTokens();
+        return new int[] {TokenTypes.ARRAY_DECLARATOR};
     }
 
     @Override
@@ -67,10 +69,10 @@ public class ArrayTypeStyleCheck extends AbstractCheck {
             if (variableAST != null) {
                 final boolean isJavaStyle =
                     variableAST.getLineNo() > ast.getLineNo()
-                    || variableAST.getColumnNo() > ast.getColumnNo();
+                    || variableAST.getColumnNo() - ast.getColumnNo() > -1;
 
                 if (isJavaStyle != javaStyle) {
-                    log(ast.getLineNo(), ast.getColumnNo(), MSG_KEY);
+                    log(ast, MSG_KEY);
                 }
             }
         }
@@ -83,4 +85,5 @@ public class ArrayTypeStyleCheck extends AbstractCheck {
     public void setJavaStyle(boolean javaStyle) {
         this.javaStyle = javaStyle;
     }
+
 }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -26,7 +26,10 @@ import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.AbstractTreeTestSupport;
 
-/** @noinspection ClassOnlyUsedInOnePackage */
+/**
+ * JavadocParseTreeTest.
+ * @noinspection ClassOnlyUsedInOnePackage
+ */
 public class JavadocParseTreeTest extends AbstractTreeTestSupport {
 
     @Override
@@ -251,4 +254,89 @@ public class JavadocParseTreeTest extends AbstractTreeTestSupport {
         verifyJavadocTree(getPath("expectedJavadocWithCrAsNewlineAst.txt"),
                 getPath("InputJavadocWithCrAsNewline.javadoc"));
     }
+
+    @Test
+    public void testNestingWithSingletonElement() throws Exception {
+        verifyJavadocTree(getHtmlPath("expectedNestingWithSingletonElementAst.txt"),
+                getHtmlPath("InputNestingWithSingletonElement.javadoc"));
+    }
+
+    @Test
+    public void testVoidElements() throws Exception {
+        verifyJavadocTree(getHtmlPath("expectedVoidElementsAst.txt"),
+                getHtmlPath("InputVoidElements.javadoc"));
+    }
+
+    @Test
+    public void testHtmlVoidElementEmbed() throws Exception {
+        verifyJavadocTree(getHtmlPath("expectedHtmlVoidElementEmbedAst.txt"),
+                getHtmlPath("InputHtmlVoidElementEmbed.javadoc"));
+    }
+
+    @Test
+    public void testSpaceBeforeDescriptionInBlockJavadocTags() throws Exception {
+        verifyJavadocTree(getDocPath("expectedSpaceBeforeDescriptionInBlockJavadocTagsAst.txt"),
+                getDocPath("InputSpaceBeforeDescriptionInBlockJavadocTags.javadoc"));
+    }
+
+    @Test
+    public void testSpaceBeforeDescriptionInInlineTags() throws Exception {
+        verifyJavadocTree(getDocPath("expectedSpaceBeforeArgsInInlineTagsAst.txt"),
+                getDocPath("InputSpaceBeforeArgsInInlineTags.javadoc"));
+    }
+
+    @Test
+    public void testHtmlVoidElementKeygen() throws Exception {
+        verifyJavadocTree(getHtmlPath("expectedHtmlVoidElementKeygenAst.txt"),
+                getHtmlPath("InputHtmlVoidElementKeygen.javadoc"));
+    }
+
+    @Test
+    public void testHtmlVoidElementSource() throws Exception {
+        verifyJavadocTree(getHtmlPath("expectedHtmlVoidElementSourceAst.txt"),
+                getHtmlPath("InputHtmlVoidElementSource.javadoc"));
+    }
+
+    @Test
+    public void testHtmlVoidElementTrack() throws Exception {
+        verifyJavadocTree(getHtmlPath("expectedHtmlVoidElementTrackAst.txt"),
+                getHtmlPath("InputHtmlVoidElementTrack.javadoc"));
+    }
+
+    @Test
+    public void testHtmlVoidElementWbr() throws Exception {
+        verifyJavadocTree(getHtmlPath("expectedHtmlVoidElementWbrAst.txt"),
+                getHtmlPath("InputHtmlVoidElementWbr.javadoc"));
+    }
+
+    @Test
+    public void testOptgroupHtmlTag() throws Exception {
+        verifyJavadocTree(getHtmlPath("expectedOptgroupHtmlTagAst.txt"),
+                getHtmlPath("InputOptgroupHtmlTag.javadoc"));
+    }
+
+    @Test
+    public void testNonTightOptgroupHtmlTag() throws Exception {
+        verifyJavadocTree(getHtmlPath("expectedNonTightOptgroupHtmlTagAst.txt"),
+                getHtmlPath("InputNonTightOptgroupHtmlTag.javadoc"));
+    }
+
+    @Test
+    public void testLeadingAsteriskAfterSeeTag() throws Exception {
+        verifyJavadocTree(getDocPath("expectedLeadingAsteriskAfterSeeTagAst.txt"),
+                getDocPath("InputLeadingAsteriskAfterSeeTag.javadoc"));
+    }
+
+    @Test
+    public void testUppercaseInPackageName() throws Exception {
+        verifyJavadocTree(getDocPath("expectedUppercaseInPackageNameAst.txt"),
+                getDocPath("InputUppercaseInPackageName.javadoc"));
+    }
+
+    @Test
+    public void testParagraph() throws Exception {
+        verifyJavadocTree(getHtmlPath("expectedParagraphAst.txt"),
+                getHtmlPath("InputParagraph.javadoc"));
+    }
+
 }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -27,11 +27,10 @@ import org.junit.Test;
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.checks.naming.MemberNameCheck;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * Tests GeneratedJava14Lexer.
- * @author Rick Giles
  */
 public class GeneratedJava14LexerTest
     extends AbstractModuleTestSupport {
@@ -51,10 +50,10 @@ public class GeneratedJava14LexerTest
     @Test
     public void testUnexpectedChar() throws Exception {
         // Encoding problems can occur in Windows
-        Assume.assumeFalse(IS_WINDOWS);
+        Assume.assumeFalse("Problems with encoding may occur", IS_WINDOWS);
 
         final DefaultConfiguration checkConfig =
-            createCheckConfig(MemberNameCheck.class);
+            createModuleConfig(MemberNameCheck.class);
         // input is 'ÃЯ'
         final String[] expected = {
             "7:9: " + getCheckMessage(MemberNameCheck.class, MSG_INVALID_PATTERN,
@@ -66,8 +65,9 @@ public class GeneratedJava14LexerTest
     @Test
     public void testSemicolonBetweenImports() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(MemberNameCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+            createModuleConfig(MemberNameCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getNonCompilablePath("InputSemicolonBetweenImports.java"), expected);
     }
+
 }

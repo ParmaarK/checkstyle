@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,10 +21,11 @@ package com.puppycrawl.tools.checkstyle.checks.blocks;
 
 import java.util.Locale;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * <p>
@@ -43,9 +44,7 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
  *
  * <p>
  * The policy to verify is specified using the {@link LeftCurlyOption} class and
- * defaults to {@link LeftCurlyOption#EOL}. Policies {@link LeftCurlyOption#EOL}
- * and {@link LeftCurlyOption#NLOW} take into account property maxLineLength.
- * The default value for maxLineLength is 80.
+ * defaults to {@link LeftCurlyOption#EOL}.
  * </p>
  * <p>
  * An example of how to configure the check is:
@@ -55,13 +54,12 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
  * </pre>
  * <p>
  * An example of how to configure the check with policy
- * {@link LeftCurlyOption#NLOW} and maxLineLength 120 is:
+ * {@link LeftCurlyOption#NLOW} is:
  * </p>
  * <pre>
  * &lt;module name="LeftCurly"&gt;
- *      &lt;property name="option"
- * value="nlow"/&gt;     &lt;property name="maxLineLength" value="120"/&gt; &lt;
- * /module&gt;
+ *      &lt;property name="option" value="nlow"/&gt;
+ * &lt;/module&gt;
  * </pre>
  * <p>
  * An example of how to configure the check to validate enum definitions:
@@ -72,12 +70,11 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
  * &lt;/module&gt;
  * </pre>
  *
- * @author Oliver Burn
- * @author lkuehne
- * @author maxvetrenko
  */
+@StatelessCheck
 public class LeftCurlyCheck
     extends AbstractCheck {
+
     /**
      * A key is pointing to the warning message text in "messages.properties"
      * file.
@@ -117,17 +114,6 @@ public class LeftCurlyCheck
         catch (IllegalArgumentException iae) {
             throw new IllegalArgumentException("unable to parse " + optionStr, iae);
         }
-    }
-
-    /**
-     * Sets the maximum line length used in calculating the placement of the
-     * left curly brace.
-     * @param maxLineLength the max allowed line length
-     * @deprecated since 6.10 release, option is not required for the Check.
-     */
-    @Deprecated
-    public void setMaxLineLength(int maxLineLength) {
-        // do nothing, option is deprecated
     }
 
     /**
@@ -171,7 +157,7 @@ public class LeftCurlyCheck
 
     @Override
     public int[] getRequiredTokens() {
-        return CommonUtils.EMPTY_INT_ARRAY;
+        return CommonUtil.EMPTY_INT_ARRAY;
     }
 
     @Override
@@ -286,7 +272,6 @@ public class LeftCurlyCheck
         while (previousAnnotation.getPreviousSibling() != null
                 && previousAnnotation.getPreviousSibling().getLineNo()
                     == lastAnnotationLineNumber) {
-
             previousAnnotation = previousAnnotation.getPreviousSibling();
         }
         return previousAnnotation;
@@ -321,18 +306,15 @@ public class LeftCurlyCheck
         if (braceLine.length() <= brace.getColumnNo() + 1
                 || braceLine.charAt(brace.getColumnNo() + 1) != '}') {
             if (option == LeftCurlyOption.NL) {
-                if (!CommonUtils.hasWhitespaceBefore(brace.getColumnNo(), braceLine)) {
+                if (!CommonUtil.hasWhitespaceBefore(brace.getColumnNo(), braceLine)) {
                     log(brace, MSG_KEY_LINE_NEW, OPEN_CURLY_BRACE, brace.getColumnNo() + 1);
                 }
             }
             else if (option == LeftCurlyOption.EOL) {
-
                 validateEol(brace, braceLine);
             }
             else if (startToken.getLineNo() != brace.getLineNo()) {
-
                 validateNewLinePosition(brace, startToken, braceLine);
-
             }
         }
     }
@@ -343,7 +325,7 @@ public class LeftCurlyCheck
      * @param braceLine line content
      */
     private void validateEol(DetailAST brace, String braceLine) {
-        if (CommonUtils.hasWhitespaceBefore(brace.getColumnNo(), braceLine)) {
+        if (CommonUtil.hasWhitespaceBefore(brace.getColumnNo(), braceLine)) {
             log(brace, MSG_KEY_LINE_PREVIOUS, OPEN_CURLY_BRACE, brace.getColumnNo() + 1);
         }
         if (!hasLineBreakAfter(brace)) {
@@ -360,14 +342,14 @@ public class LeftCurlyCheck
     private void validateNewLinePosition(DetailAST brace, DetailAST startToken, String braceLine) {
         // not on the same line
         if (startToken.getLineNo() + 1 == brace.getLineNo()) {
-            if (CommonUtils.hasWhitespaceBefore(brace.getColumnNo(), braceLine)) {
+            if (CommonUtil.hasWhitespaceBefore(brace.getColumnNo(), braceLine)) {
                 log(brace, MSG_KEY_LINE_PREVIOUS, OPEN_CURLY_BRACE, brace.getColumnNo() + 1);
             }
             else {
                 log(brace, MSG_KEY_LINE_NEW, OPEN_CURLY_BRACE, brace.getColumnNo() + 1);
             }
         }
-        else if (!CommonUtils.hasWhitespaceBefore(brace.getColumnNo(), braceLine)) {
+        else if (!CommonUtil.hasWhitespaceBefore(brace.getColumnNo(), braceLine)) {
             log(brace, MSG_KEY_LINE_NEW, OPEN_CURLY_BRACE, brace.getColumnNo() + 1);
         }
     }
@@ -394,4 +376,5 @@ public class LeftCurlyCheck
                 || nextToken.getType() == TokenTypes.RCURLY
                 || leftCurly.getLineNo() != nextToken.getLineNo();
     }
+
 }

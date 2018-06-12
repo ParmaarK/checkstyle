@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -24,17 +24,18 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TextBlock;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * <p>
  * Restrict using <a href =
- * "http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.3">
- * Unicode escapes</a> (such as {@code &#92;u221e}).
+ * "https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.3">
+ * Unicode escapes</a> (such as <code>&#92;u221e</code>).
  * It is possible to allow using escapes for
  * <a href="https://en.wiktionary.org/wiki/Appendix:Control_characters">
  * non-printable(control) characters</a>.
@@ -105,11 +106,12 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
  * &lt;/module&gt;
  * </pre>
  *
- * @author maxvetrenko
- *
+ * @noinspection HtmlTagCanBeJavadocTag
  */
+@FileStatefulCheck
 public class AvoidEscapedUnicodeCharactersCheck
     extends AbstractCheck {
+
     /**
      * A key is pointing to the warning message text in "messages.properties"
      * file.
@@ -125,40 +127,105 @@ public class AvoidEscapedUnicodeCharactersCheck
      * @see <a href="https://en.wiktionary.org/wiki/Appendix:Control_characters">
      *     Appendix:Control characters</a>
      */
-    private static final Pattern UNICODE_CONTROL = Pattern.compile("\\\\(u|U)"
-            + "(00[0-1][0-9A-Fa-f]|00[8-9][0-9A-Fa-f]|00(a|A)(d|D)|034(f|F)|070(f|F)"
-            + "|180(e|E)|200[b-fB-F]|202[a-eA-E]|206[0-4a-fA-F]"
-            + "|[fF]{3}[9a-bA-B]|[fF][eE][fF]{2})");
+    private static final Pattern UNICODE_CONTROL = Pattern.compile("\\\\[uU]"
+            + "(00[0-1][0-9A-Fa-f]"
+            + "|00[8-9][0-9A-Fa-f]"
+            + "|00[aA][dD]"
+            + "|034[fF]"
+            + "|070[fF]"
+            + "|180[eE]"
+            + "|200[b-fB-F]"
+            + "|202[a-eA-E]"
+            + "|206[0-4a-fA-F]"
+            + "|[fF]{3}[9a-bA-B]"
+            + "|[fF][eE][fF]{2})");
 
     /** Regular expression for all escaped chars. */
-    private static final Pattern ALL_ESCAPED_CHARS =
-            Pattern.compile("^((\\\\u)[a-fA-F0-9]{4}"
-                    + "||\\\\b|\\\\t|\\\\n|\\\\f|\\\\r|\\\\|\"|\')+$");
+    private static final Pattern ALL_ESCAPED_CHARS = Pattern.compile("^((\\\\u)[a-fA-F0-9]{4}"
+            + "|\""
+            + "|\'"
+            + "|\\\\"
+            + "|\\\\b"
+            + "|\\\\f"
+            + "|\\\\n"
+            + "|\\\\r"
+            + "|\\\\t"
+            + ")+$");
 
     /** Regular expression for escaped backslash. */
     private static final Pattern ESCAPED_BACKSLASH = Pattern.compile("\\\\\\\\");
 
     /** Regular expression for non-printable unicode chars. */
-    private static final Pattern NON_PRINTABLE_CHARS = Pattern.compile("\\\\u1680|\\\\u2028"
-            + "|\\\\u2029|\\\\u205(f|F)|\\\\u3000|\\\\u2007|\\\\u2000|\\\\u200(a|A)"
-            + "|\\\\u007(F|f)|\\\\u009(f|F)|\\\\u(f|F){4}|\\\\u007(F|f)|\\\\u00(a|A)(d|D)"
-            + "|\\\\u0600|\\\\u061(c|C)|\\\\u06(d|D){2}|\\\\u070(f|F)|\\\\u1680|\\\\u180(e|E)"
-            + "|\\\\u2000|\\\\u2028|\\\\u205(f|F)|\\\\u2066|\\\\u2067|\\\\u2068|\\\\u2069"
-            + "|\\\\u206(a|A)|\\\\u(d|D)800|\\\\u(f|F)(e|E)(f|F){2}|\\\\u(f|F){3}9"
-            + "|\\\\u(f|F){3}(a|A)|\\\\u0020|\\\\u00(a|A)0|\\\\u00(a|A)(d|D)|\\\\u0604"
-            + "|\\\\u061(c|C)|\\\\u06(d|D){2}|\\\\u070(f|F)|\\\\u1680|\\\\u180(e|E)|\\\\u200(f|F)"
-            + "|\\\\u202(f|F)|\\\\u2064|\\\\u2066|\\\\u2067|\\\\u2068|\\\\u2069|\\\\u206(f|F)"
-            + "|\\\\u(f|F)8(f|F){2}|\\\\u(f|F)(e|E)(f|F){2}|\\\\u(f|F){3}9|\\\\u(f|F){3}(b|B)"
-            + "|\\\\u05(d|D)0|\\\\u05(f|F)3|\\\\u0600|\\\\u0750|\\\\u0(e|E)00|\\\\u1(e|E)00"
-            + "|\\\\u2100|\\\\u(f|F)(b|B)50|\\\\u(f|F)(e|E)70|\\\\u(F|f){2}61|\\\\u04(f|F)9"
-            + "|\\\\u05(b|B)(e|E)|\\\\u05(e|E)(a|A)|\\\\u05(f|F)4|\\\\u06(f|F){2}"
-            + "|\\\\u077(f|F)|\\\\u0(e|E)7(f|F)|\\\\u20(a|A)(f|F)|\\\\u213(a|A)|\\\\u0000"
-            + "|\\\\u(f|F)(d|D)(f|F){2}|\\\\u(f|F)(e|E)(f|F){2}|\\\\u(f|F){2}(d|D)(c|C)"
-            + "|\\\\u2002|\\\\u0085|\\\\u200(a|A)|\\\\u2005|\\\\u2000|\\\\u2029|\\\\u000(B|b)"
-            + "|\\\\u2008|\\\\u2003|\\\\u205(f|F)|\\\\u1680|\\\\u0009|\\\\u0020|\\\\u2006"
-            + "|\\\\u2001|\\\\u202(f|F)|\\\\u00(a|A)0|\\\\u000(c|C)|\\\\u2009|\\\\u2004|\\\\u2028"
-            + "|\\\\u2028|\\\\u2007|\\\\u2004|\\\\u2028|\\\\u2007|\\\\u2025"
-            + "|\\\\u(f|F){2}0(e|E)|\\\\u(f|F){2}61");
+    private static final Pattern NON_PRINTABLE_CHARS = Pattern.compile("\\\\u0000"
+            + "|\\\\u0009"
+            + "|\\\\u000[bB]"
+            + "|\\\\u000[cC]"
+            + "|\\\\u0020"
+            + "|\\\\u007[fF]"
+            + "|\\\\u0085"
+            + "|\\\\u009[fF]"
+            + "|\\\\u00[aA]0"
+            + "|\\\\u00[aA][dD]"
+            + "|\\\\u04[fF]9"
+            + "|\\\\u05[bB][eE]"
+            + "|\\\\u05[dD]0"
+            + "|\\\\u05[eE][aA]"
+            + "|\\\\u05[fF]3"
+            + "|\\\\u05[fF]4"
+            + "|\\\\u0600"
+            + "|\\\\u0604"
+            + "|\\\\u061[cC]"
+            + "|\\\\u06[dD]{2}"
+            + "|\\\\u06[fF]{2}"
+            + "|\\\\u070[fF]"
+            + "|\\\\u0750"
+            + "|\\\\u077[fF]"
+            + "|\\\\u0[eE]00"
+            + "|\\\\u0[eE]7[fF]"
+            + "|\\\\u1680"
+            + "|\\\\u180[eE]"
+            + "|\\\\u1[eE]00"
+            + "|\\\\u2000"
+            + "|\\\\u2001"
+            + "|\\\\u2002"
+            + "|\\\\u2003"
+            + "|\\\\u2004"
+            + "|\\\\u2005"
+            + "|\\\\u2006"
+            + "|\\\\u2007"
+            + "|\\\\u2008"
+            + "|\\\\u2009"
+            + "|\\\\u200[aA]"
+            + "|\\\\u200[fF]"
+            + "|\\\\u2025"
+            + "|\\\\u2028"
+            + "|\\\\u2029"
+            + "|\\\\u202[fF]"
+            + "|\\\\u205[fF]"
+            + "|\\\\u2064"
+            + "|\\\\u2066"
+            + "|\\\\u2067"
+            + "|\\\\u2068"
+            + "|\\\\u2069"
+            + "|\\\\u206[aA]"
+            + "|\\\\u206[fF]"
+            + "|\\\\u20[aA][fF]"
+            + "|\\\\u2100"
+            + "|\\\\u213[aA]"
+            + "|\\\\u3000"
+            + "|\\\\u[dD]800"
+            + "|\\\\u[fF]8[fF]{2}"
+            + "|\\\\u[fF][bB]50"
+            + "|\\\\u[fF][dD][fF]{2}"
+            + "|\\\\u[fF][eE]70"
+            + "|\\\\u[fF][eE][fF]{2}"
+            + "|\\\\u[fF]{2}0[eE]"
+            + "|\\\\u[fF]{2}61"
+            + "|\\\\u[fF]{2}[dD][cC]"
+            + "|\\\\u[fF]{3}9"
+            + "|\\\\u[fF]{3}[aA]"
+            + "|\\\\u[fF]{3}[bB]"
+            + "|\\\\u[fF]{4}");
 
     /** Cpp style comments. */
     private Map<Integer, TextBlock> singlelineComments;
@@ -211,17 +278,17 @@ public class AvoidEscapedUnicodeCharactersCheck
 
     @Override
     public int[] getDefaultTokens() {
-        return getAcceptableTokens();
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {TokenTypes.STRING_LITERAL, TokenTypes.CHAR_LITERAL};
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getAcceptableTokens();
+        return new int[] {TokenTypes.STRING_LITERAL, TokenTypes.CHAR_LITERAL};
     }
 
     @Override
@@ -232,7 +299,6 @@ public class AvoidEscapedUnicodeCharactersCheck
 
     @Override
     public void visitToken(DetailAST ast) {
-
         final String literal = ast.getText();
 
         if (hasUnicodeChar(literal) && !(allowByTailComment && hasTrailComment(ast)
@@ -300,7 +366,7 @@ public class AvoidEscapedUnicodeCharactersCheck
      */
     private static boolean isTrailingBlockComment(TextBlock comment, String line) {
         return comment.getText().length != 1
-            || CommonUtils.isBlank(line.substring(comment.getEndColNo() + 1));
+            || CommonUtil.isBlank(line.substring(comment.getEndColNo() + 1));
     }
 
     /**
@@ -328,4 +394,5 @@ public class AvoidEscapedUnicodeCharactersCheck
                 && ALL_ESCAPED_CHARS.matcher(literal.substring(1,
                         literal.length() - 1)).find();
     }
+
 }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,6 +25,7 @@ import java.awt.FontMetrics;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.List;
 
@@ -38,8 +39,6 @@ import javax.swing.LookAndFeel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.tree.TreePath;
 
-import com.google.common.collect.ImmutableList;
-
 /**
  * This example shows how to create a simple TreeTable component,
  * by using a JTree as a renderer (and editor) for the cells in a
@@ -49,11 +48,10 @@ import com.google.common.collect.ImmutableList;
  * "https://docs.oracle.com/cd/E48246_01/apirefs.1111/e13403/oracle/ide/controls/TreeTableModel.html">
  * Original&nbsp;Source&nbsp;Location</a>
  *
- * @author Philip Milne
- * @author Scott Violet
- * @author Lars Kühne
+ * @noinspection ThisEscapedInObjectConstruction
  */
-public class TreeTable extends JTable {
+public final class TreeTable extends JTable {
+
     private static final long serialVersionUID = -8493693409423365387L;
     /** A subclass of JTree. */
     private final TreeTableCellRenderer tree;
@@ -67,7 +65,6 @@ public class TreeTable extends JTable {
      * @param treeTableModel Tree table model
      */
     public TreeTable(ParseTreeTableModel treeTableModel) {
-
         // Create the tree. It will be used as a renderer and editor.
         tree = new TreeTableCellRenderer(this, treeTableModel);
 
@@ -206,7 +203,7 @@ public class TreeTable extends JTable {
      * Overridden to pass the new rowHeight to the tree.
      */
     @Override
-    public final void setRowHeight(int newRowHeight) {
+    public void setRowHeight(int newRowHeight) {
         super.setRowHeight(newRowHeight);
         if (tree != null && tree.getRowHeight() != newRowHeight) {
             tree.setRowHeight(getRowHeight());
@@ -232,10 +229,9 @@ public class TreeTable extends JTable {
     /**
      * Sets line position map.
      * @param linePositionMap Line position map.
-     * @noinspection AssignmentToCollectionOrArrayFieldFromParameter
      */
-    public void setLinePositionMap(ImmutableList<Integer> linePositionMap) {
-        this.linePositionMap = linePositionMap;
+    public void setLinePositionMap(List<Integer> linePositionMap) {
+        this.linePositionMap = new ArrayList<>(linePositionMap);
     }
 
     /**
@@ -244,6 +240,7 @@ public class TreeTable extends JTable {
      */
     private class TreeTableCellEditor extends BaseCellEditor implements
             TableCellEditor {
+
         @Override
         public Component getTableCellEditorComponent(JTable table,
                 Object value,
@@ -282,7 +279,7 @@ public class TreeTable extends JTable {
                     if (getColumnClass(counter) == ParseTreeTableModel.class) {
                         final MouseEvent mouseEvent = (MouseEvent) event;
                         final MouseEvent newMouseEvent = new MouseEvent(tree, mouseEvent.getID(),
-                                mouseEvent.getWhen(), mouseEvent.getModifiers(),
+                                mouseEvent.getWhen(), mouseEvent.getModifiersEx(),
                                 mouseEvent.getX() - getCellRect(0, counter, true).x,
                                 mouseEvent.getY(), mouseEvent.getClickCount(),
                                 mouseEvent.isPopupTrigger());
@@ -294,5 +291,7 @@ public class TreeTable extends JTable {
 
             return false;
         }
+
     }
+
 }

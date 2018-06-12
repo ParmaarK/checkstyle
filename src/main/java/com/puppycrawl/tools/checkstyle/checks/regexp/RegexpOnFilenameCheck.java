@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,10 +23,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractFileSetCheck;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.FileText;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * <p>
@@ -181,9 +182,10 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
  * &lt;/module&gt;
  * </pre>
  *
- * @author Richard Veach
  */
+@StatelessCheck
 public class RegexpOnFilenameCheck extends AbstractFileSetCheck {
+
     /**
      * A key is pointing to the warning message text in "messages.properties"
      * file.
@@ -243,7 +245,7 @@ public class RegexpOnFilenameCheck extends AbstractFileSetCheck {
     @Override
     public void init() {
         if (fileNamePattern == null && folderPattern == null) {
-            fileNamePattern = CommonUtils.createPattern("\\s");
+            fileNamePattern = CommonUtil.createPattern("\\s");
         }
     }
 
@@ -267,7 +269,7 @@ public class RegexpOnFilenameCheck extends AbstractFileSetCheck {
         String fileName = file.getName();
 
         if (ignoreFileNameExtensions) {
-            fileName = CommonUtils.getFileNameWithoutExtension(fileName);
+            fileName = CommonUtil.getFileNameWithoutExtension(fileName);
         }
 
         return fileName;
@@ -283,7 +285,7 @@ public class RegexpOnFilenameCheck extends AbstractFileSetCheck {
      */
     private static String getFolderPath(File file) throws CheckstyleException {
         try {
-            return file.getParentFile().getCanonicalPath();
+            return file.getCanonicalFile().getParent();
         }
         catch (IOException ex) {
             throw new CheckstyleException("unable to create canonical path names for "
@@ -359,4 +361,5 @@ public class RegexpOnFilenameCheck extends AbstractFileSetCheck {
 
         return result;
     }
+
 }

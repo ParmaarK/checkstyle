@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,11 +23,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import antlr.collections.AST;
+import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FullIdent;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CheckUtils;
+import com.puppycrawl.tools.checkstyle.utils.CheckUtil;
 
 /**
  * <p>
@@ -49,10 +50,11 @@ import com.puppycrawl.tools.checkstyle.utils.CheckUtils;
  * <pre>
  * &lt;module name="EqualsHashCode"/&gt;
  * </pre>
- * @author lkuehne
  */
+@FileStatefulCheck
 public class EqualsHashCodeCheck
         extends AbstractCheck {
+
     // implementation note: we have to use the following members to
     // keep track of definitions in different inner classes
 
@@ -76,17 +78,17 @@ public class EqualsHashCodeCheck
 
     @Override
     public int[] getDefaultTokens() {
-        return getAcceptableTokens();
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {TokenTypes.METHOD_DEF};
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getAcceptableTokens();
+        return new int[] {TokenTypes.METHOD_DEF};
     }
 
     @Override
@@ -115,11 +117,11 @@ public class EqualsHashCodeCheck
         final DetailAST modifiers = ast.getFirstChild();
         final DetailAST parameters = ast.findFirstToken(TokenTypes.PARAMETERS);
 
-        return CheckUtils.isEqualsMethod(ast)
-                && modifiers.branchContains(TokenTypes.LITERAL_PUBLIC)
+        return CheckUtil.isEqualsMethod(ast)
+                && modifiers.findFirstToken(TokenTypes.LITERAL_PUBLIC) != null
                 && isObjectParam(parameters.getFirstChild())
-                && (ast.branchContains(TokenTypes.SLIST)
-                        || modifiers.branchContains(TokenTypes.LITERAL_NATIVE));
+                && (ast.findFirstToken(TokenTypes.SLIST) != null
+                        || modifiers.findFirstToken(TokenTypes.LITERAL_NATIVE) != null);
     }
 
     /**
@@ -136,11 +138,11 @@ public class EqualsHashCodeCheck
 
         return type.getFirstChild().getType() == TokenTypes.LITERAL_INT
                 && "hashCode".equals(methodName.getText())
-                && modifiers.branchContains(TokenTypes.LITERAL_PUBLIC)
-                && !modifiers.branchContains(TokenTypes.LITERAL_STATIC)
+                && modifiers.findFirstToken(TokenTypes.LITERAL_PUBLIC) != null
+                && modifiers.findFirstToken(TokenTypes.LITERAL_STATIC) == null
                 && parameters.getFirstChild() == null
-                && (ast.branchContains(TokenTypes.SLIST)
-                        || modifiers.branchContains(TokenTypes.LITERAL_NATIVE));
+                && (ast.findFirstToken(TokenTypes.SLIST) != null
+                        || modifiers.findFirstToken(TokenTypes.LITERAL_NATIVE) != null);
     }
 
     /**
@@ -162,14 +164,11 @@ public class EqualsHashCodeCheck
                 return objBlockWithHashCode.remove(detailASTDetailASTEntry.getKey()) == null;
             }).forEach(detailASTDetailASTEntry -> {
                 final DetailAST equalsAST = detailASTDetailASTEntry.getValue();
-                log(equalsAST.getLineNo(), equalsAST.getColumnNo(), MSG_KEY_HASHCODE);
+                log(equalsAST, MSG_KEY_HASHCODE);
             });
-        objBlockWithHashCode.entrySet().forEach(detailASTDetailASTEntry -> {
-            final DetailAST equalsAST = detailASTDetailASTEntry.getValue();
-            log(equalsAST.getLineNo(), equalsAST.getColumnNo(), MSG_KEY_EQUALS);
+        objBlockWithHashCode.forEach((key, equalsAST) -> {
+            log(equalsAST, MSG_KEY_EQUALS);
         });
-
-        objBlockWithEquals.clear();
-        objBlockWithHashCode.clear();
     }
+
 }

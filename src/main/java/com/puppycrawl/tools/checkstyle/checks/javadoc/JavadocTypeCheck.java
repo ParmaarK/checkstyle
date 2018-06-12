@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,16 +23,17 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.Scope;
 import com.puppycrawl.tools.checkstyle.api.TextBlock;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CheckUtils;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
-import com.puppycrawl.tools.checkstyle.utils.JavadocUtils;
-import com.puppycrawl.tools.checkstyle.utils.ScopeUtils;
+import com.puppycrawl.tools.checkstyle.utils.CheckUtil;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
+import com.puppycrawl.tools.checkstyle.utils.JavadocUtil;
+import com.puppycrawl.tools.checkstyle.utils.ScopeUtil;
 
 /**
  * Checks the Javadoc of a type.
@@ -40,9 +41,8 @@ import com.puppycrawl.tools.checkstyle.utils.ScopeUtils;
  * <p>Does not perform checks for author and version tags for inner classes, as
  * they should be redundant because of outer class.
  *
- * @author Oliver Burn
- * @author Michael Tamm
  */
+@StatelessCheck
 public class JavadocTypeCheck
     extends AbstractCheck {
 
@@ -179,7 +179,7 @@ public class JavadocTypeCheck
 
     @Override
     public int[] getRequiredTokens() {
-        return CommonUtils.EMPTY_INT_ARRAY;
+        return CommonUtil.EMPTY_INT_ARRAY;
     }
 
     @Override
@@ -193,7 +193,7 @@ public class JavadocTypeCheck
             }
             else {
                 final List<JavadocTag> tags = getJavadocTags(textBlock);
-                if (ScopeUtils.isOuterMostType(ast)) {
+                if (ScopeUtil.isOuterMostType(ast)) {
                     // don't check author/version for inner classes
                     checkTag(lineNo, tags, JavadocTagInfo.AUTHOR.getName(),
                             authorFormat);
@@ -202,7 +202,7 @@ public class JavadocTypeCheck
                 }
 
                 final List<String> typeParamNames =
-                    CheckUtils.getTypeParameterNames(ast);
+                    CheckUtil.getTypeParameterNames(ast);
 
                 if (!allowMissingParamTags) {
                     //Check type parameters that should exist, do
@@ -225,14 +225,14 @@ public class JavadocTypeCheck
     private boolean shouldCheck(final DetailAST ast) {
         final Scope customScope;
 
-        if (ScopeUtils.isInInterfaceOrAnnotationBlock(ast)) {
+        if (ScopeUtil.isInInterfaceOrAnnotationBlock(ast)) {
             customScope = Scope.PUBLIC;
         }
         else {
             final DetailAST mods = ast.findFirstToken(TokenTypes.MODIFIERS);
-            customScope = ScopeUtils.getScopeFromMods(mods);
+            customScope = ScopeUtil.getScopeFromMods(mods);
         }
-        final Scope surroundingScope = ScopeUtils.getSurroundingScope(ast);
+        final Scope surroundingScope = ScopeUtil.getSurroundingScope(ast);
 
         return customScope.isIn(scope)
             && (surroundingScope == null || surroundingScope.isIn(scope))
@@ -248,8 +248,8 @@ public class JavadocTypeCheck
      * @return all standalone tags from the given javadoc.
      */
     private List<JavadocTag> getJavadocTags(TextBlock textBlock) {
-        final JavadocTags tags = JavadocUtils.getJavadocTags(textBlock,
-            JavadocUtils.JavadocTagType.BLOCK);
+        final JavadocTags tags = JavadocUtil.getJavadocTags(textBlock,
+            JavadocUtil.JavadocTagType.BLOCK);
         if (!allowUnknownTags) {
             for (final InvalidJavadocTag tag : tags.getInvalidTags()) {
                 log(tag.getLine(), tag.getCol(), MSG_UNKNOWN_TAG,
@@ -322,7 +322,6 @@ public class JavadocTypeCheck
         for (int i = tags.size() - 1; i >= 0; i--) {
             final JavadocTag tag = tags.get(i);
             if (tag.isParamTag()) {
-
                 final String typeParamName = extractTypeParamNameFromTag(tag);
 
                 if (!typeParamNames.contains(typeParamName)) {
@@ -352,4 +351,5 @@ public class JavadocTypeCheck
         }
         return typeParamName;
     }
+
 }

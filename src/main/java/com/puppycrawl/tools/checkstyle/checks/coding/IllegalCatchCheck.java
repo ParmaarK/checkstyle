@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,18 +25,18 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FullIdent;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CheckUtils;
+import com.puppycrawl.tools.checkstyle.utils.CheckUtil;
 
 /**
  * Catching java.lang.Exception, java.lang.Error or java.lang.RuntimeException
  * is almost never acceptable.
- * @author <a href="mailto:simon@redhillconsulting.com.au">Simon Harris</a>
- * @author <a href="mailto:IliaDubinin91@gmail.com">Ilja Dubinin</a>
  */
+@StatelessCheck
 public final class IllegalCatchCheck extends AbstractCheck {
 
     /**
@@ -59,22 +59,22 @@ public final class IllegalCatchCheck extends AbstractCheck {
     public void setIllegalClassNames(final String... classNames) {
         illegalClassNames.clear();
         illegalClassNames.addAll(
-                CheckUtils.parseClassNames(classNames));
+                CheckUtil.parseClassNames(classNames));
     }
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[] {TokenTypes.LITERAL_CATCH};
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getDefaultTokens();
+        return new int[] {TokenTypes.LITERAL_CATCH};
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {TokenTypes.LITERAL_CATCH};
+        return getRequiredTokens();
     }
 
     @Override
@@ -120,4 +120,5 @@ public final class IllegalCatchCheck extends AbstractCheck {
         }
         return exceptionTypes;
     }
+
 }

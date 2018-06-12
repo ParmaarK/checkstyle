@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,9 +25,9 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 /**
  * Handler for if statements.
  *
- * @author jrichard
  */
 public class IfHandler extends BlockParentHandler {
+
     /**
      * Construct an instance of this handler with the given indentation check,
      * abstract syntax tree, and parent handler.
@@ -43,18 +43,26 @@ public class IfHandler extends BlockParentHandler {
 
     @Override
     public IndentLevel getSuggestedChildIndent(AbstractExpressionHandler child) {
+        final IndentLevel result;
         if (child instanceof ElseHandler) {
-            return getIndent();
+            result = getIndent();
         }
-        return super.getSuggestedChildIndent(child);
+        else {
+            result = super.getSuggestedChildIndent(child);
+        }
+        return result;
     }
 
     @Override
     protected IndentLevel getIndentImpl() {
+        final IndentLevel result;
         if (isIfAfterElse()) {
-            return getParent().getIndent();
+            result = getParent().getIndent();
         }
-        return super.getIndentImpl();
+        else {
+            result = super.getIndentImpl();
+        }
+        return result;
     }
 
     /**
@@ -104,4 +112,5 @@ public class IfHandler extends BlockParentHandler {
     private static DetailAST getIfStatementRightParen(DetailAST literalIfAst) {
         return literalIfAst.findFirstToken(TokenTypes.RPAREN);
     }
+
 }

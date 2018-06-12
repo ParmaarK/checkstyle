@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -29,10 +29,11 @@ import org.junit.Test;
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class ModifierOrderCheckTest
     extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/modifier/modifierorder";
@@ -49,7 +50,7 @@ public class ModifierOrderCheckTest
     @Test
     public void testIt() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ModifierOrderCheck.class);
+            createModuleConfig(ModifierOrderCheck.class);
         final String[] expected = {
             "14:10: " + getCheckMessage(MSG_MODIFIER_ORDER, "final"),
             "18:12: " + getCheckMessage(MSG_MODIFIER_ORDER, "private"),
@@ -66,8 +67,8 @@ public class ModifierOrderCheckTest
     public void testDefaultMethods()
             throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(ModifierOrderCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+                createModuleConfig(ModifierOrderCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputModifierOrderDefaultMethods.java"), expected);
     }
 
@@ -80,11 +81,12 @@ public class ModifierOrderCheckTest
             TokenTypes.MODIFIERS,
             TokenTypes.OBJBLOCK,
         };
-        assertArrayEquals("Default default tokens are invalid", expected, actual);
-        final int[] unexpectedEmptyArray = CommonUtils.EMPTY_INT_ARRAY;
-        Assert.assertNotSame(unexpectedEmptyArray, actual);
-        Assert.assertNotSame(unexpectedArray, actual);
-        Assert.assertNotNull(actual);
+        assertArrayEquals("Default tokens are invalid", expected, actual);
+        final int[] unexpectedEmptyArray = CommonUtil.EMPTY_INT_ARRAY;
+        Assert.assertNotSame("Default tokens should not be empty array",
+                unexpectedEmptyArray, actual);
+        Assert.assertNotSame("Invalid default tokens", unexpectedArray, actual);
+        Assert.assertNotNull("Default tokens should not be null", actual);
     }
 
     @Test
@@ -97,10 +99,11 @@ public class ModifierOrderCheckTest
             TokenTypes.OBJBLOCK,
         };
         assertArrayEquals("Default acceptable tokens are invalid", expected, actual);
-        final int[] unexpectedEmptyArray = CommonUtils.EMPTY_INT_ARRAY;
-        Assert.assertNotSame(unexpectedEmptyArray, actual);
-        Assert.assertNotSame(unexpectedArray, actual);
-        Assert.assertNotNull(actual);
+        final int[] unexpectedEmptyArray = CommonUtil.EMPTY_INT_ARRAY;
+        Assert.assertNotSame("Default tokens should not be empty array",
+                unexpectedEmptyArray, actual);
+        Assert.assertNotSame("Invalid acceptable tokens", unexpectedArray, actual);
+        Assert.assertNotNull("Acceptable tokens should not be null", actual);
     }
 
     @Test
@@ -108,9 +111,9 @@ public class ModifierOrderCheckTest
         // Type Annotations are available only in Java 8
         // We skip type annotations from validation
         // See https://github.com/checkstyle/checkstyle/issues/903#issuecomment-172228013
-        final DefaultConfiguration checkConfig = createCheckConfig(ModifierOrderCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(ModifierOrderCheck.class);
         final String[] expected = {
-            "103:13: " + getCheckMessage(MSG_ANNOTATION_ORDER, "@MethodAnnotation"),
+            "104:13: " + getCheckMessage(MSG_ANNOTATION_ORDER, "@MethodAnnotation"),
         };
         verify(checkConfig, getNonCompilablePath("InputModifierOrderTypeAnnotations.java"),
             expected);
@@ -118,10 +121,11 @@ public class ModifierOrderCheckTest
 
     @Test
     public void testAnnotationOnAnnotationDeclaration() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(ModifierOrderCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(ModifierOrderCheck.class);
         final String[] expected = {
             "3:8: " + getCheckMessage(MSG_ANNOTATION_ORDER, "@InterfaceAnnotation"),
         };
         verify(checkConfig, getPath("InputModifierOrderAnnotationDeclaration.java"), expected);
     }
+
 }

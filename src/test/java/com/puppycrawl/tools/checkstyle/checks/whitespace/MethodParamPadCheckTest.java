@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -26,23 +26,16 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class MethodParamPadCheckTest
     extends AbstractModuleTestSupport {
-    private DefaultConfiguration checkConfig;
-
-    @Before
-    public void setUp() {
-        checkConfig = createCheckConfig(MethodParamPadCheck.class);
-    }
 
     @Override
     protected String getPackageLocation() {
@@ -53,12 +46,13 @@ public class MethodParamPadCheckTest
     public void testGetRequiredTokens() {
         final MethodParamPadCheck checkObj = new MethodParamPadCheck();
         assertArrayEquals(
-            "MethodParamPadCheck#getRequiredTockens should return empty array by default",
-            CommonUtils.EMPTY_INT_ARRAY, checkObj.getRequiredTokens());
+            "MethodParamPadCheck#getRequiredTokens should return empty array by default",
+            CommonUtil.EMPTY_INT_ARRAY, checkObj.getRequiredTokens());
     }
 
     @Test
     public void testDefault() throws Exception {
+        final DefaultConfiguration checkConfig = createModuleConfig(MethodParamPadCheck.class);
         final String[] expected = {
             "11:32: " + getCheckMessage(MSG_WS_PRECEDED, "("),
             "13:15: " + getCheckMessage(MSG_WS_PRECEDED, "("),
@@ -84,6 +78,7 @@ public class MethodParamPadCheckTest
 
     @Test
     public void testAllowLineBreaks() throws Exception {
+        final DefaultConfiguration checkConfig = createModuleConfig(MethodParamPadCheck.class);
         checkConfig.addAttribute("allowLineBreaks", "true");
         final String[] expected = {
             "11:32: " + getCheckMessage(MSG_WS_PRECEDED, "("),
@@ -101,6 +96,7 @@ public class MethodParamPadCheckTest
 
     @Test
     public void testSpaceOption() throws Exception {
+        final DefaultConfiguration checkConfig = createModuleConfig(MethodParamPadCheck.class);
         checkConfig.addAttribute("option", "space");
         final String[] expected = {
             "6:31: " + getCheckMessage(MSG_WS_NOT_PRECEDED, "("),
@@ -131,8 +127,9 @@ public class MethodParamPadCheckTest
 
     @Test
     public void test1322879() throws Exception {
+        final DefaultConfiguration checkConfig = createModuleConfig(MethodParamPadCheck.class);
         checkConfig.addAttribute("option", PadOption.SPACE.toString());
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputMethodParamPadWhitespaceAround.java"),
                expected);
     }
@@ -154,10 +151,11 @@ public class MethodParamPadCheckTest
 
     @Test
     public void testInvalidOption() throws Exception {
+        final DefaultConfiguration checkConfig = createModuleConfig(MethodParamPadCheck.class);
         checkConfig.addAttribute("option", "invalid_option");
 
         try {
-            final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+            final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
             verify(checkConfig, getPath("InputMethodParamPad.java"), expected);
             fail("exception expected");
@@ -170,4 +168,5 @@ public class MethodParamPadCheckTest
                 ex.getMessage().startsWith(messageStart));
         }
     }
+
 }

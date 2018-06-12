@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,25 +19,20 @@
 
 package com.google.checkstyle.test.chapter4formatting.rule488numericliterals;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.junit.Test;
 
-import com.google.checkstyle.test.base.BaseCheckTestSupport;
+import com.google.checkstyle.test.base.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 
-public class UpperEllTest extends BaseCheckTestSupport {
+public class UpperEllTest extends AbstractModuleTestSupport {
 
     @Override
-    protected String getPath(String fileName) throws IOException {
-        return super.getPath("chapter4formatting" + File.separator + "rule488numericliterals"
-                + File.separator + fileName);
+    protected String getPackageLocation() {
+        return "com/google/checkstyle/test/chapter4formatting/rule488numericliterals";
     }
 
     @Test
     public void testUpperEll() throws Exception {
-
         final String[] expected = {
             "6:36: Should use uppercase 'L'.",
             "12:27: Should use uppercase 'L'.",
@@ -65,10 +60,11 @@ public class UpperEllTest extends BaseCheckTestSupport {
             "100:22: Should use uppercase 'L'.",
         };
 
-        final Configuration checkConfig = getCheckConfig("UpperEll");
+        final Configuration checkConfig = getModuleConfig("UpperEll");
         final String filePath = getPath("InputUpperEll.java");
 
         final Integer[] warnList = getLinesWithWarn(filePath);
         verify(checkConfig, filePath, expected, warnList);
     }
+
 }

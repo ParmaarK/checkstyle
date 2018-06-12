@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,35 +19,23 @@
 
 package com.google.checkstyle.test.chapter5naming.rule51identifiernames;
 
-import java.io.File;
-import java.io.IOException;
-
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.google.checkstyle.test.base.BaseCheckTestSupport;
-import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+import com.google.checkstyle.test.base.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 
-public class CatchParameterNameTest extends BaseCheckTestSupport {
-    private static Configuration checkConfig;
-    private static String format;
+public class CatchParameterNameTest extends AbstractModuleTestSupport {
 
     @Override
-    protected String getPath(String fileName) throws IOException {
-        return super.getPath("chapter5naming" + File.separator + "rule51identifiernames"
-            + File.separator + fileName);
-    }
-
-    @BeforeClass
-    public static void setConfigurationBuilder() throws CheckstyleException {
-        checkConfig = getCheckConfig("CatchParameterName");
-        format = checkConfig.getAttribute("format");
+    protected String getPackageLocation() {
+        return "com/google/checkstyle/test/chapter5naming/rule51identifiernames";
     }
 
     @Test
     public void testCatchParameterName() throws Exception {
         final String msgKey = "name.invalidPattern";
+        final Configuration checkConfig = getModuleConfig("CatchParameterName");
+        final String format = checkConfig.getAttribute("format");
 
         final String[] expected = {
             "47:28: " + getCheckMessage(checkConfig.getMessages(), msgKey, "iException", format),
@@ -63,4 +51,5 @@ public class CatchParameterNameTest extends BaseCheckTestSupport {
         final Integer[] warnList = getLinesWithWarn(filePath);
         verify(checkConfig, filePath, expected, warnList);
     }
+
 }

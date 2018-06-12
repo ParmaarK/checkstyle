@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -31,10 +31,11 @@ import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class ConstantNameCheckTest
     extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/naming/constantname";
@@ -52,7 +53,7 @@ public class ConstantNameCheckTest
     public void testIllegalRegexp()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ConstantNameCheck.class);
+            createModuleConfig(ConstantNameCheck.class);
         checkConfig.addAttribute("format", "\\");
         try {
             createChecker(checkConfig);
@@ -71,7 +72,7 @@ public class ConstantNameCheckTest
     public void testDefault()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ConstantNameCheck.class);
+            createModuleConfig(ConstantNameCheck.class);
 
         final String pattern = "^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$";
 
@@ -86,7 +87,7 @@ public class ConstantNameCheckTest
     public void testAccessControlTuning()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ConstantNameCheck.class);
+            createModuleConfig(ConstantNameCheck.class);
         checkConfig.addAttribute("applyToPublic", "false");
         checkConfig.addAttribute("applyToProtected", "false");
         checkConfig.addAttribute("applyToPackage", "false");
@@ -103,7 +104,7 @@ public class ConstantNameCheckTest
     public void testInterfaceAndAnnotation()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ConstantNameCheck.class);
+            createModuleConfig(ConstantNameCheck.class);
 
         final String pattern = "^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$";
 
@@ -118,15 +119,15 @@ public class ConstantNameCheckTest
     public void testDefault1()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ConstantNameCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+            createModuleConfig(ConstantNameCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputConstantName.java"), expected);
     }
 
     @Test
     public void testIntoInterface() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(ConstantNameCheck.class);
+                createModuleConfig(ConstantNameCheck.class);
 
         final String pattern = "^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$";
 
@@ -147,8 +148,8 @@ public class ConstantNameCheckTest
     public void testStaticMethodInInterface()
             throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(ConstantNameCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+                createModuleConfig(ConstantNameCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputConstantNameStaticModifierInInterface.java"), expected);
     }
 
@@ -162,4 +163,5 @@ public class ConstantNameCheckTest
         Assert.assertNotNull("Default acceptable should not be null", actual);
         assertArrayEquals("Default acceptable tokens are invalid", expected, actual);
     }
+
 }

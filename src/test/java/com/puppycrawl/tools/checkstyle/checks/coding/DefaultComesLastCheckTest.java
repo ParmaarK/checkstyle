@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -27,11 +27,9 @@ import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class DefaultComesLastCheckTest extends AbstractModuleTestSupport {
-
-    private DefaultConfiguration checkConfig;
 
     @Override
     protected String getPackageLocation() {
@@ -40,7 +38,7 @@ public class DefaultComesLastCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testSkipIfLastAndSharedWithCase() throws Exception {
-        checkConfig = createCheckConfig(DefaultComesLastCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(DefaultComesLastCheck.class);
         checkConfig.addAttribute("skipIfLastAndSharedWithCase", "true");
         final String[] expected = {
             "17:13: " + getCheckMessage(MSG_KEY_SKIP_IF_LAST_AND_SHARED_WITH_CASE),
@@ -53,12 +51,13 @@ public class DefaultComesLastCheckTest extends AbstractModuleTestSupport {
             "98:13: " + getCheckMessage(MSG_KEY),
         };
 
-        verify(checkConfig, getPath("InputSkipIfLastAndSharedWithCase.java"), expected);
+        verify(checkConfig, getPath("InputDefaultComesLastSkipIfLastAndSharedWithCase.java"),
+                expected);
     }
 
     @Test
     public void testDefault() throws Exception {
-        checkConfig = createCheckConfig(DefaultComesLastCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(DefaultComesLastCheck.class);
         final String[] expected = {
             "25:9: " + getCheckMessage(MSG_KEY),
             "32:24: " + getCheckMessage(MSG_KEY),
@@ -83,8 +82,8 @@ public class DefaultComesLastCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testDefaultMethodsInJava8()
             throws Exception {
-        checkConfig = createCheckConfig(DefaultComesLastCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final DefaultConfiguration checkConfig = createModuleConfig(DefaultComesLastCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig,
                 getPath("InputDefaultComesLastDefaultMethodsInInterface.java"),
                 expected);
@@ -97,4 +96,5 @@ public class DefaultComesLastCheckTest extends AbstractModuleTestSupport {
         Assert.assertNotNull("Default tokens should not be null", check.getDefaultTokens());
         Assert.assertNotNull("Required tokens should not be null", check.getRequiredTokens());
     }
+
 }

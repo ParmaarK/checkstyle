@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,10 +23,11 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Locale;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * This Check controls the indentation between comments and surrounding code.
@@ -64,9 +65,8 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
  * }
  * </pre>
  *
- * @author <a href="mailto:nesterenko-aleksey@list.ru">Aleksey Nesterenko</a>
- * @author <a href="mailto:andreyselkin@gmail.com">Andrei Selkin</a>
  */
+@StatelessCheck
 public class CommentsIndentationCheck extends AbstractCheck {
 
     /**
@@ -97,7 +97,7 @@ public class CommentsIndentationCheck extends AbstractCheck {
 
     @Override
     public int[] getRequiredTokens() {
-        return CommonUtils.EMPTY_INT_ARRAY;
+        return CommonUtil.EMPTY_INT_ARRAY;
     }
 
     @Override
@@ -420,7 +420,6 @@ public class CommentsIndentationCheck extends AbstractCheck {
      */
     private void handleCommentInEmptyCaseBlock(DetailAST prevStmt, DetailAST comment,
                                                DetailAST nextStmt) {
-
         if (comment.getColumnNo() < prevStmt.getColumnNo()
                 || comment.getColumnNo() < nextStmt.getColumnNo()) {
             logMultilineIndentation(prevStmt, comment, nextStmt);
@@ -462,7 +461,6 @@ public class CommentsIndentationCheck extends AbstractCheck {
      */
     private void handleFallThroughComment(DetailAST prevStmt, DetailAST comment,
                                           DetailAST nextStmt) {
-
         if (!areSameLevelIndented(comment, prevStmt, nextStmt)) {
             logMultilineIndentation(prevStmt, comment, nextStmt);
         }
@@ -506,7 +504,6 @@ public class CommentsIndentationCheck extends AbstractCheck {
                         comment.getColumnNo(), getLineStart(prevStmtLineNo));
             }
         }
-
     }
 
     /**
@@ -751,7 +748,7 @@ public class CommentsIndentationCheck extends AbstractCheck {
         final String[] lines = getLines();
         final int endLineNo = endStatement.getLineNo();
         for (int lineNo = startStatement.getLineNo(); lineNo < endLineNo; lineNo++) {
-            if (CommonUtils.isBlank(lines[lineNo])) {
+            if (CommonUtil.isBlank(lines[lineNo])) {
                 emptyLinesNumber++;
             }
         }
@@ -888,7 +885,6 @@ public class CommentsIndentationCheck extends AbstractCheck {
      */
     private boolean areSameLevelIndented(DetailAST comment, DetailAST prevStmt,
                                                 DetailAST nextStmt) {
-
         return comment.getColumnNo() == getLineStart(nextStmt.getLineNo())
             || comment.getColumnNo() == getLineStart(prevStmt.getLineNo());
     }
@@ -936,7 +932,7 @@ public class CommentsIndentationCheck extends AbstractCheck {
     private boolean isTrailingSingleLineComment(DetailAST singleLineComment) {
         final String targetSourceLine = getLine(singleLineComment.getLineNo() - 1);
         final int commentColumnNo = singleLineComment.getColumnNo();
-        return !CommonUtils.hasWhitespaceBefore(commentColumnNo, targetSourceLine);
+        return !CommonUtil.hasWhitespaceBefore(commentColumnNo, targetSourceLine);
     }
 
     /**
@@ -954,7 +950,8 @@ public class CommentsIndentationCheck extends AbstractCheck {
         final String commentLine = getLine(blockComment.getLineNo() - 1);
         final int commentColumnNo = blockComment.getColumnNo();
         final DetailAST nextSibling = blockComment.getNextSibling();
-        return !CommonUtils.hasWhitespaceBefore(commentColumnNo, commentLine)
+        return !CommonUtil.hasWhitespaceBefore(commentColumnNo, commentLine)
             || nextSibling != null && nextSibling.getLineNo() == blockComment.getLineNo();
     }
+
 }

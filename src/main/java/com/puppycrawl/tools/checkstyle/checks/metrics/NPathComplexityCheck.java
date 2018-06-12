@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,7 @@ import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -34,10 +35,9 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * takes into account the nesting of conditional statements and
  * multi-part boolean expressions.
  *
- * @author <a href="mailto:simon@redhillconsulting.com.au">Simon Harris</a>
- * @author o_sukhodolsky
  */
 // -@cs[AbbreviationAsWordInName] Can't change check name
+@FileStatefulCheck
 public final class NPathComplexityCheck extends AbstractCheck {
 
     /**
@@ -88,11 +88,16 @@ public final class NPathComplexityCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return getAcceptableTokens();
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getAcceptableTokens() {
+        return getRequiredTokens();
+    }
+
+    @Override
+    public int[] getRequiredTokens() {
         return new int[] {
             TokenTypes.CTOR_DEF,
             TokenTypes.METHOD_DEF,
@@ -111,11 +116,6 @@ public final class NPathComplexityCheck extends AbstractCheck {
             TokenTypes.LITERAL_RETURN,
             TokenTypes.LITERAL_DEFAULT,
         };
-    }
-
-    @Override
-    public int[] getRequiredTokens() {
-        return getAcceptableTokens();
     }
 
     @Override
@@ -335,14 +335,14 @@ public final class NPathComplexityCheck extends AbstractCheck {
     }
 
     /**
-     * Calculates number of conditional operators, including inline ternary operatior, for a token.
+     * Calculates number of conditional operators, including inline ternary operator, for a token.
      * @param ast inspected token.
      * @return number of conditional operators.
-     * @see <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-15.html#jls-15.23">
+     * @see <a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-15.html#jls-15.23">
      * Java Language Specification, &sect;15.23</a>
-     * @see <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-15.html#jls-15.24">
+     * @see <a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-15.html#jls-15.24">
      * Java Language Specification, &sect;15.24</a>
-     * @see <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-15.html#jls-15.25">
+     * @see <a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-15.html#jls-15.25">
      * Java Language Specification, &sect;15.25</a>
      */
     private static int countConditionalOperators(DetailAST ast) {
@@ -399,6 +399,7 @@ public final class NPathComplexityCheck extends AbstractCheck {
      * operator from being processed twice.
      */
     private static class TokenEnd {
+
         /** End line of token. */
         private int endLineNo;
 
@@ -438,6 +439,7 @@ public final class NPathComplexityCheck extends AbstractCheck {
             }
             return isAfter;
         }
+
     }
 
     /**

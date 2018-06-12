@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,6 +20,7 @@
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import antlr.collections.AST;
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -35,8 +36,8 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * <pre>
  * &lt;module name="SimplifyBooleanReturn"/&gt;
  * </pre>
- * @author Lars Kühne
  */
+@StatelessCheck
 public class SimplifyBooleanReturnCheck
     extends AbstractCheck {
 
@@ -48,17 +49,17 @@ public class SimplifyBooleanReturnCheck
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {TokenTypes.LITERAL_IF};
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getDefaultTokens() {
-        return getAcceptableTokens();
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getAcceptableTokens();
+        return new int[] {TokenTypes.LITERAL_IF};
     }
 
     @Override
@@ -82,7 +83,7 @@ public class SimplifyBooleanReturnCheck
 
             if (canReturnOnlyBooleanLiteral(thenStatement)
                 && canReturnOnlyBooleanLiteral(elseStatement)) {
-                log(ast.getLineNo(), ast.getColumnNo(), MSG_KEY);
+                log(ast, MSG_KEY);
             }
         }
     }
@@ -108,12 +109,12 @@ public class SimplifyBooleanReturnCheck
      * @return if ast is a return statement with a boolean literal.
      */
     private static boolean canReturnOnlyBooleanLiteral(AST ast) {
-        if (isBooleanLiteralReturnStatement(ast)) {
-            return true;
+        boolean result = true;
+        if (!isBooleanLiteralReturnStatement(ast)) {
+            final AST firstStatement = ast.getFirstChild();
+            result = isBooleanLiteralReturnStatement(firstStatement);
         }
-
-        final AST firstStatement = ast.getFirstChild();
-        return isBooleanLiteralReturnStatement(firstStatement);
+        return result;
     }
 
     /**
@@ -152,4 +153,5 @@ public class SimplifyBooleanReturnCheck
         final boolean isFalse = tokenType == TokenTypes.LITERAL_FALSE;
         return isTrue || isFalse;
     }
+
 }

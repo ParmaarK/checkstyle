@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,23 +25,16 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class EmptyForIteratorPadCheckTest
     extends AbstractModuleTestSupport {
-    private DefaultConfiguration checkConfig;
-
-    @Before
-    public void setUp() {
-        checkConfig = createCheckConfig(EmptyForIteratorPadCheck.class);
-    }
 
     @Override
     protected String getPackageLocation() {
@@ -58,6 +51,7 @@ public class EmptyForIteratorPadCheckTest
 
     @Test
     public void testDefault() throws Exception {
+        final DefaultConfiguration checkConfig = createModuleConfig(EmptyForIteratorPadCheck.class);
         final String[] expected = {
             "27:31: " + getCheckMessage(MSG_WS_FOLLOWED, ";"),
             "43:32: " + getCheckMessage(MSG_WS_FOLLOWED, ";"),
@@ -68,6 +62,7 @@ public class EmptyForIteratorPadCheckTest
 
     @Test
     public void testSpaceOption() throws Exception {
+        final DefaultConfiguration checkConfig = createModuleConfig(EmptyForIteratorPadCheck.class);
         checkConfig.addAttribute("option", PadOption.SPACE.toString());
         final String[] expected = {
             "23:31: " + getCheckMessage(MSG_WS_NOT_FOLLOWED, ";"),
@@ -87,10 +82,11 @@ public class EmptyForIteratorPadCheckTest
 
     @Test
     public void testInvalidOption() throws Exception {
+        final DefaultConfiguration checkConfig = createModuleConfig(EmptyForIteratorPadCheck.class);
         checkConfig.addAttribute("option", "invalid_option");
 
         try {
-            final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+            final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
             verify(checkConfig, getPath("InputEmptyForIteratorPad.java"), expected);
             fail("exception expected");
@@ -103,4 +99,5 @@ public class EmptyForIteratorPadCheckTest
                 ex.getMessage().startsWith(messageStart));
         }
     }
+
 }

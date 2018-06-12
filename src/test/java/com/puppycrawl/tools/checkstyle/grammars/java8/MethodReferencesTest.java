@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -24,9 +24,10 @@ import org.junit.Test;
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.checks.naming.MemberNameCheck;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class MethodReferencesTest extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/grammars/java8";
@@ -36,55 +37,50 @@ public class MethodReferencesTest extends AbstractModuleTestSupport {
     public void testCanParse()
             throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(MemberNameCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+                createModuleConfig(MemberNameCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputMethodReferences.java"), expected);
-
     }
 
     @Test
     public void testFromSpec()
             throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(MemberNameCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+                createModuleConfig(MemberNameCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputMethodReferences2.java"), expected);
-
     }
 
     @Test
     public void testGenericInPostfixExpressionBeforeReference()
             throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(MemberNameCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+                createModuleConfig(MemberNameCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputMethodReferences3.java"), expected);
-
     }
 
     @Test
     public void testArrayAfterGeneric()
             throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(MemberNameCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final DefaultConfiguration checkConfig = createModuleConfig(MemberNameCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputMethodReferences4.java"), expected);
-
     }
 
     @Test
     public void testFromHibernate()
             throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(MemberNameCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final DefaultConfiguration checkConfig = createModuleConfig(MemberNameCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputMethodReferences5.java"), expected);
-
     }
 
     @Test
     public void testFromSpring()
             throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(MemberNameCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final DefaultConfiguration checkConfig = createModuleConfig(MemberNameCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputMethodReferences6.java"), expected);
     }
 
@@ -92,9 +88,9 @@ public class MethodReferencesTest extends AbstractModuleTestSupport {
     public void testMethodReferences7()
             throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(MemberNameCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+                createModuleConfig(MemberNameCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputMethodReferences7.java"), expected);
-
     }
+
 }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -27,9 +27,10 @@ import org.junit.Test;
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class OuterTypeNumberCheckTest extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/sizes/outertypenumber";
@@ -65,7 +66,7 @@ public class OuterTypeNumberCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testDefault() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(OuterTypeNumberCheck.class);
+            createModuleConfig(OuterTypeNumberCheck.class);
         final String[] expected = {
             "6:1: " + getCheckMessage(MSG_KEY, 3, 1),
         };
@@ -75,18 +76,19 @@ public class OuterTypeNumberCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testMax30() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(OuterTypeNumberCheck.class);
+            createModuleConfig(OuterTypeNumberCheck.class);
         checkConfig.addAttribute("max", "30");
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputOuterTypeNumberSimple.java"), expected);
     }
 
     @Test
     public void testWithInnerClass() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(OuterTypeNumberCheck.class);
+            createModuleConfig(OuterTypeNumberCheck.class);
         checkConfig.addAttribute("max", "1");
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputOuterTypeNumberEmptyInner.java"), expected);
     }
+
 }

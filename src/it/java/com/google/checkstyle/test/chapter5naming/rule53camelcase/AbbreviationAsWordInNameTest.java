@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,29 +19,26 @@
 
 package com.google.checkstyle.test.chapter5naming.rule53camelcase;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.junit.Test;
 
-import com.google.checkstyle.test.base.BaseCheckTestSupport;
+import com.google.checkstyle.test.base.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 import com.puppycrawl.tools.checkstyle.checks.naming.AbbreviationAsWordInNameCheck;
 
-public class AbbreviationAsWordInNameTest extends BaseCheckTestSupport {
+public class AbbreviationAsWordInNameTest extends AbstractModuleTestSupport {
 
     private static final String MSG_KEY = "abbreviation.as.word";
     private final Class<AbbreviationAsWordInNameCheck> clazz = AbbreviationAsWordInNameCheck.class;
 
     @Override
-    protected String getPath(String fileName) throws IOException {
-        return super.getPath("chapter5naming" + File.separator + "rule53camelcase"
-                + File.separator + fileName);
+    protected String getPackageLocation() {
+        return "com/google/checkstyle/test/chapter5naming/rule53camelcase";
     }
 
     @Test
     public void testAbbreviationAsWordInName() throws Exception {
-
         final int maxCapitalCount = 2;
 
         final String[] expected = {
@@ -58,12 +55,14 @@ public class AbbreviationAsWordInNameTest extends BaseCheckTestSupport {
 
         final String filePath = getPath("InputAbbreviationAsWordInTypeNameCheck.java");
 
-        final Configuration checkConfig = getCheckConfig("AbbreviationAsWordInName");
+        final Configuration checkConfig = getModuleConfig("AbbreviationAsWordInName");
         final Integer[] warnList = getLinesWithWarn(filePath);
         verify(checkConfig, filePath, expected, warnList);
     }
 
-    private String getWarningMessage(String typeName, int expectedCapitalCount) {
+    private String getWarningMessage(String typeName, int expectedCapitalCount)
+            throws IOException {
         return getCheckMessage(clazz, MSG_KEY, typeName, expectedCapitalCount);
     }
+
 }

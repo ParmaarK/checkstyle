@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,26 +19,21 @@
 
 package com.google.checkstyle.test.chapter3filestructure.rule3421overloadsplit;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.junit.Test;
 
-import com.google.checkstyle.test.base.BaseCheckTestSupport;
+import com.google.checkstyle.test.base.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 import com.puppycrawl.tools.checkstyle.checks.coding.OverloadMethodsDeclarationOrderCheck;
 
-public class OverloadMethodsDeclarationOrderTest extends BaseCheckTestSupport {
+public class OverloadMethodsDeclarationOrderTest extends AbstractModuleTestSupport {
 
     @Override
-    protected String getPath(String fileName) throws IOException {
-        return super.getPath("chapter3filestructure" + File.separator + "rule3421overloadsplit"
-                + File.separator + fileName);
+    protected String getPackageLocation() {
+        return "com/google/checkstyle/test/chapter3filestructure/rule3421overloadsplit";
     }
 
     @Test
     public void testOverloadMethods() throws Exception {
-
         final Class<OverloadMethodsDeclarationOrderCheck> clazz =
             OverloadMethodsDeclarationOrderCheck.class;
         final String messageKey = "overload.methods.declaration";
@@ -50,10 +45,11 @@ public class OverloadMethodsDeclarationOrderTest extends BaseCheckTestSupport {
             "109: " + getCheckMessage(clazz, messageKey, 98),
         };
 
-        final Configuration checkConfig = getCheckConfig("OverloadMethodsDeclarationOrder");
+        final Configuration checkConfig = getModuleConfig("OverloadMethodsDeclarationOrder");
         final String filePath = getPath("InputOverloadMethodsDeclarationOrder.java");
 
         final Integer[] warnList = getLinesWithWarn(filePath);
         verify(checkConfig, filePath, expected, warnList);
     }
+
 }

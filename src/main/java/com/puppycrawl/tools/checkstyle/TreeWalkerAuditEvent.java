@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,21 +19,24 @@
 
 package com.puppycrawl.tools.checkstyle;
 
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.LocalizedMessage;
 
 /**
  * Raw {@code TreeWalker} event for audit.
  *
- * @author Timur Tibeyev
  */
 public class TreeWalkerAuditEvent {
+
     /** Filename event associated with. **/
     private final String fileName;
     /** The file contents. */
     private final FileContents fileContents;
     /** Message associated with the event. **/
     private final LocalizedMessage localizedMessage;
+    /** Root ast element. **/
+    private final DetailAST rootAst;
 
     /**
      * Creates a new {@code TreeWalkerAuditEvent} instance.
@@ -41,12 +44,14 @@ public class TreeWalkerAuditEvent {
      * @param fileContents contents of the file associated with the event
      * @param fileName file associated with the event
      * @param localizedMessage the actual message
+     * @param rootAst root AST element {@link DetailAST} of the file
      */
     public TreeWalkerAuditEvent(FileContents fileContents, String fileName,
-                                LocalizedMessage localizedMessage) {
+                                LocalizedMessage localizedMessage, DetailAST rootAst) {
         this.fileContents = fileContents;
         this.fileName = fileName;
         this.localizedMessage = localizedMessage;
+        this.rootAst = rootAst;
     }
 
     /**
@@ -100,6 +105,14 @@ public class TreeWalkerAuditEvent {
     }
 
     /**
+     * Gets the column char index associated with the message.
+     * @return the column char index associated with the message
+     */
+    public int getColumnCharIndex() {
+        return localizedMessage.getColumnCharIndex();
+    }
+
+    /**
      * Returns id of module.
      * @return the identifier of the module that generated the event. Can return
      *         null.
@@ -115,4 +128,21 @@ public class TreeWalkerAuditEvent {
     public String getSourceName() {
         return localizedMessage.getSourceName();
     }
+
+    /**
+     * Gets the token type of the message.
+     * @return the token type of the message
+     */
+    public int getTokenType() {
+        return localizedMessage.getTokenType();
+    }
+
+    /**
+     * Gets the root element of the AST tree.
+     * @return the root element of the AST tree
+     */
+    public DetailAST getRootAst() {
+        return rootAst;
+    }
+
 }

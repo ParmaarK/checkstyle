@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -28,12 +28,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
-import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+import com.puppycrawl.tools.checkstyle.AbstractPathTestSupport;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.DetailNode;
 import com.puppycrawl.tools.checkstyle.gui.MainFrameModel.ParseMode;
 
-public class CodeSelectorPresentationTest {
+public class CodeSelectorPresentationTest extends AbstractPathTestSupport {
 
     private MainFrameModel model;
 
@@ -42,20 +42,21 @@ public class CodeSelectorPresentationTest {
     private ImmutableList<Integer> linesToPosition;
 
     @Before
-    public void loadFile() throws CheckstyleException {
+    public void loadFile() throws Exception {
         model = new MainFrameModel();
         model.setParseMode(ParseMode.JAVA_WITH_JAVADOC_AND_COMMENTS);
-        model.openFile(new File(getPath("InputJavadocAttributesAndMethods.java")));
+        model.openFile(new File(getPath("InputCodeSelectorPresentation.java")));
         tree = ((DetailAST) model.getParseTreeTableModel().getRoot()).getFirstChild();
         linesToPosition = ImmutableList.copyOf(convertLinesToPosition(model.getLinesToPosition()));
     }
 
-    private static String getPath(String filename) {
-        return "src/test/resources/com/puppycrawl/tools/checkstyle/gui/" + filename;
+    @Override
+    protected String getPackageLocation() {
+        return "com/puppycrawl/tools/checkstyle/gui/codeselectorpresentation";
     }
 
     /** Converts lineToPosition from multicharacter to one character line separator
-      * needs to support crossplatform line separators
+      * needs to support crossplatform line separators.
       * @param systemLinesToPosition lines to position mapping for current system
       * @return lines to position mapping with one character line separator
       */
@@ -76,7 +77,7 @@ public class CodeSelectorPresentationTest {
                 linesToPosition);
         selector.findSelectionPositions();
         Assert.assertEquals("Invalid selection start", 23, selector.getSelectionStart());
-        Assert.assertEquals("Invalid selection end", 212, selector.getSelectionEnd());
+        Assert.assertEquals("Invalid selection end", 209, selector.getSelectionEnd());
     }
 
     @Test
@@ -85,8 +86,8 @@ public class CodeSelectorPresentationTest {
         final CodeSelectorPresentation selector = new CodeSelectorPresentation(leaf,
                 linesToPosition);
         selector.findSelectionPositions();
-        Assert.assertEquals("Invalid selection start", 62, selector.getSelectionStart());
-        Assert.assertEquals("Invalid selection end", 63, selector.getSelectionEnd());
+        Assert.assertEquals("Invalid selection start", 59, selector.getSelectionStart());
+        Assert.assertEquals("Invalid selection end", 60, selector.getSelectionEnd());
     }
 
     @Test

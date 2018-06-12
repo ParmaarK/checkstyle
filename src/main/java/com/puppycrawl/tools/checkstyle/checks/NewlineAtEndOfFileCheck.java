@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Locale;
 
-import com.google.common.io.Closeables;
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractFileSetCheck;
 import com.puppycrawl.tools.checkstyle.api.FileText;
 
@@ -53,9 +53,8 @@ import com.puppycrawl.tools.checkstyle.api.FileText;
  * 'crlf' (windows), 'cr' (mac), 'lf' (unix) and 'lf_cr_crlf' (lf, cr or crlf).
  * </p>
  *
- * @author Christopher Lenz
- * @author lkuehne
  */
+@StatelessCheck
 public class NewlineAtEndOfFileCheck
     extends AbstractFileSetCheck {
 
@@ -110,16 +109,10 @@ public class NewlineAtEndOfFileCheck
      */
     private void readAndCheckFile(File file) throws IOException {
         // Cannot use lines as the line separators have been removed!
-        final RandomAccessFile randomAccessFile = new RandomAccessFile(file, "r");
-        boolean threw = true;
-        try {
+        try (RandomAccessFile randomAccessFile = new RandomAccessFile(file, "r")) {
             if (!endsWithNewline(randomAccessFile)) {
                 log(0, MSG_KEY_NO_NEWLINE_EOF, file.getPath());
             }
-            threw = false;
-        }
-        finally {
-            Closeables.close(randomAccessFile, threw);
         }
     }
 
@@ -150,4 +143,5 @@ public class NewlineAtEndOfFileCheck
         }
         return result;
     }
+
 }

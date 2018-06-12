@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -30,8 +30,7 @@ import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FullIdent;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CheckUtils;
-import com.puppycrawl.tools.checkstyle.utils.TokenUtils;
+import com.puppycrawl.tools.checkstyle.utils.TokenUtil;
 
 /**
  * Checks that particular class are never used as types in variable
@@ -49,7 +48,7 @@ import com.puppycrawl.tools.checkstyle.utils.TokenUtils;
  * <p><b>illegalClassNames</b> - Classes that should not be used as types in variable
    declarations, return values or parameters.
  * It is possible to set illegal class names via short or
- * <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-6.html#jls-6.7">
+ * <a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-6.html#jls-6.7">
  *  canonical</a> name.
  *  Specifying illegal type invokes analyzing imports and Check puts violations at
  *   corresponding declarations
@@ -86,9 +85,6 @@ import com.puppycrawl.tools.checkstyle.utils.TokenUtils;
  *  benefit from checking for them.
  * </p>
  *
- * @author <a href="mailto:simon@redhillconsulting.com.au">Simon Harris</a>
- * @author <a href="mailto:nesterenko-aleksey@list.ru">Aleksey Nesterenko</a>
- * @author <a href="mailto:andreyselkin@gmail.com">Andrei Selkin</a>
  */
 public final class IllegalTypeCheck extends AbstractCheck {
 
@@ -98,8 +94,6 @@ public final class IllegalTypeCheck extends AbstractCheck {
      */
     public static final String MSG_KEY = "illegal.type";
 
-    /** Abstract classes legal by default. */
-    private static final String[] DEFAULT_LEGAL_ABSTRACT_NAMES = {};
     /** Types illegal by default. */
     private static final String[] DEFAULT_ILLEGAL_TYPES = {
         "HashSet",
@@ -124,6 +118,8 @@ public final class IllegalTypeCheck extends AbstractCheck {
 
     /** Illegal classes. */
     private final Set<String> illegalClassNames = new HashSet<>();
+    /** Illegal short classes. */
+    private final Set<String> illegalShortClassNames = new HashSet<>();
     /** Legal abstract classes. */
     private final Set<String> legalAbstractClassNames = new HashSet<>();
     /** Methods which should be ignored. */
@@ -142,7 +138,6 @@ public final class IllegalTypeCheck extends AbstractCheck {
     /** Creates new instance of the check. */
     public IllegalTypeCheck() {
         setIllegalClassNames(DEFAULT_ILLEGAL_TYPES);
-        setLegalAbstractClassNames(DEFAULT_LEGAL_ABSTRACT_NAMES);
         setIgnoredMethodNames(DEFAULT_IGNORED_METHOD_NAMES);
     }
 
@@ -175,6 +170,17 @@ public final class IllegalTypeCheck extends AbstractCheck {
             TokenTypes.METHOD_DEF,
             TokenTypes.IMPORT,
         };
+    }
+
+    @Override
+    public void beginTree(DetailAST rootAST) {
+        illegalShortClassNames.clear();
+
+        for (String s : illegalClassNames) {
+            if (s.indexOf('.') == -1) {
+                illegalShortClassNames.add(s);
+            }
+        }
     }
 
     @Override
@@ -316,7 +322,7 @@ public final class IllegalTypeCheck extends AbstractCheck {
      */
     private void checkClassName(DetailAST ast) {
         final DetailAST type = ast.findFirstToken(TokenTypes.TYPE);
-        final FullIdent ident = CheckUtils.createFullType(type);
+        final FullIdent ident = FullIdent.createFullIdent(type.getFirstChild());
 
         if (isMatchingClassName(ident.getText())) {
             log(ident.getLineNo(), ident.getColumnNo(),
@@ -333,7 +339,7 @@ public final class IllegalTypeCheck extends AbstractCheck {
     private boolean isMatchingClassName(String className) {
         final String shortName = className.substring(className.lastIndexOf('.') + 1);
         return illegalClassNames.contains(className)
-                || illegalClassNames.contains(shortName)
+                || illegalShortClassNames.contains(shortName)
                 || validateAbstractClassNames
                     && !legalAbstractClassNames.contains(className)
                     && format.matcher(className).find();
@@ -342,26 +348,26 @@ public final class IllegalTypeCheck extends AbstractCheck {
     /**
      * Extends illegal class names set via imported short type name.
      * @param canonicalName
-     *  <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-6.html#jls-6.7">
+     *  <a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-6.html#jls-6.7">
      *  Canonical</a> name of imported type.
      */
     private void extendIllegalClassNamesWithShortName(String canonicalName) {
         if (illegalClassNames.contains(canonicalName)) {
             final String shortName = canonicalName
                 .substring(canonicalName.lastIndexOf('.') + 1);
-            illegalClassNames.add(shortName);
+            illegalShortClassNames.add(shortName);
         }
     }
 
     /**
      * Gets imported type's
-     * <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-6.html#jls-6.7">
+     * <a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-6.html#jls-6.7">
      *  canonical name</a>.
      * @param importAst {@link TokenTypes#IMPORT Import}
      * @return Imported canonical type's name.
      */
     private static String getImportedTypeCanonicalName(DetailAST importAst) {
-        final StringBuilder canonicalNameBuilder = new StringBuilder();
+        final StringBuilder canonicalNameBuilder = new StringBuilder(256);
         DetailAST toVisit = importAst;
         while (toVisit != null) {
             toVisit = getNextSubTreeNode(toVisit, importAst);
@@ -414,6 +420,7 @@ public final class IllegalTypeCheck extends AbstractCheck {
     /**
      * Set the list of illegal variable types.
      * @param classNames array of illegal variable types
+     * @noinspection WeakerAccess
      */
     public void setIllegalClassNames(String... classNames) {
         illegalClassNames.clear();
@@ -423,6 +430,7 @@ public final class IllegalTypeCheck extends AbstractCheck {
     /**
      * Set the list of ignore method names.
      * @param methodNames array of ignored method names
+     * @noinspection WeakerAccess
      */
     public void setIgnoredMethodNames(String... methodNames) {
         ignoredMethodNames.clear();
@@ -432,9 +440,9 @@ public final class IllegalTypeCheck extends AbstractCheck {
     /**
      * Set the list of legal abstract class names.
      * @param classNames array of legal abstract class names
+     * @noinspection WeakerAccess
      */
     public void setLegalAbstractClassNames(String... classNames) {
-        legalAbstractClassNames.clear();
         Collections.addAll(legalAbstractClassNames, classNames);
     }
 
@@ -445,8 +453,9 @@ public final class IllegalTypeCheck extends AbstractCheck {
     public void setMemberModifiers(String modifiers) {
         final List<Integer> modifiersList = new ArrayList<>();
         for (String modifier : modifiers.split(",")) {
-            modifiersList.add(TokenUtils.getTokenId(modifier.trim()));
+            modifiersList.add(TokenUtil.getTokenId(modifier.trim()));
         }
         memberModifiers = modifiersList;
     }
+
 }

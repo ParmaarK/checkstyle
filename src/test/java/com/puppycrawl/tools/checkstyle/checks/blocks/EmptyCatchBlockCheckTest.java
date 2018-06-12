@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -28,12 +28,8 @@ import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
-/**
- *
- * @author <a href="mailto:nesterenko-aleksey@list.ru">Aleksey Nesterenko</a>
- *
- */
 public class EmptyCatchBlockCheckTest extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/blocks/emptycatchblock";
@@ -50,7 +46,7 @@ public class EmptyCatchBlockCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testDefault() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(EmptyCatchBlockCheck.class);
+            createModuleConfig(EmptyCatchBlockCheck.class);
         final String[] expected = {
             "35: " + getCheckMessage(MSG_KEY_CATCH_BLOCK_EMPTY),
             "42: " + getCheckMessage(MSG_KEY_CATCH_BLOCK_EMPTY),
@@ -61,7 +57,7 @@ public class EmptyCatchBlockCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testWithUserSetValues() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(EmptyCatchBlockCheck.class);
+            createModuleConfig(EmptyCatchBlockCheck.class);
         checkConfig.addAttribute("exceptionVariableName", "expected|ignore|myException");
         checkConfig.addAttribute("commentFormat", "This is expected");
         final String[] expected = {
@@ -84,4 +80,5 @@ public class EmptyCatchBlockCheckTest extends AbstractModuleTestSupport {
         final int[] expected = {TokenTypes.LITERAL_CATCH };
         assertArrayEquals("Default acceptable tokens are invalid", expected, actual);
     }
+
 }

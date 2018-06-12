@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,9 +21,10 @@ package com.puppycrawl.tools.checkstyle.checks.sizes;
 
 import java.util.regex.Pattern;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * Checks for long lines.
@@ -70,8 +71,8 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
  * &lt;/module&gt;
  * </pre>
  *
- * @author Lars Kühne
  */
+@StatelessCheck
 public class LineLengthCheck extends AbstractCheck {
 
     /**
@@ -94,26 +95,25 @@ public class LineLengthCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return CommonUtils.EMPTY_INT_ARRAY;
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return CommonUtils.EMPTY_INT_ARRAY;
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return CommonUtils.EMPTY_INT_ARRAY;
+        return CommonUtil.EMPTY_INT_ARRAY;
     }
 
     @Override
     public void beginTree(DetailAST rootAST) {
         final String[] lines = getLines();
         for (int i = 0; i < lines.length; i++) {
-
             final String line = lines[i];
-            final int realLength = CommonUtils.lengthExpandedTabs(
+            final int realLength = CommonUtil.lengthExpandedTabs(
                 line, line.length(), getTabWidth());
 
             if (realLength > max && !IGNORE_PATTERN.matcher(line).find()
@@ -138,4 +138,5 @@ public class LineLengthCheck extends AbstractCheck {
     public final void setIgnorePattern(Pattern pattern) {
         ignorePattern = pattern;
     }
+
 }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,28 +19,24 @@
 
 package com.google.checkstyle.test.chapter4formatting.rule462horizontalwhitespace;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.junit.Test;
 
-import com.google.checkstyle.test.base.BaseCheckTestSupport;
+import com.google.checkstyle.test.base.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
-public class GenericWhitespaceTest extends BaseCheckTestSupport {
+public class GenericWhitespaceTest extends AbstractModuleTestSupport {
 
     @Override
-    protected String getPath(String fileName) throws IOException {
-        return super.getPath("chapter4formatting" + File.separator + "rule462horizontalwhitespace"
-                + File.separator + fileName);
+    protected String getPackageLocation() {
+        return "com/google/checkstyle/test/chapter4formatting/rule462horizontalwhitespace";
     }
 
     @Test
     public void testWhitespaceAroundGenerics() throws Exception {
-
         final String msgPreceded = "ws.preceded";
         final String msgFollowed = "ws.followed";
-        final Configuration checkConfig = getCheckConfig("GenericWhitespace");
+        final Configuration checkConfig = getModuleConfig("GenericWhitespace");
 
         final String[] expected = {
             "12:16: " + getCheckMessage(checkConfig.getMessages(), msgPreceded, "<"),
@@ -73,7 +69,7 @@ public class GenericWhitespaceTest extends BaseCheckTestSupport {
         final String msgFollowed = "ws.followed";
         final String msgNotPreceded = "ws.notPreceded";
         final String msgIllegalFollow = "ws.illegalFollow";
-        final Configuration checkConfig = getCheckConfig("GenericWhitespace");
+        final Configuration checkConfig = getModuleConfig("GenericWhitespace");
 
         final String[] expected = {
             "16:13: " + getCheckMessage(checkConfig.getMessages(), msgPreceded, "<"),
@@ -112,10 +108,10 @@ public class GenericWhitespaceTest extends BaseCheckTestSupport {
 
     @Test
     public void genericEndsTheLine() throws Exception {
-        final Configuration checkConfig = getCheckConfig("GenericWhitespace");
-        final String[] expected = {
-        };
+        final Configuration checkConfig = getModuleConfig("GenericWhitespace");
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputGenericWhitespaceEndsTheLine.java"),
                 expected);
     }
+
 }

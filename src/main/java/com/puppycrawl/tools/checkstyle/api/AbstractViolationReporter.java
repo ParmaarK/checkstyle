@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -26,10 +26,11 @@ import java.util.Map;
  * findings. Such modules have a Severity level which is used for the
  * {@link LocalizedMessage localized messages} that are created by the module.
  *
- * @author lkuehne
+ * @noinspection NoopMethodInAbstractClass
  */
 public abstract class AbstractViolationReporter
     extends AutomaticBean {
+
     /** The severity level of any violations found. */
     private SeverityLevel severityLevel = SeverityLevel.ERROR;
 
@@ -41,6 +42,7 @@ public abstract class AbstractViolationReporter
      * @return the severity level
      * @see SeverityLevel
      * @see LocalizedMessage#getSeverityLevel
+     * @noinspection WeakerAccess
      */
     public final SeverityLevel getSeverityLevel() {
         return severityLevel;
@@ -61,6 +63,7 @@ public abstract class AbstractViolationReporter
      *  Get the severity level's name.
      *
      *  @return  the check's severity level name.
+     *  @noinspection WeakerAccess
      */
     public final String getSeverity() {
         return severityLevel.getName();
@@ -132,6 +135,11 @@ public abstract class AbstractViolationReporter
         return messageBundle;
     }
 
+    @Override
+    protected void finishLocalSetup() throws CheckstyleException {
+        // No code by default
+    }
+
     /**
      * Log a message that has no column information.
      *
@@ -159,4 +167,5 @@ public abstract class AbstractViolationReporter
     // overloaded methods. See https://github.com/sevntu-checkstyle/sevntu.checkstyle/issues/414
     public abstract void log(int line, int col, String key,
             Object... args);
+
 }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,12 +25,13 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.Scope;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CheckUtils;
-import com.puppycrawl.tools.checkstyle.utils.ScopeUtils;
+import com.puppycrawl.tools.checkstyle.utils.CheckUtil;
+import com.puppycrawl.tools.checkstyle.utils.ScopeUtil;
 
 /**
  * Checks that a local variable or a parameter does not shadow
@@ -126,10 +127,11 @@ import com.puppycrawl.tools.checkstyle.utils.ScopeUtils;
  * }
  * </pre>
  *
- * @author Dmitri Priimak
  */
+@FileStatefulCheck
 public class HiddenFieldCheck
     extends AbstractCheck {
+
     /**
      * A key is pointing to the warning message text in "messages.properties"
      * file.
@@ -219,7 +221,8 @@ public class HiddenFieldCheck
         final DetailAST firstChild = ast.getFirstChild();
         if (firstChild.getType() == TokenTypes.IDENT) {
             final String untypedLambdaParameterName = firstChild.getText();
-            if (isStaticOrInstanceField(firstChild, untypedLambdaParameterName)) {
+            if (frame.containsStaticField(untypedLambdaParameterName)
+                || isInstanceField(firstChild, untypedLambdaParameterName)) {
                 log(firstChild, MSG_KEY, untypedLambdaParameterName);
             }
         }
@@ -245,7 +248,7 @@ public class HiddenFieldCheck
         final DetailAST typeMods = ast.findFirstToken(TokenTypes.MODIFIERS);
         final boolean isStaticInnerType =
                 typeMods != null
-                        && typeMods.branchContains(TokenTypes.LITERAL_STATIC);
+                        && typeMods.findFirstToken(TokenTypes.LITERAL_STATIC) != null;
         final String frameName;
 
         if (type == TokenTypes.CLASS_DEF || type == TokenTypes.ENUM_DEF) {
@@ -267,11 +270,11 @@ public class HiddenFieldCheck
                         child.findFirstToken(TokenTypes.IDENT).getText();
                     final DetailAST mods =
                         child.findFirstToken(TokenTypes.MODIFIERS);
-                    if (mods.branchContains(TokenTypes.LITERAL_STATIC)) {
-                        newFrame.addStaticField(name);
+                    if (mods.findFirstToken(TokenTypes.LITERAL_STATIC) == null) {
+                        newFrame.addInstanceField(name);
                     }
                     else {
-                        newFrame.addInstanceField(name);
+                        newFrame.addStaticField(name);
                     }
                 }
                 child = child.getNextSibling();
@@ -298,32 +301,20 @@ public class HiddenFieldCheck
      * @param ast the variable token.
      */
     private void processVariable(DetailAST ast) {
-        if (!ScopeUtils.isInInterfaceOrAnnotationBlock(ast)
-            && !CheckUtils.isReceiverParameter(ast)
-            && (ScopeUtils.isLocalVariableDef(ast)
+        if (!ScopeUtil.isInInterfaceOrAnnotationBlock(ast)
+            && !CheckUtil.isReceiverParameter(ast)
+            && (ScopeUtil.isLocalVariableDef(ast)
                 || ast.getType() == TokenTypes.PARAMETER_DEF)) {
             // local variable or parameter. Does it shadow a field?
             final DetailAST nameAST = ast.findFirstToken(TokenTypes.IDENT);
             final String name = nameAST.getText();
 
-            if ((isStaticFieldHiddenFromAnonymousClass(ast, name)
-                        || isStaticOrInstanceField(ast, name))
+            if ((frame.containsStaticField(name) || isInstanceField(ast, name))
                     && !isMatchingRegexp(name)
                     && !isIgnoredParam(ast, name)) {
                 log(nameAST, MSG_KEY, name);
             }
         }
-    }
-
-    /**
-     * Checks whether a static field is hidden from closure.
-     * @param nameAST local variable or parameter.
-     * @param name field name.
-     * @return true if static field is hidden from closure.
-     */
-    private boolean isStaticFieldHiddenFromAnonymousClass(DetailAST nameAST, String name) {
-        return isInStatic(nameAST)
-            && frame.containsStaticField(name);
     }
 
     /**
@@ -339,14 +330,13 @@ public class HiddenFieldCheck
     }
 
     /**
-     * Check for static or instance field.
+     * Check for instance field.
      * @param ast token
      * @param name identifier of token
-     * @return true if static or instance field
+     * @return true if instance field
      */
-    private boolean isStaticOrInstanceField(DetailAST ast, String name) {
-        return frame.containsStaticField(name)
-                || !isInStatic(ast) && frame.containsInstanceField(name);
+    private boolean isInstanceField(DetailAST ast, String name) {
+        return !isInStatic(ast) && frame.containsInstanceField(name);
     }
 
     /**
@@ -373,11 +363,11 @@ public class HiddenFieldCheck
                 inStatic = true;
             }
             else if (parent.getType() == TokenTypes.METHOD_DEF
-                        && !ScopeUtils.isInScope(parent, Scope.ANONINNER)
+                        && !ScopeUtil.isInScope(parent, Scope.ANONINNER)
                         || parent.getType() == TokenTypes.VARIABLE_DEF) {
                 final DetailAST mods =
                     parent.findFirstToken(TokenTypes.MODIFIERS);
-                inStatic = mods.branchContains(TokenTypes.LITERAL_STATIC);
+                inStatic = mods.findFirstToken(TokenTypes.LITERAL_STATIC) != null;
                 break;
             }
             else {
@@ -402,16 +392,17 @@ public class HiddenFieldCheck
      *     ignoreSetter is true and ast is the parameter of a setter method.
      */
     private boolean isIgnoredSetterParam(DetailAST ast, String name) {
+        boolean isIgnoredSetterParam = false;
         if (ignoreSetter && ast.getType() == TokenTypes.PARAMETER_DEF) {
             final DetailAST parametersAST = ast.getParent();
             final DetailAST methodAST = parametersAST.getParent();
             if (parametersAST.getChildCount() == 1
                 && methodAST.getType() == TokenTypes.METHOD_DEF
                 && isSetterMethod(methodAST, name)) {
-                return true;
+                isIgnoredSetterParam = true;
             }
         }
-        return false;
+        return isIgnoredSetterParam;
     }
 
     /**
@@ -434,7 +425,7 @@ public class HiddenFieldCheck
             // therefore this method is potentially a setter
             final DetailAST typeAST = aMethodAST.findFirstToken(TokenTypes.TYPE);
             final String returnType = typeAST.getFirstChild().getText();
-            if (typeAST.branchContains(TokenTypes.LITERAL_VOID)
+            if (typeAST.findFirstToken(TokenTypes.LITERAL_VOID) != null
                     || setterCanReturnItsClass && frame.isEmbeddedIn(returnType)) {
                 // this method has signature
                 //
@@ -503,7 +494,7 @@ public class HiddenFieldCheck
             final DetailAST method = ast.getParent().getParent();
             if (method.getType() == TokenTypes.METHOD_DEF) {
                 final DetailAST mods = method.findFirstToken(TokenTypes.MODIFIERS);
-                result = mods.branchContains(TokenTypes.ABSTRACT);
+                result = mods.findFirstToken(TokenTypes.ABSTRACT) != null;
             }
         }
         return result;
@@ -563,9 +554,9 @@ public class HiddenFieldCheck
 
     /**
      * Holds the names of static and instance fields of a type.
-     * @author Rick Giles
      */
     private static class FieldFrame {
+
         /** Name of the frame, such name of the class or enum declaration. */
         private final String frameName;
 
@@ -619,7 +610,6 @@ public class HiddenFieldCheck
                     || parent != null
                     && !staticType
                     && parent.containsInstanceField(field);
-
         }
 
         /**
@@ -653,13 +643,17 @@ public class HiddenFieldCheck
          */
         private boolean isEmbeddedIn(String classOrEnumName) {
             FieldFrame currentFrame = this;
+            boolean isEmbeddedIn = false;
             while (currentFrame != null) {
                 if (Objects.equals(currentFrame.frameName, classOrEnumName)) {
-                    return true;
+                    isEmbeddedIn = true;
+                    break;
                 }
                 currentFrame = currentFrame.parent;
             }
-            return false;
+            return isEmbeddedIn;
         }
+
     }
+
 }

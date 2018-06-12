@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -29,6 +29,7 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 public class IllegalImportCheckTest extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/imports/illegalimport";
@@ -46,7 +47,7 @@ public class IllegalImportCheckTest extends AbstractModuleTestSupport {
     public void testWithSupplied()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(IllegalImportCheck.class);
+            createModuleConfig(IllegalImportCheck.class);
         checkConfig.addAttribute("illegalPkgs", "java.io");
         final String[] expected = {
             "9:1: " + getCheckMessage(MSG_KEY, "java.io.*"),
@@ -60,7 +61,7 @@ public class IllegalImportCheckTest extends AbstractModuleTestSupport {
     public void testWithDefault()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(IllegalImportCheck.class);
+            createModuleConfig(IllegalImportCheck.class);
         final String[] expected = {
             "15:1: " + getCheckMessage(MSG_KEY, "sun.applet.*"),
             "28:1: " + getCheckMessage(MSG_KEY, "sun.*"),
@@ -82,7 +83,7 @@ public class IllegalImportCheckTest extends AbstractModuleTestSupport {
     public void testIllegalClasses()
             throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(IllegalImportCheck.class);
+                createModuleConfig(IllegalImportCheck.class);
         checkConfig.addAttribute("illegalClasses", "java.sql.Connection");
         final String[] expected = {
             "11:1: " + getCheckMessage(MSG_KEY, "java.sql.Connection"),
@@ -96,7 +97,7 @@ public class IllegalImportCheckTest extends AbstractModuleTestSupport {
     public void testIllegalPackagesRegularExpression()
             throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(IllegalImportCheck.class);
+                createModuleConfig(IllegalImportCheck.class);
         checkConfig.addAttribute("illegalPkgs", "java\\.util");
         checkConfig.addAttribute("regexp", "true");
         final String[] expected = {
@@ -112,10 +113,10 @@ public class IllegalImportCheckTest extends AbstractModuleTestSupport {
     }
 
     @Test
-    public void testIllegalClassessRegularExpression()
+    public void testIllegalClassesRegularExpression()
             throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(IllegalImportCheck.class);
+                createModuleConfig(IllegalImportCheck.class);
         checkConfig.addAttribute("illegalPkgs", "");
         checkConfig.addAttribute("illegalClasses", "^java\\.util\\.(List|Arrays)");
         checkConfig.addAttribute("regexp", "true");
@@ -131,7 +132,7 @@ public class IllegalImportCheckTest extends AbstractModuleTestSupport {
     public void testIllegalPackagesAndClassesRegularExpression()
             throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(IllegalImportCheck.class);
+                createModuleConfig(IllegalImportCheck.class);
         checkConfig.addAttribute("illegalPkgs", "java\\.util");
         checkConfig.addAttribute("illegalClasses",
                 "^com\\.puppycrawl\\.tools\\.checkstyle\\.Checker.*");
@@ -149,4 +150,5 @@ public class IllegalImportCheckTest extends AbstractModuleTestSupport {
         };
         verify(checkConfig, getPath("InputIllegalImportDefault.java"), expected);
     }
+
 }

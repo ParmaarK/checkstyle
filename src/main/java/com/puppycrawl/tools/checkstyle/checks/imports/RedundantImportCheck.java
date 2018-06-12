@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,7 @@ package com.puppycrawl.tools.checkstyle.checks.imports;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FullIdent;
@@ -48,8 +49,8 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * </pre>
  * Compatible with Java 1.5 source.
  *
- * @author Oliver Burn
  */
+@FileStatefulCheck
 public class RedundantImportCheck
     extends AbstractCheck {
 
@@ -88,20 +89,19 @@ public class RedundantImportCheck
 
     @Override
     public int[] getDefaultTokens() {
-        return getAcceptableTokens();
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[]
-        {TokenTypes.IMPORT,
-         TokenTypes.STATIC_IMPORT,
-         TokenTypes.PACKAGE_DEF, };
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getAcceptableTokens();
+        return new int[] {
+            TokenTypes.IMPORT, TokenTypes.STATIC_IMPORT, TokenTypes.PACKAGE_DEF,
+        };
     }
 
     @Override
@@ -113,18 +113,16 @@ public class RedundantImportCheck
         else if (ast.getType() == TokenTypes.IMPORT) {
             final FullIdent imp = FullIdent.createFullIdentBelow(ast);
             if (isFromPackage(imp.getText(), "java.lang")) {
-                log(ast.getLineNo(), ast.getColumnNo(), MSG_LANG,
-                    imp.getText());
+                log(ast, MSG_LANG, imp.getText());
             }
             // imports from unnamed package are not allowed,
             // so we are checking SAME rule only for named packages
             else if (pkgName != null && isFromPackage(imp.getText(), pkgName)) {
-                log(ast.getLineNo(), ast.getColumnNo(), MSG_SAME,
-                    imp.getText());
+                log(ast, MSG_SAME, imp.getText());
             }
             // Check for a duplicate import
             imports.stream().filter(full -> imp.getText().equals(full.getText()))
-                .forEach(full -> log(ast.getLineNo(), ast.getColumnNo(),
+                .forEach(full -> log(ast,
                     MSG_DUPLICATE, full.getLineNo(),
                     imp.getText()));
 
@@ -136,7 +134,7 @@ public class RedundantImportCheck
                 FullIdent.createFullIdent(
                     ast.getLastChild().getPreviousSibling());
             staticImports.stream().filter(full -> imp.getText().equals(full.getText()))
-                .forEach(full -> log(ast.getLineNo(), ast.getColumnNo(),
+                .forEach(full -> log(ast,
                     MSG_DUPLICATE, full.getLineNo(), imp.getText()));
 
             staticImports.add(imp);
@@ -151,10 +149,11 @@ public class RedundantImportCheck
      */
     private static boolean isFromPackage(String importName, String pkg) {
         // imports from unnamed package are not allowed:
-        // http://docs.oracle.com/javase/specs/jls/se7/html/jls-7.html#jls-7.5
+        // https://docs.oracle.com/javase/specs/jls/se7/html/jls-7.html#jls-7.5
         // So '.' must be present in member name and we are not checking for it
         final int index = importName.lastIndexOf('.');
         final String front = importName.substring(0, index);
         return front.equals(pkg);
     }
+
 }

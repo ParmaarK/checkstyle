@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -29,6 +29,7 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 
 public class CovariantEqualsCheckTest
     extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/coding/covariantequals";
@@ -38,7 +39,7 @@ public class CovariantEqualsCheckTest
     public void testDefault()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(CovariantEqualsCheck.class);
+            createModuleConfig(CovariantEqualsCheck.class);
         final String[] expected = {
             "11:24: " + getCheckMessage(MSG_KEY),
             "30:20: " + getCheckMessage(MSG_KEY),
@@ -57,4 +58,5 @@ public class CovariantEqualsCheckTest
         Assert.assertNotNull("Default tokens should not be null", check.getDefaultTokens());
         Assert.assertNotNull("Required tokens should not be null", check.getRequiredTokens());
     }
+
 }

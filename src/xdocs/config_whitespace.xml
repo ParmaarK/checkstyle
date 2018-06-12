@@ -6,7 +6,8 @@
 
   <head>
     <title>Whitespace</title>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"/>
+    <script type="text/javascript"
+            src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"/>
     <script type="text/javascript" src="js/anchors.js"/>
     <script type="text/javascript" src="js/google-analytics.js"/>
     <link rel="icon" href="images/favicon.png" type="image/x-icon" />
@@ -49,7 +50,7 @@ for (
           <tr>
             <td>option</td>
             <td>policy on how to pad an empty for iterator</td>
-            <td><a href="property_types.html#parenPad">pad policy</a></td>
+            <td><a href="property_types.html#parenPad">Pad Policy</a></td>
             <td><code>nospace</code></td>
             <td>3.4</td>
           </tr>
@@ -70,7 +71,7 @@ for (
         </p>
         <source>
 &lt;module name=&quot;EmptyForInitializerPad&quot;&gt;
-    &lt;property name=&quot;option&quot; value=&quot;space&quot;/&gt;
+  &lt;property name=&quot;option&quot; value=&quot;space&quot;/&gt;
 &lt;/module&gt;
         </source>
       </subsection>
@@ -144,7 +145,7 @@ for (Iterator foo = very.long.line.iterator();
           <tr>
             <td>option</td>
             <td>policy on how to pad an empty for iterator</td>
-            <td><a href="property_types.html#parenPad">pad policy</a></td>
+            <td><a href="property_types.html#parenPad">Pad Policy</a></td>
             <td><code>nospace</code></td>
             <td>3.0</td>
           </tr>
@@ -165,7 +166,7 @@ for (Iterator foo = very.long.line.iterator();
         </p>
         <source>
 &lt;module name=&quot;EmptyForIteratorPad&quot;&gt;
-    &lt;property name=&quot;option&quot; value=&quot;space&quot;/&gt;
+  &lt;property name=&quot;option&quot; value=&quot;space&quot;/&gt;
 &lt;/module&gt;
         </source>
       </subsection>
@@ -224,7 +225,8 @@ for (Iterator foo = very.long.line.iterator();
           static initializers and instance initializers.
         </p>
         <p>
-          ATTENTION: empty line separator is required between AST siblings, not after line where token is found.
+          ATTENTION: empty line separator is required between AST siblings,
+          not after line where token is found.
         </p>
       </subsection>
 
@@ -262,28 +264,48 @@ for (Iterator foo = very.long.line.iterator();
             <td>tokens</td>
             <td>tokens to check</td>
             <td>subset of tokens
-            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#PACKAGE_DEF">PACKAGE_DEF</a>,
-            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#IMPORT">IMPORT</a>,
-            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CLASS_DEF">CLASS_DEF</a>,
-            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#INTERFACE_DEF">INTERFACE_DEF</a>,
-            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ENUM_DEF">ENUM_DEF</a>,
-            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_DEF">STATIC_INIT</a>,
-            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#INSTANCE_INIT">INSTANCE_INIT</a>,
-            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_DEF">METHOD_DEF</a>,
-            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CTOR_DEF">CTOR_DEF</a>,
-            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#VARIABLE_DEF">VARIABLE_DEF</a>.
+            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#PACKAGE_DEF">
+                PACKAGE_DEF</a>,
+            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#IMPORT">
+                IMPORT</a>,
+            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CLASS_DEF">
+                CLASS_DEF</a>,
+            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#INTERFACE_DEF">
+                INTERFACE_DEF</a>,
+            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ENUM_DEF">
+                ENUM_DEF</a>,
+            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_DEF">
+                STATIC_INIT</a>,
+            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#INSTANCE_INIT">
+                INSTANCE_INIT</a>,
+            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_DEF">
+                METHOD_DEF</a>,
+            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CTOR_DEF">
+                CTOR_DEF</a>,
+            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#VARIABLE_DEF">
+                VARIABLE_DEF</a>.
           </td>
           <td>
-            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#PACKAGE_DEF">PACKAGE_DEF</a>,
-            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#IMPORT">IMPORT</a>,
-            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CLASS_DEF">CLASS_DEF</a>,
-            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#INTERFACE_DEF">INTERFACE_DEF</a>,
-            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ENUM_DEF">ENUM_DEF</a>,
-            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_DEF">STATIC_INIT</a>,
-            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#INSTANCE_INIT">INSTANCE_INIT</a>,
-            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_DEF">METHOD_DEF</a>,
-            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CTOR_DEF">CTOR_DEF</a>,
-            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#VARIABLE_DEF">VARIABLE_DEF</a>.
+            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#PACKAGE_DEF">
+                PACKAGE_DEF</a>,
+            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#IMPORT">
+                IMPORT</a>,
+            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CLASS_DEF">
+                CLASS_DEF</a>,
+            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#INTERFACE_DEF">
+                INTERFACE_DEF</a>,
+            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ENUM_DEF">
+                ENUM_DEF</a>,
+            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_DEF">
+                STATIC_INIT</a>,
+            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#INSTANCE_INIT">
+                INSTANCE_INIT</a>,
+            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_DEF">
+                METHOD_DEF</a>,
+            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CTOR_DEF">
+                CTOR_DEF</a>,
+            <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#VARIABLE_DEF">
+                VARIABLE_DEF</a>.
           </td>
           <td>5.8</td>
           </tr>
@@ -302,8 +324,8 @@ package com.puppycrawl.tools.checkstyle.whitespace;
 import java.io.Serializable;
 class Foo
 {
-    public static final int FOO_CONST = 1;
-    public void foo() {} //should be separated from previous statement.
+  public static final int FOO_CONST = 1;
+  public void foo() {} //should be separated from previous statement.
 }
       </source>
       <p>
@@ -326,19 +348,21 @@ import java.io.Serializable;
 
 class Foo
 {
-    public static final int FOO_CONST = 1;
+  public static final int FOO_CONST = 1;
 
-    public void foo() {} //should be separated from previous statement.
+  public void foo() {} //should be separated from previous statement.
 }
       </source>
       <p>
         An example how to check empty line after  <a
-               href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#VARIABLE_DEF">VARIABLE_DEF</a> and <a
-               href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_DEF">METHOD_DEF</a>:
+               href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#VARIABLE_DEF">
+                VARIABLE_DEF</a> and <a
+               href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_DEF">
+                METHOD_DEF</a>:
       </p>
       <source>
 &lt;module name="EmptyLineSeparator"&gt;
-    &lt;property name="tokens" value="VARIABLE_DEF, METHOD_DEF"/&gt;
+  &lt;property name="tokens" value="VARIABLE_DEF, METHOD_DEF"/&gt;
 &lt;/module&gt;
       </source>
       <p>
@@ -346,47 +370,55 @@ class Foo
       </p>
       <source>
 &lt;module name="EmptyLineSeparator"&gt;
-    &lt;property name="allowNoEmptyLineBetweenFields" value="true"/&gt;
+  &lt;property name="allowNoEmptyLineBetweenFields" value="true"/&gt;
 &lt;/module&gt;
       </source>
       <p>
-          An example how to disallow multiple empty lines inside constructor, initialization block and method:
+          An example how to disallow multiple empty lines inside constructor,
+          initialization block and method:
       </p>
       <source>
-          &lt;module name="EmptyLineSeparator"&gt;
-          &lt;property name="allowMultipleEmptyLinesInsideClassMembers" value="false"/&gt;
-          &lt;/module&gt;
+&lt;module name="EmptyLineSeparator"&gt;
+  &lt;property name="allowMultipleEmptyLinesInsideClassMembers" value="false"/&gt;
+&lt;/module&gt;
       </source>
 
       <p>
           The check is valid only for statements that have body:
-          <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CLASS_DEF">CLASS_DEF</a>,
-          <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#INTERFACE_DEF">INTERFACE_DEF</a>,
-          <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ENUM_DEF">ENUM_DEF</a>,
-          <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_DEF">STATIC_INIT</a>,
-          <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#INSTANCE_INIT">INSTANCE_INIT</a>,
-          <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_DEF">METHOD_DEF</a>,
-          <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CTOR_DEF">CTOR_DEF</a>,
+          <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CLASS_DEF">
+                CLASS_DEF</a>,
+          <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#INTERFACE_DEF">
+                INTERFACE_DEF</a>,
+          <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ENUM_DEF">
+                ENUM_DEF</a>,
+          <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_DEF">
+                STATIC_INIT</a>,
+          <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#INSTANCE_INIT">
+                INSTANCE_INIT</a>,
+          <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_DEF">
+                METHOD_DEF</a>,
+          <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CTOR_DEF">
+                CTOR_DEF</a>,
       </p>
       <p>
           Example of declarations with multiple empty lines inside method:
       </p>
       <source>
-          ///////////////////////////////////////////////////
-          //HEADER
-          ///////////////////////////////////////////////////
+///////////////////////////////////////////////////
+//HEADER
+///////////////////////////////////////////////////
 
-          package com.puppycrawl.tools.checkstyle.whitespace;
+package com.puppycrawl.tools.checkstyle.whitespace;
 
-          class Foo
-          {
+class Foo
+{
 
-              public void foo() {
-              <br/>
+  public void foo() {
+  <br/>
 
-                  System.out.println(1); // violation since method has 2 empty lines subsequently
-              }
-          }
+    System.out.println(1); // violation since method has 2 empty lines subsequently
+  }
+}
       </source>
       </subsection>
 
@@ -486,7 +518,7 @@ class Foo
             <td>fileExtensions</td>
             <td>file type extension of files to process</td>
             <td><a href="property_types.html#stringSet">String Set</a></td>
-            <td><code>{}</code></td>
+            <td><code>all files</code></td>
             <td>5.0</td>
           </tr>
         </table>
@@ -505,7 +537,7 @@ class Foo
         </p>
         <source>
 &lt;module name=&quot;FileTabCharacter&quot;&gt;
-    &lt;property name=&quot;eachLine&quot; value=&quot;true&quot;/&gt;
+  &lt;property name=&quot;eachLine&quot; value=&quot;true&quot;/&gt;
 &lt;/module&gt;
         </source>
       </subsection>
@@ -570,7 +602,8 @@ class Foo
         </p>
         <ul>
           <li> should be preceded with whitespace only in generic methods definitions.</li>
-          <li> should not be preceded with whitespace when it is precede method name or following type name.</li>
+          <li> should not be preceded with whitespace when it is precede method name
+               or following type name.</li>
           <li> should not be followed with whitespace in all cases.</li>
         </ul>
         <p>
@@ -578,7 +611,8 @@ class Foo
         </p>
         <ul>
           <li> should not be preceded with whitespace in all cases.</li>
-          <li> should be followed with whitespace in almost all cases, except diamond operators and when preceding method name.</li>
+          <li> should be followed with whitespace in almost all cases, except diamond operators
+               and when preceding method name.</li>
         </ul>
 
         <p>
@@ -698,7 +732,7 @@ sort(list, Comparable::&lt;String&gt;compareTo);             // Method reference
             <td>option</td>
             <td>policy on how to pad method parameter</td>
             <td>
-              <a href="property_types.html#parenPad">pad policy</a>
+              <a href="property_types.html#parenPad">Pad Policy</a>
             </td>
             <td><code>nospace</code></td>
             <td>3.4</td>
@@ -709,32 +743,44 @@ sort(list, Comparable::&lt;String&gt;compareTo);             // Method reference
 
             <td>
               subset of tokens <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CTOR_DEF">CTOR_DEF</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CTOR_DEF">
+                CTOR_DEF</a>,
               <a
-               href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_NEW">LITERAL_NEW</a>,
+               href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_NEW">
+                LITERAL_NEW</a>,
                <a
-                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_CALL">METHOD_CALL</a>,
+                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_CALL">
+                METHOD_CALL</a>,
                 <a
-                 href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_DEF">METHOD_DEF</a>,
+                 href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_DEF">
+                METHOD_DEF</a>,
                  <a
-                 href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SUPER_CTOR_CALL">SUPER_CTOR_CALL</a>,
+                 href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SUPER_CTOR_CALL">
+                SUPER_CTOR_CALL</a>,
                 <a
-                 href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ENUM_CONSTANT_DEF">ENUM_CONSTANT_DEF</a>.
+                 href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ENUM_CONSTANT_DEF">
+                ENUM_CONSTANT_DEF</a>.
             </td>
 
             <td>
               <a
-               href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CTOR_DEF">CTOR_DEF</a>,
+               href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CTOR_DEF">
+                CTOR_DEF</a>,
                <a
-                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_NEW">LITERAL_NEW</a>,
+                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_NEW">
+                LITERAL_NEW</a>,
                 <a
-                 href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_CALL">METHOD_CALL</a>,
+                 href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_CALL">
+                METHOD_CALL</a>,
                  <a
-                  href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_DEF">METHOD_DEF</a>,
+                  href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_DEF">
+                METHOD_DEF</a>,
                   <a
-                  href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SUPER_CTOR_CALL">SUPER_CTOR_CALL</a>,
+                  href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SUPER_CTOR_CALL">
+                SUPER_CTOR_CALL</a>,
                  <a
-                  href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ENUM_CONSTANT_DEF">ENUM_CONSTANT_DEF</a>.
+                  href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ENUM_CONSTANT_DEF">
+                ENUM_CONSTANT_DEF</a>.
             </td>
             <td>3.4</td>
           </tr>
@@ -756,9 +802,9 @@ sort(list, Comparable::&lt;String&gt;compareTo);             // Method reference
         </p>
         <source>
 &lt;module name=&quot;MethodParamPad&quot;&gt;
-    &lt;property name=&quot;tokens&quot; value=&quot;METHOD_DEF&quot;/&gt;
-    &lt;property name=&quot;option&quot; value=&quot;space&quot;/&gt;
-    &lt;property name=&quot;allowLineBreaks&quot; value=&quot;true&quot;/&gt;
+  &lt;property name=&quot;tokens&quot; value=&quot;METHOD_DEF&quot;/&gt;
+  &lt;property name=&quot;option&quot; value=&quot;space&quot;/&gt;
+  &lt;property name=&quot;allowLineBreaks&quot; value=&quot;true&quot;/&gt;
 &lt;/module&gt;
         </source>
       </subsection>
@@ -838,28 +884,39 @@ sort(list, Comparable::&lt;String&gt;compareTo);             // Method reference
             <td>tokens to check</td>
             <td>subset of tokens
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#IMPORT">IMPORT</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#IMPORT">
+                IMPORT</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#STATIC_IMPORT">STATIC_IMPORT</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#STATIC_IMPORT">
+                STATIC_IMPORT</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#PACKAGE_DEF">PACKAGE_DEF</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#PACKAGE_DEF">
+                PACKAGE_DEF</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CLASS_DEF">CLASS_DEF</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CLASS_DEF">
+                CLASS_DEF</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_DEF">METHOD_DEF</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_DEF">
+                METHOD_DEF</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CTOR_DEF">CTOR_DEF</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CTOR_DEF">
+                CTOR_DEF</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ENUM_DEF">ENUM_DEF</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ENUM_DEF">
+                ENUM_DEF</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#INTERFACE_DEF">INTERFACE_DEF</a>.
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#INTERFACE_DEF">
+                INTERFACE_DEF</a>.
             </td>
             <td><a
-            href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#PACKAGE_DEF">PACKAGE_DEF</a>,
+            href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#PACKAGE_DEF">
+                PACKAGE_DEF</a>,
             <a
-             href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#IMPORT">IMPORT</a>,
+             href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#IMPORT">
+                IMPORT</a>,
             <a
-            href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#STATIC_IMPORT">STATIC_IMPORT</a>.</td>
+            href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#STATIC_IMPORT">
+                STATIC_IMPORT</a>.</td>
             <td>5.8</td>
           </tr>
         </table>
@@ -892,7 +949,7 @@ import static java.math. //violation
       </p>
       <source>
 &lt;module name=&quot;NoLineWrap&quot;&gt;
-    &lt;property name="tokens" value="IMPORT"/&gt;
+  &lt;property name="tokens" value="IMPORT"/&gt;
 &lt;/module&gt;
       </source>
       <p>
@@ -956,12 +1013,25 @@ import static java.math.BigInteger.ZERO;
         <p>
           The check processes
           <a
-          href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ARRAY_DECLARATOR">ARRAY_DECLARATOR</a>
+          href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ARRAY_DECLARATOR">
+              ARRAY_DECLARATOR</a>
           and
           <a
           href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#INDEX_OP">INDEX_OP</a>
           tokens specially from other tokens. Actually it is checked that there is
           no whitespace before this tokens, not after them.
+          Space after the
+          <a
+          href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ANNOTATIONS">
+                ANNOTATIONS</a> before
+          <a
+          href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ARRAY_DECLARATOR">
+                ARRAY_DECLARATOR</a>
+          and
+          <a
+          href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#INDEX_OP">
+                INDEX_OP</a>
+          will be ignored.
           </p>
       </subsection>
 
@@ -989,54 +1059,83 @@ import static java.math.BigInteger.ZERO;
 
             <td>
               subset of tokens <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ARRAY_INIT">ARRAY_INIT</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ARRAY_INIT">
+                ARRAY_INIT</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#INC">INC</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#AT">
+                AT</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DEC">DEC</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#INC">
+                INC</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#UNARY_MINUS">UNARY_MINUS</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DEC">
+                DEC</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#UNARY_PLUS">UNARY_PLUS</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#UNARY_MINUS">
+                UNARY_MINUS</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BNOT">BNOT</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#UNARY_PLUS">
+                UNARY_PLUS</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LNOT">LNOT</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BNOT">
+                BNOT</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DOT">DOT</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LNOT">
+                LNOT</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#TYPECAST">TYPECAST</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DOT">
+                DOT</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ARRAY_DECLARATOR">ARRAY_DECLARATOR</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#TYPECAST">
+                TYPECAST</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#INDEX_OP">INDEX_OP</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ARRAY_DECLARATOR">
+                ARRAY_DECLARATOR</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_SYNCHRONIZED">LITERAL_SYNCHRONIZED</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#INDEX_OP">
+                INDEX_OP</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_REF">METHOD_REF</a>.
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_SYNCHRONIZED">
+                LITERAL_SYNCHRONIZED</a>,
+              <a
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_REF">
+                METHOD_REF</a>.
             </td>
 
             <td>
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ARRAY_INIT">ARRAY_INIT</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ARRAY_INIT">
+                ARRAY_INIT</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#INC">INC</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#AT">
+                AT</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DEC">DEC</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#INC">
+                INC</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#UNARY_MINUS">UNARY_MINUS</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DEC">
+                DEC</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#UNARY_PLUS">UNARY_PLUS</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#UNARY_MINUS">
+                UNARY_MINUS</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BNOT">BNOT</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#UNARY_PLUS">
+                UNARY_PLUS</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LNOT">LNOT</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BNOT">
+                BNOT</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DOT">DOT</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LNOT">
+                LNOT</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ARRAY_DECLARATOR">ARRAY_DECLARATOR</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DOT">
+                DOT</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#INDEX_OP">INDEX_OP</a>.
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ARRAY_DECLARATOR">
+                ARRAY_DECLARATOR</a>,
+              <a
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#INDEX_OP">
+                INDEX_OP</a>.
             </td>
             <td>3.0</td>
           </tr>
@@ -1056,9 +1155,16 @@ import static java.math.BigInteger.ZERO;
         </p>
         <source>
 &lt;module name=&quot;NoWhitespaceAfter&quot;&gt;
-    &lt;property name=&quot;tokens&quot; value=&quot;DOT&quot;/&gt;
-    &lt;property name=&quot;allowLineBreaks&quot; value=&quot;false&quot;/&gt;
+  &lt;property name=&quot;tokens&quot; value=&quot;DOT&quot;/&gt;
+  &lt;property name=&quot;allowLineBreaks&quot; value=&quot;false&quot;/&gt;
 &lt;/module&gt;
+        </source>
+        <p>
+         If the annotation is between the type and the array, the check will skip validation for
+         spaces:
+        </p>
+        <source>
+public void foo(final char @NotNull [] param) {} // No violation
         </source>
       </subsection>
 
@@ -1108,8 +1214,9 @@ import static java.math.BigInteger.ZERO;
           Checks that there is no whitespace before a token. More
           specifically, it checks that it is not preceded with whitespace, or
           (if linebreaks are allowed) all characters on the line before are
-          whitespace. To allow linebreaks before a token, set property <code>allowLineBreaks</code> to <code>
-          true</code>.
+          whitespace. To allow linebreaks before a token, set property
+          <code>allowLineBreaks</code> to <code>true</code>. No check occurs
+          before semi-colons in empty for loop initializers or conditions.
         </p>
       </subsection>
 
@@ -1137,22 +1244,36 @@ import static java.math.BigInteger.ZERO;
 
             <td>
               subset of tokens
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#COMMA">COMMA</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SEMI">SEMI</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#POST_INC">POST_INC</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#POST_DEC">POST_DEC</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DOT">DOT</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#GENERIC_START">GENERIC_START</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#GENERIC_END">GENERIC_END</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ELLIPSIS">ELLIPSIS</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ELLIPSIS">METHOD_REF</a>.
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#COMMA">
+                COMMA</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SEMI">
+                SEMI</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#POST_INC">
+                POST_INC</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#POST_DEC">
+                POST_DEC</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DOT">
+                DOT</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#GENERIC_START">
+                GENERIC_START</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#GENERIC_END">
+                GENERIC_END</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ELLIPSIS">
+                ELLIPSIS</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ELLIPSIS">
+                METHOD_REF</a>.
             </td>
             <td>
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#COMMA">COMMA</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SEMI">SEMI</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#POST_INC">POST_INC</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#POST_DEC">POST_DEC</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ELLIPSIS">ELLIPSIS</a>.
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#COMMA">
+                COMMA</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SEMI">
+                SEMI</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#POST_INC">
+                POST_INC</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#POST_DEC">
+                POST_DEC</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ELLIPSIS">
+                ELLIPSIS</a>.
             </td>
             <td>3.0</td>
           </tr>
@@ -1172,14 +1293,18 @@ import static java.math.BigInteger.ZERO;
         </p>
         <source>
 &lt;module name=&quot;NoWhitespaceBefore&quot;&gt;
-    &lt;property name=&quot;tokens&quot; value=&quot;DOT&quot;/&gt;
-    &lt;property name=&quot;allowLineBreaks&quot; value=&quot;true&quot;/&gt;
+  &lt;property name=&quot;tokens&quot; value=&quot;DOT&quot;/&gt;
+  &lt;property name=&quot;allowLineBreaks&quot; value=&quot;true&quot;/&gt;
 &lt;/module&gt;
         </source>
       </subsection>
 
       <subsection name="Example of Usage">
         <ul>
+          <li>
+            <a href="https://github.com/search?q=path%3Asrc%2Fmain%2Fresources+filename%3Agoogle_checks.xml+repo%3Acheckstyle%2Fcheckstyle+NoWhitespaceBefore">
+            Google Style</a>
+          </li>
           <li>
             <a href="https://github.com/search?q=path%3Asrc%2Fmain%2Fresources+filename%3Asun_checks.xml+repo%3Acheckstyle%2Fcheckstyle+NoWhitespaceBefore">
             Sun Style</a>
@@ -1238,7 +1363,7 @@ import static java.math.BigInteger.ZERO;
             <td>option</td>
             <td>policy on how to wrap lines</td>
             <td>
-              <a href="property_types.html#wrapOp">wrap operator policy</a>
+              <a href="property_types.html#wrapOp">Wrap Operator Policy</a>
             </td>
             <td><code>nl</code></td>
             <td>3.0</td>
@@ -1249,68 +1374,127 @@ import static java.math.BigInteger.ZERO;
 
             <td>
               subset of tokens
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#QUESTION">QUESTION</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#COLON">COLON</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#EQUAL">EQUAL</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#NOT_EQUAL">NOT_EQUAL</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DIV">DIV</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#PLUS">PLUS</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#MINUS">MINUS</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#STAR">STAR</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#MOD">MOD</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SR">SR</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BSR">BSR</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#GE">GE</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#GT">GT</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SL">SL</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LE">LE</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LT">LT</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BXOR">BXOR</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BOR">BOR</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LOR">LOR</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BAND">BAND</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LAND">LAND</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_INSTANCEOF">LITERAL_INSTANCEOF</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#TYPE_EXTENSION_AND">TYPE_EXTENSION_AND</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ASSIGN">ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DIV_ASSIGN">DIV_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#PLUS_ASSIGN">PLUS_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#MINUS_ASSIGN">MINUS_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#STAR_ASSIGN">STAR_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#MOD_ASSIGN">MOD_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SR_ASSIGN">SR_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BSR_ASSIGN">BSR_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SL_ASSIGN">SL_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BXOR_ASSIGN">BXOR_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BOR_ASSIGN">BOR_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BAND_ASSIGN">BAND_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_REF">METHOD_REF</a>.
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#QUESTION">
+                QUESTION</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#COLON">
+                COLON</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#EQUAL">
+                EQUAL</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#NOT_EQUAL">
+                NOT_EQUAL</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DIV">
+                DIV</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#PLUS">
+                PLUS</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#MINUS">
+                MINUS</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#STAR">
+                STAR</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#MOD">
+                MOD</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SR">
+                SR</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BSR">
+                BSR</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#GE">
+                GE</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#GT">
+                GT</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SL">
+                SL</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LE">
+                LE</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LT">
+                LT</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BXOR">
+                BXOR</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BOR">
+                BOR</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LOR">
+                LOR</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BAND">
+                BAND</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LAND">
+                LAND</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_INSTANCEOF">
+                LITERAL_INSTANCEOF</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#TYPE_EXTENSION_AND">
+                TYPE_EXTENSION_AND</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ASSIGN">
+                ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DIV_ASSIGN">
+                DIV_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#PLUS_ASSIGN">
+                PLUS_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#MINUS_ASSIGN">
+                MINUS_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#STAR_ASSIGN">
+                STAR_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#MOD_ASSIGN">
+                MOD_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SR_ASSIGN">
+                SR_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BSR_ASSIGN">
+                BSR_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SL_ASSIGN">
+                SL_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BXOR_ASSIGN">
+                BXOR_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BOR_ASSIGN">
+                BOR_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BAND_ASSIGN">
+                BAND_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_REF">
+                METHOD_REF</a>.
             </td>
 
             <td>
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#QUESTION">QUESTION</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#COLON">COLON</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#EQUAL">EQUAL</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#NOT_EQUAL">NOT_EQUAL</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DIV">DIV</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#PLUS">PLUS</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#MINUS">MINUS</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#STAR">STAR</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#MOD">MOD</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SR">SR</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BSR">BSR</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#GE">GE</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#GT">GT</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SL">SL</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LE">LE</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LT">LT</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BXOR">BXOR</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BOR">BOR</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LOR">LOR</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BAND">BAND</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LAND">LAND</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#TYPE_EXTENSION_AND">TYPE_EXTENSION_AND</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_INSTANCEOF">LITERAL_INSTANCEOF</a>.
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#QUESTION">
+                QUESTION</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#COLON">
+                COLON</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#EQUAL">
+                EQUAL</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#NOT_EQUAL">
+                NOT_EQUAL</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DIV">
+                DIV</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#PLUS">
+                PLUS</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#MINUS">
+                MINUS</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#STAR">
+                STAR</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#MOD">
+                MOD</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SR">
+                SR</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BSR">
+                BSR</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#GE">
+                GE</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#GT">
+                GT</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SL">
+                SL</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LE">
+                LE</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LT">
+                LT</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BXOR">
+                BXOR</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BOR">
+                BOR</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LOR">
+                LOR</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BAND">
+                BAND</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LAND">
+                LAND</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#TYPE_EXTENSION_AND">
+                TYPE_EXTENSION_AND</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_INSTANCEOF">
+                LITERAL_INSTANCEOF</a>.
             </td>
             <td>3.0</td>
           </tr>
@@ -1330,8 +1514,8 @@ import static java.math.BigInteger.ZERO;
         </p>
         <source>
 &lt;module name=&quot;OperatorWrap&quot;&gt;
-    &lt;property name=&quot;tokens&quot; value=&quot;ASSIGN&quot;/&gt;
-    &lt;property name=&quot;option&quot; value=&quot;eol&quot;/&gt;
+  &lt;property name=&quot;tokens&quot; value=&quot;ASSIGN&quot;/&gt;
+  &lt;property name=&quot;option&quot; value=&quot;eol&quot;/&gt;
 &lt;/module&gt;
         </source>
       </subsection>
@@ -1391,9 +1575,11 @@ import static java.math.BigInteger.ZERO;
         <p>
           Checks the policy on the padding of parentheses; i.e. whether a
           space is required after a left parenthesis and before a right
-          parenthesis, or such spaces are forbidden, with the exception that it does
-          not check for padding of the right parenthesis at an empty for iterator and
-          empty for initializer.
+          parenthesis, or such spaces are forbidden. No check occurs at
+          the right parenthesis after an empty for iterator, at the left
+          parenthesis before an empty for initialization, or at the right
+          parenthesis of a try-with-resources resource specification where
+          the last resource variable has a trailing semi-colon.
           Use Check <a
           href="config_whitespace.html#EmptyForIteratorPad">EmptyForIteratorPad</a>
           to validate empty for iterators and <a
@@ -1416,7 +1602,7 @@ import static java.math.BigInteger.ZERO;
           <tr>
             <td>option</td>
             <td>policy on how to pad parentheses</td>
-            <td><a href="property_types.html#parenPad">pad policy</a></td>
+            <td><a href="property_types.html#parenPad">Pad Policy</a></td>
             <td><code>nospace</code></td>
             <td>3.0</td>
           </tr>
@@ -1426,92 +1612,134 @@ import static java.math.BigInteger.ZERO;
 
             <td>
               subset of tokens <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ANNOTATION">ANNOTATION</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ANNOTATION">
+                ANNOTATION</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ANNOTATION_FIELD_DEF">ANNOTATION_FIELD_DEF</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ANNOTATION_FIELD_DEF">
+                ANNOTATION_FIELD_DEF</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CTOR_CALL">CTOR_CALL</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CTOR_CALL">
+                CTOR_CALL</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CTOR_DEF">CTOR_DEF</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CTOR_DEF">
+                CTOR_DEF</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DOT">DOT</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DOT">
+                DOT</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ENUM_CONSTANT_DEF">ENUM_CONSTANT_DEF</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ENUM_CONSTANT_DEF">
+                ENUM_CONSTANT_DEF</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#EXPR">EXPR</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#EXPR">
+                EXPR</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_CATCH">LITERAL_CATCH</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_CATCH">
+                LITERAL_CATCH</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_DO">LITERAL_DO</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_DO">
+                LITERAL_DO</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_FOR">LITERAL_FOR</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_FOR">
+                LITERAL_FOR</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_IF">LITERAL_IF</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_IF">
+                LITERAL_IF</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_NEW">LITERAL_NEW</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_NEW">
+                LITERAL_NEW</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_SWITCH">LITERAL_SWITCH</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_SWITCH">
+                LITERAL_SWITCH</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_SYNCHRONIZED">LITERAL_SYNCHRONIZED</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_SYNCHRONIZED">
+                LITERAL_SYNCHRONIZED</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_WHILE">LITERAL_WHILE</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_WHILE">
+                LITERAL_WHILE</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_CALL">METHOD_CALL</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_CALL">
+                METHOD_CALL</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_DEF">METHOD_DEF</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_DEF">
+                METHOD_DEF</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#QUESTION">QUESTION</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#QUESTION">
+                QUESTION</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#RESOURCE_SPECIFICATION">RESOURCE_SPECIFICATION</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#RESOURCE_SPECIFICATION">
+                RESOURCE_SPECIFICATION</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SUPER_CTOR_CALL">SUPER_CTOR_CALL</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SUPER_CTOR_CALL">
+                SUPER_CTOR_CALL</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LAMBDA">LAMBDA</a>.
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LAMBDA">
+                LAMBDA</a>.
             </td>
 
             <td>
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ANNOTATION">ANNOTATION</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ANNOTATION">
+                ANNOTATION</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ANNOTATION_FIELD_DEF">ANNOTATION_FIELD_DEF</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ANNOTATION_FIELD_DEF">
+                ANNOTATION_FIELD_DEF</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CTOR_CALL">CTOR_CALL</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CTOR_CALL">
+                CTOR_CALL</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CTOR_DEF">CTOR_DEF</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CTOR_DEF">
+                CTOR_DEF</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DOT">DOT</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DOT">
+                DOT</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ENUM_CONSTANT_DEF">ENUM_CONSTANT_DEF</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ENUM_CONSTANT_DEF">
+                ENUM_CONSTANT_DEF</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#EXPR">EXPR</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#EXPR">
+                EXPR</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_CATCH">LITERAL_CATCH</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_CATCH">
+                LITERAL_CATCH</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_DO">LITERAL_DO</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_DO">
+                LITERAL_DO</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_FOR">LITERAL_FOR</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_FOR">
+                LITERAL_FOR</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_IF">LITERAL_IF</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_IF">
+                LITERAL_IF</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_NEW">LITERAL_NEW</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_NEW">
+                LITERAL_NEW</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_SWITCH">LITERAL_SWITCH</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_SWITCH">
+                LITERAL_SWITCH</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_SYNCHRONIZED">LITERAL_SYNCHRONIZED</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_SYNCHRONIZED">
+                LITERAL_SYNCHRONIZED</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_WHILE">LITERAL_WHILE</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_WHILE">
+                LITERAL_WHILE</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_CALL">METHOD_CALL</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_CALL">
+                METHOD_CALL</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_DEF">METHOD_DEF</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_DEF">
+                METHOD_DEF</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#QUESTION">QUESTION</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#QUESTION">
+                QUESTION</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#RESOURCE_SPECIFICATION">RESOURCE_SPECIFICATION</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#RESOURCE_SPECIFICATION">
+                RESOURCE_SPECIFICATION</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SUPER_CTOR_CALL">SUPER_CTOR_CALL</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SUPER_CTOR_CALL">
+                SUPER_CTOR_CALL</a>,
               <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LAMBDA">LAMBDA</a>.
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LAMBDA">
+                LAMBDA</a>.
             </td>
             <td>3.0</td>
           </tr>
@@ -1532,11 +1760,21 @@ import static java.math.BigInteger.ZERO;
         </p>
         <source>
 &lt;module name=&quot;ParenPad&quot;&gt;
-    &lt;property name=&quot;tokens&quot; value=&quot;CTOR_CALL, METHOD_CALL,
+  &lt;property name=&quot;tokens&quot; value=&quot;CTOR_CALL, METHOD_CALL,
     SUPER_CTOR_CALL&quot;/&gt;
-    &lt;property name=&quot;option&quot; value=&quot;space&quot;/&gt;
+  &lt;property name=&quot;option&quot; value=&quot;space&quot;/&gt;
 &lt;/module&gt;
         </source>
+
+        <p>
+          The following cases not checked:
+        </p>
+        <source>
+for ( ; i &lt; j; i++, j--) // no check after left parenthesis
+for (Iterator it = xs.iterator(); it.hasNext(); ) // no check before right parenthesis
+try (Closeable resource = acquire(); ) // no check before right parenthesis
+        </source>
+
       </subsection>
 
       <subsection name="Example of Usage">
@@ -1615,7 +1853,7 @@ import static java.math.BigInteger.ZERO;
             <td>option</td>
             <td>policy on how to wrap lines</td>
             <td>
-              <a href="property_types.html#wrapOp">wrap operator policy</a>
+              <a href="property_types.html#wrapOp">Wrap Operator Policy</a>
             </td>
             <td><code>eol</code></td>
             <td>5.8</td>
@@ -1626,32 +1864,44 @@ import static java.math.BigInteger.ZERO;
 
             <td>
               subset of tokens <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DOT">DOT</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DOT">
+                DOT</a>,
               <a
-               href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#COMMA">COMMA</a>,
+               href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#COMMA">
+                COMMA</a>,
                <a
-                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SEMI">SEMI</a>,
+                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SEMI">
+                SEMI</a>,
                 <a
-                 href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ELLIPSIS">ELLIPSIS</a>,
+                 href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ELLIPSIS">
+                ELLIPSIS</a>,
                  <a
-                  href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#AT">AT</a>,
+                  href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#AT">
+                AT</a>,
                   <a
-                   href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LPAREN">LPAREN</a>,
+                   href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LPAREN">
+                LPAREN</a>,
                    <a
-                    href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#RPAREN">RPAREN</a>,
+                    href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#RPAREN">
+                RPAREN</a>,
                     <a
-                     href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ARRAY_DECLARATOR">ARRAY_DECLARATOR</a>,
+                     href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ARRAY_DECLARATOR">
+                ARRAY_DECLARATOR</a>,
                      <a
-                      href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#RBRACK">RBRACK</a>,
+                      href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#RBRACK">
+                RBRACK</a>,
                       <a
-                       href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_REF">METHOD_REF</a>.
+                       href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_REF">
+                METHOD_REF</a>.
             </td>
 
             <td>
              <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DOT">DOT</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DOT">
+                DOT</a>,
               <a
-               href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#COMMA">COMMA</a>.
+               href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#COMMA">
+                COMMA</a>.
             </td>
             <td>5.8</td>
           </tr>
@@ -1694,12 +1944,13 @@ Arrays.sort(stringArray, String
         </source>
         <p>
           An example of how to configure the check for <a
-               href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_REF">METHOD_REF</a> at new line:
+               href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_REF">
+            METHOD_REF</a> at new line:
         </p>
         <source>
 &lt;module name="SeparatorWrap"&gt;
-    &lt;property name="tokens" value="METHOD_REF"/&gt;
-    &lt;property name="option" value="nl"/&gt;
+  &lt;property name="tokens" value="METHOD_REF"/&gt;
+  &lt;property name="option" value="nl"/&gt;
 &lt;/module&gt;
         </source>
         <p>
@@ -1707,8 +1958,8 @@ Arrays.sort(stringArray, String
         </p>
         <source>
 &lt;module name="SeparatorWrap"&gt;
-    &lt;property name="tokens" value="COMMA"/&gt;
-    &lt;property name="option" value="nl"/&gt;
+  &lt;property name="tokens" value="COMMA"/&gt;
+  &lt;property name="option" value="nl"/&gt;
 &lt;/module&gt;
         </source>
       </subsection>
@@ -1800,7 +2051,7 @@ public long toMicros(long d) { return d / (C1 / C0); }
           </tr>
           <tr>
             <td>validateComments</td>
-            <td>If set to true, whitespaces surrounding comments will be ignored.</td>
+            <td>If set to true, whitespaces surrounding comments will be validated.</td>
             <td><a href="property_types.html#boolean">Boolean</a></td>
             <td><code>false</code></td>
             <td>6.19</td>
@@ -1885,7 +2136,7 @@ public long toMicros(long d) { return d / (C1 / C0); }
           <tr>
             <td>option</td>
             <td>policy on how to pad parentheses</td>
-            <td><a href="property_types.html#parenPad">pad policy</a></td>
+            <td><a href="property_types.html#parenPad">Pad Policy</a></td>
             <td><code>nospace</code></td>
             <td>3.2</td>
           </tr>
@@ -1905,7 +2156,7 @@ public long toMicros(long d) { return d / (C1 / C0); }
         </p>
         <source>
 &lt;module name=&quot;TypecastParenPad&quot;&gt;
-    &lt;property name=&quot;option&quot; value=&quot;space&quot;/&gt;
+  &lt;property name=&quot;option&quot; value=&quot;space&quot;/&gt;
 &lt;/module&gt;
         </source>
       </subsection>
@@ -1984,44 +2235,62 @@ public long toMicros(long d) { return d / (C1 / C0); }
 
             <td>
               subset of tokens <a
-              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#COMMA">COMMA</a>,
+              href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#COMMA">
+                COMMA</a>,
               <a
-               href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SEMI">SEMI</a>,
+               href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SEMI">
+                SEMI</a>,
                <a
-               href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#TYPECAST">TYPECAST</a>,
+               href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#TYPECAST">
+                TYPECAST</a>,
                 <a
-                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_IF">LITERAL_IF</a>,
+                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_IF">
+                LITERAL_IF</a>,
                 <a
-                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_ELSE">LITERAL_ELSE</a>,
+                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_ELSE">
+                LITERAL_ELSE</a>,
                 <a
-                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_WHILE">LITERAL_WHILE</a>,
+                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_WHILE">
+                LITERAL_WHILE</a>,
                 <a
-                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_DO">LITERAL_DO</a>,
+                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_DO">
+                LITERAL_DO</a>,
                 <a
-                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_FOR">LITERAL_FOR</a>,
+                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_FOR">
+                LITERAL_FOR</a>,
                 <a
-                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_DO">DO_WHILE</a>.
+                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_DO">
+                DO_WHILE</a>.
             </td>
 
             <td>
               <a
-               href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#COMMA">COMMA</a>,
+               href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#COMMA">
+                COMMA</a>,
                <a
-                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SEMI">SEMI</a>,
+                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SEMI">
+                SEMI</a>,
                 <a
-                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#TYPECAST">TYPECAST</a>,
+                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#TYPECAST">
+                TYPECAST</a>,
                 <a
-                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_IF">LITERAL_IF</a>,
+                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_IF">
+                LITERAL_IF</a>,
                 <a
-                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_ELSE">LITERAL_ELSE</a>,
+                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_ELSE">
+                LITERAL_ELSE</a>,
                 <a
-                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_WHILE">LITERAL_WHILE</a>,
+                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_WHILE">
+                LITERAL_WHILE</a>,
                 <a
-                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_DO">LITERAL_DO</a>,
+                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_DO">
+                LITERAL_DO</a>,
                 <a
-                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_FOR">LITERAL_FOR</a>,
+                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_FOR">
+                LITERAL_FOR</a>,
                 <a
-                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_DO">DO_WHILE</a>.
+                href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_DO">
+                DO_WHILE</a>.
             </td>
             <td>3.0</td>
           </tr>
@@ -2042,7 +2311,7 @@ public long toMicros(long d) { return d / (C1 / C0); }
         </p>
         <source>
 &lt;module name=&quot;WhitespaceAfter&quot;&gt;
-    &lt;property name=&quot;tokens&quot; value=&quot;COMMA, SEMI&quot;/&gt;
+  &lt;property name=&quot;tokens&quot; value=&quot;COMMA, SEMI&quot;/&gt;
 &lt;/module&gt;
         </source>
       </subsection>
@@ -2203,114 +2472,222 @@ try {
 
             <td>
               subset of tokens
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ASSIGN">ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ARRAY_INIT">ARRAY_INIT</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BAND">BAND</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BAND_ASSIGN">BAND_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BOR">BOR</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BOR_ASSIGN">BOR_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BSR">BSR</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BSR_ASSIGN">BSR_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BXOR">BXOR</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BXOR_ASSIGN">BXOR_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#COLON">COLON</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DIV">DIV</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DIV_ASSIGN">DIV_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DO_WHILE">DO_WHILE</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#EQUAL">EQUAL</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#GE">GE</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#GT">GT</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LAMBDA">LAMBDA</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LAND">LAND</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LCURLY">LCURLY</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LE">LE</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_CATCH">LITERAL_CATCH</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_DO">LITERAL_DO</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_ELSE">LITERAL_ELSE</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_FINALLY">LITERAL_FINALLY</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_FOR">LITERAL_FOR</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_IF">LITERAL_IF</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_RETURN">LITERAL_RETURN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_SWITCH">LITERAL_SWITCH</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_SYNCHRONIZED">LITERAL_SYNCHRONIZED</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_TRY">LITERAL_TRY</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_WHILE">LITERAL_WHILE</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LOR">LOR</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LT">LT</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#MINUS">MINUS</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#MINUS_ASSIGN">MINUS_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#MOD">MOD</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#MOD_ASSIGN">MOD_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#NOT_EQUAL">NOT_EQUAL</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#PLUS">PLUS</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#PLUS_ASSIGN">PLUS_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#QUESTION">QUESTION</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#RCURLY">RCURLY</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SL">SL</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SLIST">SLIST</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SL_ASSIGN">SL_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SR">SR</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SR_ASSIGN">SR_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#STAR">STAR</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#STAR_ASSIGN">STAR_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_ASSERT">LITERAL_ASSERT</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#TYPE_EXTENSION_AND">TYPE_EXTENSION_AND</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#WILDCARD_TYPE">WILDCARD_TYPE</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#GENERIC_START">GENERIC_START</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#GENERIC_END">GENERIC_END</a>.
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ASSIGN">
+                ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ARRAY_INIT">
+                ARRAY_INIT</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BAND">
+                BAND</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BAND_ASSIGN">
+                BAND_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BOR">
+                BOR</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BOR_ASSIGN">
+                BOR_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BSR">
+                BSR</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BSR_ASSIGN">
+                BSR_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BXOR">
+                BXOR</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BXOR_ASSIGN">
+                BXOR_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#COLON">
+                COLON</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DIV">
+                DIV</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DIV_ASSIGN">
+                DIV_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DO_WHILE">
+                DO_WHILE</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#EQUAL">
+                EQUAL</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#GE">
+                GE</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#GT">
+                GT</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LAMBDA">
+                LAMBDA</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LAND">
+                LAND</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LCURLY">
+                LCURLY</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LE">
+                LE</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_CATCH">
+                LITERAL_CATCH</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_DO">
+                LITERAL_DO</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_ELSE">
+                LITERAL_ELSE</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_FINALLY">
+                LITERAL_FINALLY</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_FOR">
+                LITERAL_FOR</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_IF">
+                LITERAL_IF</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_RETURN">
+                LITERAL_RETURN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_SWITCH">
+                LITERAL_SWITCH</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_SYNCHRONIZED">
+                LITERAL_SYNCHRONIZED</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_TRY">
+                LITERAL_TRY</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_WHILE">
+                LITERAL_WHILE</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LOR">
+                LOR</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LT">
+                LT</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#MINUS">
+                MINUS</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#MINUS_ASSIGN">
+                MINUS_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#MOD">
+                MOD</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#MOD_ASSIGN">
+                MOD_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#NOT_EQUAL">
+                NOT_EQUAL</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#PLUS">
+                PLUS</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#PLUS_ASSIGN">
+                PLUS_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#QUESTION">
+                QUESTION</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#RCURLY">
+                RCURLY</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SL">
+                SL</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SLIST">
+                SLIST</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SL_ASSIGN">
+                SL_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SR">
+                SR</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SR_ASSIGN">
+                SR_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#STAR">
+                STAR</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#STAR_ASSIGN">
+                STAR_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_ASSERT">
+                LITERAL_ASSERT</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#TYPE_EXTENSION_AND">
+                TYPE_EXTENSION_AND</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#WILDCARD_TYPE">
+                WILDCARD_TYPE</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#GENERIC_START">
+                GENERIC_START</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#GENERIC_END">
+                GENERIC_END</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ELLIPSIS">
+                ELLIPSIS</a>.
             </td>
             <td>
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ASSIGN">ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BAND">BAND</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BAND_ASSIGN">BAND_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BOR">BOR</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BOR_ASSIGN">BOR_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BSR">BSR</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BSR_ASSIGN">BSR_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BXOR">BXOR</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BXOR_ASSIGN">BXOR_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#COLON">COLON</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DIV">DIV</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DIV_ASSIGN">DIV_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DO_WHILE">DO_WHILE</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#EQUAL">EQUAL</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#GE">GE</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#GT">GT</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LAMBDA">LAMBDA</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LAND">LAND</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LCURLY">LCURLY</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LE">LE</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_CATCH">LITERAL_CATCH</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_DO">LITERAL_DO</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_ELSE">LITERAL_ELSE</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_FINALLY">LITERAL_FINALLY</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_FOR">LITERAL_FOR</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_IF">LITERAL_IF</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_RETURN">LITERAL_RETURN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_SWITCH">LITERAL_SWITCH</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_SYNCHRONIZED">LITERAL_SYNCHRONIZED</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_TRY">LITERAL_TRY</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_WHILE">LITERAL_WHILE</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LOR">LOR</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LT">LT</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#MINUS">MINUS</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#MINUS_ASSIGN">MINUS_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#MOD">MOD</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#MOD_ASSIGN">MOD_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#NOT_EQUAL">NOT_EQUAL</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#PLUS">PLUS</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#PLUS_ASSIGN">PLUS_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#QUESTION">QUESTION</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#RCURLY">RCURLY</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SL">SL</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SLIST">SLIST</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SL_ASSIGN">SL_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SR">SR</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SR_ASSIGN">SR_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#STAR">STAR</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#STAR_ASSIGN">STAR_ASSIGN</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_ASSERT">LITERAL_ASSERT</a>,
-              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#TYPE_EXTENSION_AND">TYPE_EXTENSION_AND</a>.
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#ASSIGN">
+                ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BAND">
+                BAND</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BAND_ASSIGN">
+                BAND_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BOR">
+                BOR</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BOR_ASSIGN">
+                BOR_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BSR">
+                BSR</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BSR_ASSIGN">
+                BSR_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BXOR">
+                BXOR</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#BXOR_ASSIGN">
+                BXOR_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#COLON">
+                COLON</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DIV">
+                DIV</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DIV_ASSIGN">
+                DIV_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#DO_WHILE">
+                DO_WHILE</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#EQUAL">
+                EQUAL</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#GE">
+                GE</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#GT">
+                GT</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LAMBDA">
+                LAMBDA</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LAND">
+                LAND</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LCURLY">
+                LCURLY</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LE">
+                LE</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_CATCH">
+                LITERAL_CATCH</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_DO">
+                LITERAL_DO</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_ELSE">
+                LITERAL_ELSE</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_FINALLY">
+                LITERAL_FINALLY</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_FOR">
+                LITERAL_FOR</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_IF">
+                LITERAL_IF</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_RETURN">
+                LITERAL_RETURN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_SWITCH">
+                LITERAL_SWITCH</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_SYNCHRONIZED">
+                LITERAL_SYNCHRONIZED</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_TRY">
+                LITERAL_TRY</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_WHILE">
+                LITERAL_WHILE</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LOR">
+                LOR</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LT">
+                LT</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#MINUS">
+                MINUS</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#MINUS_ASSIGN">
+                MINUS_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#MOD">
+                MOD</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#MOD_ASSIGN">
+                MOD_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#NOT_EQUAL">
+                NOT_EQUAL</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#PLUS">
+                PLUS</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#PLUS_ASSIGN">
+                PLUS_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#QUESTION">
+                QUESTION</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#RCURLY">
+                RCURLY</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SL">
+                SL</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SLIST">
+                SLIST</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SL_ASSIGN">
+                SL_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SR">
+                SR</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#SR_ASSIGN">
+                SR_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#STAR">
+                STAR</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#STAR_ASSIGN">
+                STAR_ASSIGN</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LITERAL_ASSERT">
+                LITERAL_ASSERT</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#TYPE_EXTENSION_AND">
+                TYPE_EXTENSION_AND</a>.
             </td>
             <td>3.0</td>
           </tr>
@@ -2331,7 +2708,7 @@ try {
         </p>
         <source>
 &lt;module name=&quot;WhitespaceAround&quot;&gt;
-    &lt;property name=&quot;tokens&quot; value=&quot;ASSIGN&quot;/&gt;
+  &lt;property name=&quot;tokens&quot; value=&quot;ASSIGN&quot;/&gt;
 &lt;/module&gt;
         </source>
       </subsection>

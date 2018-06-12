@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,6 +19,7 @@
 
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -27,10 +28,8 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * Checks that no method having zero parameters is defined
  * using the name <em>finalize</em>.
  *
- * @author fqian@google.com (Feng Qian)
- * @author smckay@google.com (Steve McKay)
- * @author lkuehne
  */
+@StatelessCheck
 public class NoFinalizerCheck extends AbstractCheck {
 
     /**
@@ -41,17 +40,17 @@ public class NoFinalizerCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return getAcceptableTokens();
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {TokenTypes.METHOD_DEF};
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getAcceptableTokens();
+        return new int[] {TokenTypes.METHOD_DEF};
     }
 
     @Override
@@ -60,14 +59,14 @@ public class NoFinalizerCheck extends AbstractCheck {
         final String name = mid.getText();
 
         if ("finalize".equals(name)) {
-
             final DetailAST params = aAST.findFirstToken(TokenTypes.PARAMETERS);
             final boolean hasEmptyParamList =
-                !params.branchContains(TokenTypes.PARAMETER_DEF);
+                params.findFirstToken(TokenTypes.PARAMETER_DEF) == null;
 
             if (hasEmptyParamList) {
                 log(aAST.getLineNo(), MSG_KEY);
             }
         }
     }
+
 }

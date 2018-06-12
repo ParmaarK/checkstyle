@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,7 @@ package com.puppycrawl.tools.checkstyle.checks.coding;
 import java.util.Arrays;
 
 import antlr.collections.AST;
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -38,8 +39,8 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * where a variable is set.
  * </p>
  *
- * @author lkuehne
  */
+@StatelessCheck
 public class InnerAssignmentCheck
         extends AbstractCheck {
 
@@ -104,11 +105,16 @@ public class InnerAssignmentCheck
 
     @Override
     public int[] getDefaultTokens() {
-        return getAcceptableTokens();
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getAcceptableTokens() {
+        return getRequiredTokens();
+    }
+
+    @Override
+    public int[] getRequiredTokens() {
         return new int[] {
             TokenTypes.ASSIGN,            // '='
             TokenTypes.DIV_ASSIGN,        // "/="
@@ -126,16 +132,11 @@ public class InnerAssignmentCheck
     }
 
     @Override
-    public int[] getRequiredTokens() {
-        return getAcceptableTokens();
-    }
-
-    @Override
     public void visitToken(DetailAST ast) {
         if (!isInContext(ast, ALLOWED_ASSIGNMENT_CONTEXT)
                 && !isInNoBraceControlStatement(ast)
                 && !isInWhileIdiom(ast)) {
-            log(ast.getLineNo(), ast.getColumnNo(), MSG_KEY);
+            log(ast, MSG_KEY);
         }
     }
 
@@ -169,12 +170,13 @@ public class InnerAssignmentCheck
      * @return whether ast is in the body of a flow control statement
      */
     private static boolean isInNoBraceControlStatement(DetailAST ast) {
-        if (!isInContext(ast, CONTROL_CONTEXT)) {
-            return false;
+        boolean result = false;
+        if (isInContext(ast, CONTROL_CONTEXT)) {
+            final DetailAST expr = ast.getParent();
+            final AST exprNext = expr.getNextSibling();
+            result = exprNext.getType() == TokenTypes.SEMI;
         }
-        final DetailAST expr = ast.getParent();
-        final AST exprNext = expr.getNextSibling();
-        return exprNext.getType() == TokenTypes.SEMI;
+        return result;
     }
 
     /**
@@ -191,14 +193,14 @@ public class InnerAssignmentCheck
      *
      * @param ast assignment AST
      * @return whether the context of the assignment AST indicates the idiom
-     * @noinspection SimplifiableIfStatement
      */
     private static boolean isInWhileIdiom(DetailAST ast) {
-        if (!isComparison(ast.getParent())) {
-            return false;
+        boolean result = false;
+        if (isComparison(ast.getParent())) {
+            result = isInContext(
+                    ast.getParent(), ALLOWED_ASSIGNMENT_IN_COMPARISON_CONTEXT);
         }
-        return isInContext(
-                ast.getParent(), ALLOWED_ASSIGNMENT_IN_COMPARISON_CONTEXT);
+        return result;
     }
 
     /**
@@ -241,4 +243,5 @@ public class InnerAssignmentCheck
         }
         return found;
     }
+
 }

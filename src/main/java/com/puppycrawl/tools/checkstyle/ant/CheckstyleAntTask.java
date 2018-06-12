@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,10 +20,10 @@
 package com.puppycrawl.tools.checkstyle.ant;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -44,7 +44,6 @@ import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.Reference;
 
-import com.google.common.io.Closeables;
 import com.puppycrawl.tools.checkstyle.Checker;
 import com.puppycrawl.tools.checkstyle.ConfigurationLoader;
 import com.puppycrawl.tools.checkstyle.DefaultLogger;
@@ -54,6 +53,7 @@ import com.puppycrawl.tools.checkstyle.PropertiesExpander;
 import com.puppycrawl.tools.checkstyle.ThreadModeSettings;
 import com.puppycrawl.tools.checkstyle.XMLLogger;
 import com.puppycrawl.tools.checkstyle.api.AuditListener;
+import com.puppycrawl.tools.checkstyle.api.AutomaticBean;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 import com.puppycrawl.tools.checkstyle.api.RootModule;
@@ -63,10 +63,10 @@ import com.puppycrawl.tools.checkstyle.api.SeverityLevelCounter;
 /**
  * An implementation of a ANT task for calling checkstyle. See the documentation
  * of the task for usage.
- * @author Oliver Burn
  * @noinspection ClassLoaderInstantiation
  */
 public class CheckstyleAntTask extends Task {
+
     /** Poor man's enum for an xml formatter. */
     private static final String E_XML = "xml";
     /** Poor man's enum for an plain formatter. */
@@ -322,18 +322,9 @@ public class CheckstyleAntTask extends Task {
             processFiles(rootModule, warningCounter, checkstyleVersion);
         }
         finally {
-            destroyRootModule(rootModule);
-        }
-    }
-
-    /**
-     * Destroy root module. This method exists only due to bug in cobertura library
-     * https://github.com/cobertura/cobertura/issues/170
-     * @param rootModule Root module that was used to process files
-     */
-    private static void destroyRootModule(RootModule rootModule) {
-        if (rootModule != null) {
-            rootModule.destroy();
+            if (rootModule != null) {
+                rootModule.destroy();
+            }
         }
     }
 
@@ -395,9 +386,16 @@ public class CheckstyleAntTask extends Task {
             final Properties props = createOverridingProperties();
             final ThreadModeSettings threadModeSettings =
                     ThreadModeSettings.SINGLE_THREAD_MODE_INSTANCE;
-            final Configuration configuration = ConfigurationLoader.loadConfiguration(
-                    config, new PropertiesExpander(props),
-                    !executeIgnoredModules, threadModeSettings);
+            final ConfigurationLoader.IgnoredModulesOptions ignoredModulesOptions;
+            if (executeIgnoredModules) {
+                ignoredModulesOptions = ConfigurationLoader.IgnoredModulesOptions.EXECUTE;
+            }
+            else {
+                ignoredModulesOptions = ConfigurationLoader.IgnoredModulesOptions.OMIT;
+            }
+
+            final Configuration configuration = ConfigurationLoader.loadConfiguration(config,
+                    new PropertiesExpander(props), ignoredModulesOptions, threadModeSettings);
 
             final ClassLoader moduleClassLoader =
                 Checker.class.getClassLoader();
@@ -435,17 +433,12 @@ public class CheckstyleAntTask extends Task {
 
         // Load the properties file if specified
         if (properties != null) {
-            FileInputStream inStream = null;
-            try {
-                inStream = new FileInputStream(properties);
+            try (InputStream inStream = Files.newInputStream(properties.toPath())) {
                 returnValue.load(inStream);
             }
             catch (final IOException ex) {
                 throw new BuildException("Error loading Properties file '"
                         + properties + "'", ex, getLocation());
-            }
-            finally {
-                Closeables.closeQuietly(inStream);
             }
         }
 
@@ -478,7 +471,8 @@ public class CheckstyleAntTask extends Task {
             if (formatters.isEmpty()) {
                 final OutputStream debug = new LogOutputStream(this, Project.MSG_DEBUG);
                 final OutputStream err = new LogOutputStream(this, Project.MSG_ERR);
-                listeners[0] = new DefaultLogger(debug, true, err, true);
+                listeners[0] = new DefaultLogger(debug, AutomaticBean.OutputStreamOptions.CLOSE,
+                        err, AutomaticBean.OutputStreamOptions.CLOSE);
             }
             else {
                 for (int i = 0; i < formatterCount; i++) {
@@ -498,7 +492,7 @@ public class CheckstyleAntTask extends Task {
      * Returns the list of files (full path name) to process.
      * @return the list of files included via the fileName, filesets and paths.
      */
-    protected List<File> getFilesToCheck() {
+    private List<File> getFilesToCheck() {
         final List<File> allFiles = new ArrayList<>();
         if (fileName != null) {
             // oops we've got an additional one to process, don't
@@ -606,9 +600,9 @@ public class CheckstyleAntTask extends Task {
 
     /**
      * Poor mans enumeration for the formatter types.
-     * @author Oliver Burn
      */
     public static class FormatterType extends EnumeratedAttribute {
+
         /** My possible values. */
         private static final String[] VALUES = {E_XML, E_PLAIN};
 
@@ -616,13 +610,14 @@ public class CheckstyleAntTask extends Task {
         public String[] getValues() {
             return VALUES.clone();
         }
+
     }
 
     /**
      * Details about a formatter to be used.
-     * @author Oliver Burn
      */
     public static class Formatter {
+
         /** The formatter type. */
         private FormatterType type;
         /** The file to output to. */
@@ -684,11 +679,16 @@ public class CheckstyleAntTask extends Task {
             if (toFile == null || !useFile) {
                 defaultLogger = new DefaultLogger(
                     new LogOutputStream(task, Project.MSG_DEBUG),
-                    true, new LogOutputStream(task, Project.MSG_ERR), true);
+                        AutomaticBean.OutputStreamOptions.CLOSE,
+                        new LogOutputStream(task, Project.MSG_ERR),
+                        AutomaticBean.OutputStreamOptions.CLOSE
+                );
             }
             else {
-                final FileOutputStream infoStream = new FileOutputStream(toFile);
-                defaultLogger = new DefaultLogger(infoStream, true, infoStream, false);
+                final OutputStream infoStream = Files.newOutputStream(toFile.toPath());
+                defaultLogger =
+                        new DefaultLogger(infoStream, AutomaticBean.OutputStreamOptions.CLOSE,
+                                infoStream, AutomaticBean.OutputStreamOptions.NONE);
             }
             return defaultLogger;
         }
@@ -702,19 +702,23 @@ public class CheckstyleAntTask extends Task {
         private AuditListener createXmlLogger(Task task) throws IOException {
             final AuditListener xmlLogger;
             if (toFile == null || !useFile) {
-                xmlLogger = new XMLLogger(new LogOutputStream(task, Project.MSG_INFO), true);
+                xmlLogger = new XMLLogger(new LogOutputStream(task, Project.MSG_INFO),
+                        AutomaticBean.OutputStreamOptions.CLOSE);
             }
             else {
-                xmlLogger = new XMLLogger(new FileOutputStream(toFile), true);
+                xmlLogger = new XMLLogger(Files.newOutputStream(toFile.toPath()),
+                        AutomaticBean.OutputStreamOptions.CLOSE);
             }
             return xmlLogger;
         }
+
     }
 
     /**
      * Represents a property that consists of a key and value.
      */
     public static class Property {
+
         /** The property key. */
         private String key;
         /** The property value. */
@@ -759,10 +763,12 @@ public class CheckstyleAntTask extends Task {
         public void setFile(File file) {
             value = file.getAbsolutePath();
         }
+
     }
 
     /** Represents a custom listener. */
     public static class Listener {
+
         /** Class name of the listener class. */
         private String className;
 
@@ -781,5 +787,7 @@ public class CheckstyleAntTask extends Task {
         public void setClassname(String name) {
             className = name;
         }
+
     }
+
 }

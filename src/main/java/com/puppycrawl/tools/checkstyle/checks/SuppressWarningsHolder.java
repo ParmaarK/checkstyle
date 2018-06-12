@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
@@ -34,9 +35,8 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 /**
  * Maintains a set of check suppressions from {@link SuppressWarnings}
  * annotations.
- * @author Trevor Robinson
- * @author St&eacute;phane Galland
  */
+@StatelessCheck
 public class SuppressWarningsHolder
     extends AbstractCheck {
 
@@ -53,7 +53,7 @@ public class SuppressWarningsHolder
      * suppression {@code "checkstyle:fallthrough"} or {@code "checkstyle:FallThrough"}.
      * To suppress the warning in both tools, just use {@code "fallthrough"}.
      */
-    public static final String CHECKSTYLE_PREFIX = "checkstyle:";
+    private static final String CHECKSTYLE_PREFIX = "checkstyle:";
 
     /** Java.lang namespace prefix, which is stripped from SuppressWarnings */
     private static final String JAVA_LANG_PREFIX = "java.lang.";
@@ -71,12 +71,8 @@ public class SuppressWarningsHolder
      * A thread-local holder for the list of suppression entries for the last
      * file parsed.
      */
-    private static final ThreadLocal<List<Entry>> ENTRIES = new ThreadLocal<List<Entry>>() {
-        @Override
-        protected List<Entry> initialValue() {
-            return new LinkedList<>();
-        }
-    };
+    private static final ThreadLocal<List<Entry>> ENTRIES =
+            ThreadLocal.withInitial(LinkedList::new);
 
     /**
      * Returns the default alias for the source name of a check, which is the
@@ -117,7 +113,7 @@ public class SuppressWarningsHolder
      *        name)
      * @param checkAlias the alias used in {@link SuppressWarnings} annotations
      */
-    public static void registerAlias(String sourceName, String checkAlias) {
+    private static void registerAlias(String sourceName, String checkAlias) {
         CHECK_ALIAS_MAP.put(sourceName, checkAlias);
     }
 
@@ -204,17 +200,17 @@ public class SuppressWarningsHolder
 
     @Override
     public int[] getDefaultTokens() {
-        return getAcceptableTokens();
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {TokenTypes.ANNOTATION};
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getAcceptableTokens();
+        return new int[] {TokenTypes.ANNOTATION};
     }
 
     @Override
@@ -231,7 +227,6 @@ public class SuppressWarningsHolder
             identifier = identifier.substring(JAVA_LANG_PREFIX.length());
         }
         if ("SuppressWarnings".equals(identifier)) {
-
             final List<String> values = getAllAnnotationValues(ast);
             if (!isAnnotationEmpty(values)) {
                 final DetailAST targetAST = getAnnotationTarget(ast);
@@ -493,6 +488,7 @@ public class SuppressWarningsHolder
 
     /** Records a particular suppression for a region of a file. */
     private static class Entry {
+
         /** The source name of the suppressed check. */
         private final String checkName;
         /** The suppression region for the check - first line. */
@@ -560,5 +556,7 @@ public class SuppressWarningsHolder
         public int getLastColumn() {
             return lastColumn;
         }
+
     }
+
 }

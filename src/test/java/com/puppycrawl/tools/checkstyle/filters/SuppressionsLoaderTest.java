@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,29 +40,29 @@ import org.powermock.reflect.Whitebox;
 import org.xml.sax.InputSource;
 
 import com.puppycrawl.tools.checkstyle.AbstractPathTestSupport;
+import com.puppycrawl.tools.checkstyle.TreeWalkerFilter;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.FilterSet;
 
 /**
  * Tests SuppressionsLoader.
- * @author Rick Giles
- * @author <a href="mailto:andreyselkin@gmail.com">Andrei Selkin</a>
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ SuppressionsLoader.class, SuppressionsLoaderTest.class })
 public class SuppressionsLoaderTest extends AbstractPathTestSupport {
+
     @Rule
     public final ExpectedException thrown = ExpectedException.none();
 
     @Override
     protected String getPackageLocation() {
-        return "com/puppycrawl/tools/checkstyle/filters";
+        return "com/puppycrawl/tools/checkstyle/filters/suppressionsloader";
     }
 
     @Test
     public void testNoSuppressions() throws Exception {
         final FilterSet fc =
-            SuppressionsLoader.loadSuppressions(getPath("suppressions_none.xml"));
+            SuppressionsLoader.loadSuppressions(getPath("InputSuppressionsLoaderNone.xml"));
         final FilterSet fc2 = new FilterSet();
         assertEquals("No suppressions should be loaded, but found: " + fc.getFilters().size(),
             fc2, fc);
@@ -102,7 +104,7 @@ public class SuppressionsLoaderTest extends AbstractPathTestSupport {
     }
 
     @Test
-    public void testLoadFromNonExistingUrl() {
+    public void testLoadFromNonExistentUrl() {
         try {
             SuppressionsLoader.loadSuppressions("http://^%$^* %&% %^&");
             fail("exception expected");
@@ -116,32 +118,33 @@ public class SuppressionsLoaderTest extends AbstractPathTestSupport {
     @Test
     public void testMultipleSuppression() throws Exception {
         final FilterSet fc =
-            SuppressionsLoader.loadSuppressions(getPath("suppressions_multiple.xml"));
+            SuppressionsLoader.loadSuppressions(getPath("InputSuppressionsLoaderMultiple.xml"));
         final FilterSet fc2 = new FilterSet();
-        final SuppressElement se0 = new SuppressElement("file0");
-        se0.setChecks("check0");
+
+        final SuppressElement se0 =
+                new SuppressElement("file0", "check0", null, null, null, null);
         fc2.addFilter(se0);
-        final SuppressElement se1 = new SuppressElement("file1");
-        se1.setChecks("check1");
-        se1.setLines("1,2-3");
+        final SuppressElement se1 =
+                new SuppressElement("file1", "check1", null, null, "1,2-3", null);
         fc2.addFilter(se1);
-        final SuppressElement se2 = new SuppressElement("file2");
-        se2.setChecks("check2");
-        se2.setColumns("1,2-3");
+        final SuppressElement se2 =
+                new SuppressElement("file2", "check2", null, null, null, "1,2-3");
         fc2.addFilter(se2);
-        final SuppressElement se3 = new SuppressElement("file3");
-        se3.setChecks("check3");
-        se3.setLines("1,2-3");
-        se3.setColumns("1,2-3");
+        final SuppressElement se3 =
+                new SuppressElement("file3", "check3", null, null, "1,2-3", "1,2-3");
         fc2.addFilter(se3);
+        final SuppressElement se4 =
+                new SuppressElement(null, null, "message0", null, null, null);
+        fc2.addFilter(se4);
         assertEquals("Multiple suppressions were loaded incorrectly", fc2, fc);
     }
 
     @Test
     public void testNoFile() throws IOException {
-        final String fn = getPath("suppressions_no_file.xml");
+        final String fn = getPath("InputSuppressionsLoaderNoFile.xml");
         try {
             SuppressionsLoader.loadSuppressions(fn);
+            fail("Exception is expected");
         }
         catch (CheckstyleException ex) {
             final String messageStart = "Unable to parse " + fn;
@@ -156,9 +159,10 @@ public class SuppressionsLoaderTest extends AbstractPathTestSupport {
 
     @Test
     public void testNoCheck() throws IOException {
-        final String fn = getPath("suppressions_no_check.xml");
+        final String fn = getPath("InputSuppressionsLoaderNoCheck.xml");
         try {
             SuppressionsLoader.loadSuppressions(fn);
+            fail("Exception is expected");
         }
         catch (CheckstyleException ex) {
             final String messageStart = "Unable to parse " + fn;
@@ -173,9 +177,10 @@ public class SuppressionsLoaderTest extends AbstractPathTestSupport {
 
     @Test
     public void testBadInt() throws IOException {
-        final String fn = getPath("suppressions_bad_int.xml");
+        final String fn = getPath("InputSuppressionsLoaderBadInt.xml");
         try {
             SuppressionsLoader.loadSuppressions(fn);
+            fail("Exception is expected");
         }
         catch (CheckstyleException ex) {
             assertTrue(
@@ -232,7 +237,7 @@ public class SuppressionsLoaderTest extends AbstractPathTestSupport {
             loaderClass.getDeclaredMethod("loadSuppressions", InputSource.class, String.class);
         loadSuppressions.setAccessible(true);
 
-        final String sourceName = "suppressions_none.xml";
+        final String sourceName = "InputSuppressionsLoaderNone.xml";
         final InputSource inputSource = new InputSource(sourceName);
 
         thrown.expect(CheckstyleException.class);
@@ -251,7 +256,7 @@ public class SuppressionsLoaderTest extends AbstractPathTestSupport {
         final InputSource inputSource = new InputSource();
 
         thrown.expect(CheckstyleException.class);
-        final String sourceName = "suppressions_none.xml";
+        final String sourceName = "InputSuppressionsLoaderNone.xml";
         thrown.expectMessage("Unable to read " + sourceName);
 
         loadSuppressions.invoke(loaderClass, inputSource, sourceName);
@@ -259,20 +264,21 @@ public class SuppressionsLoaderTest extends AbstractPathTestSupport {
 
     @Test
     public void testNoCheckNoId() throws IOException {
-        final String fn = getPath("suppressions_no_check_and_id.xml");
+        final String fn = getPath("InputSuppressionsLoaderNoCheckAndId.xml");
         try {
             SuppressionsLoader.loadSuppressions(fn);
+            fail("Exception is expected");
         }
         catch (CheckstyleException ex) {
             assertEquals("Invalid error message",
-                "Unable to parse " + fn + " - missing checks and id attribute",
+                "Unable to parse " + fn + " - missing checks or id or message attribute",
                 ex.getMessage());
         }
     }
 
     @Test
     public void testNoCheckYesId() throws Exception {
-        final String fn = getPath("suppressions_id.xml");
+        final String fn = getPath("InputSuppressionsLoaderId.xml");
         final FilterSet set = SuppressionsLoader.loadSuppressions(fn);
 
         assertEquals("Invalid number of filters", 1, set.getFilters().size());
@@ -280,13 +286,14 @@ public class SuppressionsLoaderTest extends AbstractPathTestSupport {
 
     @Test
     public void testInvalidFileFormat() throws IOException {
-        final String fn = getPath("suppressions_invalid_file.xml");
+        final String fn = getPath("InputSuppressionsLoaderInvalidFile.xml");
         try {
             SuppressionsLoader.loadSuppressions(fn);
+            fail("Exception is expected");
         }
         catch (CheckstyleException ex) {
             assertEquals("Invalid error message",
-                "Unable to parse " + fn + " - invalid files or checks format",
+                "Unable to parse " + fn + " - invalid files or checks or message format",
                 ex.getMessage());
         }
     }
@@ -294,7 +301,7 @@ public class SuppressionsLoaderTest extends AbstractPathTestSupport {
     @Test
     public void testLoadFromClasspath() throws Exception {
         final FilterSet fc =
-            SuppressionsLoader.loadSuppressions(getPath("suppressions_none.xml"));
+            SuppressionsLoader.loadSuppressions(getPath("InputSuppressionsLoaderNone.xml"));
         final FilterSet fc2 = new FilterSet();
         assertEquals("Suppressions were not loaded", fc2, fc);
     }
@@ -302,10 +309,66 @@ public class SuppressionsLoaderTest extends AbstractPathTestSupport {
     @Test
     public void testSettingModuleId() throws Exception {
         final FilterSet fc =
-                SuppressionsLoader.loadSuppressions(getPath("suppressions_with_id.xml"));
+                SuppressionsLoader.loadSuppressions(getPath("InputSuppressionsLoaderWithId.xml"));
         final SuppressElement suppressElement = (SuppressElement) fc.getFilters().toArray()[0];
 
         final String id = Whitebox.getInternalState(suppressElement, "moduleId");
         assertEquals("Id has to be defined", "someId", id);
     }
+
+    @Test
+    public void testXpathSuppressions() throws Exception {
+        final String fn = getPath("InputSuppressionsLoaderXpathCorrect.xml");
+        final Set<TreeWalkerFilter> filterSet = SuppressionsLoader.loadXpathSuppressions(fn);
+
+        final Set<TreeWalkerFilter> expectedFilterSet = new HashSet<>();
+        final XpathFilter xf0 =
+                new XpathFilter("file1", "test", null, "id1", "/CLASS_DEF");
+        expectedFilterSet.add(xf0);
+        final XpathFilter xf1 =
+                new XpathFilter(null, null, "message1", null, "/CLASS_DEF");
+        expectedFilterSet.add(xf1);
+        assertEquals("Multiple xpath suppressions were loaded incorrectly", expectedFilterSet,
+                filterSet);
+    }
+
+    @Test
+    public void testXpathInvalidFileFormat() throws IOException {
+        final String fn = getPath("InputSuppressionsLoaderXpathInvalidFile.xml");
+        try {
+            SuppressionsLoader.loadXpathSuppressions(fn);
+            fail("Exception should be thrown");
+        }
+        catch (CheckstyleException ex) {
+            assertEquals("Invalid error message",
+                    "Unable to parse " + fn + " - invalid files or checks or message format for "
+                            + "suppress-xpath",
+                    ex.getMessage());
+        }
+    }
+
+    @Test
+    public void testXpathNoCheckNoId() throws IOException {
+        final String fn =
+                getPath("InputSuppressionsLoaderXpathNoCheckAndId.xml");
+        try {
+            SuppressionsLoader.loadXpathSuppressions(fn);
+            fail("Exception should be thrown");
+        }
+        catch (CheckstyleException ex) {
+            assertEquals("Invalid error message",
+                    "Unable to parse " + fn + " - missing checks or id or message attribute for "
+                            + "suppress-xpath",
+                    ex.getMessage());
+        }
+    }
+
+    @Test
+    public void testXpathNoCheckYesId() throws Exception {
+        final String fn = getPath("InputSuppressionsLoaderXpathId.xml");
+        final Set<TreeWalkerFilter> filterSet = SuppressionsLoader.loadXpathSuppressions(fn);
+
+        assertEquals("Invalid number of filters", 1, filterSet.size());
+    }
+
 }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -39,9 +39,9 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * </UL>
  *
  *
- * @author jrichard
  */
 public class BlockParentHandler extends AbstractExpressionHandler {
+
     /**
      * Children checked by parent handlers.
      */
@@ -53,6 +53,8 @@ public class BlockParentHandler extends AbstractExpressionHandler {
         TokenTypes.LITERAL_RETURN,
         TokenTypes.LITERAL_THROW,
         TokenTypes.LITERAL_CONTINUE,
+        TokenTypes.CTOR_CALL,
+        TokenTypes.SUPER_CTOR_CALL,
     };
 
     /**
@@ -63,6 +65,7 @@ public class BlockParentHandler extends AbstractExpressionHandler {
      * @param name          the name of the handler
      * @param ast           the abstract syntax tree
      * @param parent        the parent handler
+     * @noinspection WeakerAccess
      */
     public BlockParentHandler(IndentationCheck indentCheck,
         String name, DetailAST ast, AbstractExpressionHandler parent) {
@@ -94,29 +97,9 @@ public class BlockParentHandler extends AbstractExpressionHandler {
 
         if (topLevel != null
                 && !getIndent().isAcceptable(expandedTabsColumnNo(topLevel))
-                && !hasLabelBefore()
-                && (shouldTopLevelStartLine() || isOnStartOfLine(topLevel))) {
+                && isOnStartOfLine(topLevel)) {
             logError(topLevel, "", expandedTabsColumnNo(topLevel));
         }
-    }
-
-    /**
-     * Check if the top level token has label before.
-     * @return true if the top level token has label before.
-     */
-    protected boolean hasLabelBefore() {
-        final DetailAST parent = getTopLevelAst().getParent();
-        return parent.getType() == TokenTypes.LABELED_STAT
-            && parent.getLineNo() == getTopLevelAst().getLineNo();
-    }
-
-    /**
-     * Determines if the top level token must start the line.
-     *
-     * @return true
-     */
-    protected boolean shouldTopLevelStartLine() {
-        return true;
     }
 
     /**
@@ -124,7 +107,7 @@ public class BlockParentHandler extends AbstractExpressionHandler {
      *
      * @return true if curly braces are present, false otherwise
      */
-    protected boolean hasCurlies() {
+    private boolean hasCurlies() {
         return getLeftCurly() != null && getRightCurly() != null;
     }
 
@@ -150,7 +133,7 @@ public class BlockParentHandler extends AbstractExpressionHandler {
     /**
      * Check the indentation of the left curly brace.
      */
-    protected void checkLeftCurly() {
+    private void checkLeftCurly() {
         // the lcurly can either be at the correct indentation, or nested
         // with a previous expression
         final DetailAST lcurly = getLeftCurly();
@@ -182,7 +165,7 @@ public class BlockParentHandler extends AbstractExpressionHandler {
     /**
      * Check the indentation of the right curly brace.
      */
-    protected void checkRightCurly() {
+    private void checkRightCurly() {
         final DetailAST rcurly = getRightCurly();
         final int rcurlyPos = expandedTabsColumnNo(rcurly);
 
@@ -226,7 +209,7 @@ public class BlockParentHandler extends AbstractExpressionHandler {
      *
      * @return the right parenthesis expression
      */
-    protected DetailAST getRightParen() {
+    private DetailAST getRightParen() {
         return getMainAst().findFirstToken(TokenTypes.RPAREN);
     }
 
@@ -235,7 +218,7 @@ public class BlockParentHandler extends AbstractExpressionHandler {
      *
      * @return the left parenthesis expression
      */
-    protected DetailAST getLeftParen() {
+    private DetailAST getLeftParen() {
         return getMainAst().findFirstToken(TokenTypes.LPAREN);
     }
 
@@ -301,4 +284,5 @@ public class BlockParentHandler extends AbstractExpressionHandler {
     private int getLineWrappingIndent() {
         return getIndentCheck().getLineWrappingIndentation();
     }
+
 }

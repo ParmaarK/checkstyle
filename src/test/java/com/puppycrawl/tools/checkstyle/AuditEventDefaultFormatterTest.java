@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -41,34 +41,28 @@ public class AuditEventDefaultFormatterTest {
 
     @Test
     public void testFormatFullyQualifiedModuleNameContainsCheckSuffix() {
-        final AuditEvent mock = PowerMockito.mock(AuditEvent.class);
-        when(mock.getSourceName()).thenReturn("com.test.package.TestModuleCheck");
-        when(mock.getSeverityLevel()).thenReturn(SeverityLevel.WARNING);
-        when(mock.getLine()).thenReturn(1);
-        when(mock.getColumn()).thenReturn(1);
-        when(mock.getMessage()).thenReturn("Mocked message.");
-        when(mock.getFileName()).thenReturn("InputMockFile.java");
+        final LocalizedMessage message = new LocalizedMessage(1, 1, null, null, null,
+                SeverityLevel.WARNING, null, TestModuleCheck.class, "Mocked message.");
+        final AuditEvent event = new AuditEvent("", "InputMockFile.java", message);
         final AuditEventFormatter formatter = new AuditEventDefaultFormatter();
 
-        final String expected = "[WARN] InputMockFile.java:1:1: Mocked message. [TestModule]";
+        final String expected = "[WARN] InputMockFile.java:1:1: Mocked message. "
+                + "[AuditEventDefaultFormatterTest$TestModule]";
 
-        assertEquals("Invalid format", expected, formatter.format(mock));
+        assertEquals("Invalid format", expected, formatter.format(event));
     }
 
     @Test
     public void testFormatFullyQualifiedModuleNameDoesNotContainCheckSuffix() {
-        final AuditEvent mock = PowerMockito.mock(AuditEvent.class);
-        when(mock.getSourceName()).thenReturn("com.test.package.TestModule");
-        when(mock.getSeverityLevel()).thenReturn(SeverityLevel.WARNING);
-        when(mock.getLine()).thenReturn(1);
-        when(mock.getColumn()).thenReturn(1);
-        when(mock.getMessage()).thenReturn("Mocked message.");
-        when(mock.getFileName()).thenReturn("InputMockFile.java");
+        final LocalizedMessage message = new LocalizedMessage(1, 1, null, null, null,
+                SeverityLevel.WARNING, null, TestModule.class, "Mocked message.");
+        final AuditEvent event = new AuditEvent("", "InputMockFile.java", message);
         final AuditEventFormatter formatter = new AuditEventDefaultFormatter();
 
-        final String expected = "[WARN] InputMockFile.java:1:1: Mocked message. [TestModule]";
+        final String expected = "[WARN] InputMockFile.java:1:1: Mocked message. "
+                + "[AuditEventDefaultFormatterTest$TestModule]";
 
-        assertEquals("Invalid format", expected, formatter.format(mock));
+        assertEquals("Invalid format", expected, formatter.format(event));
     }
 
     @Test
@@ -104,6 +98,18 @@ public class AuditEventDefaultFormatterTest {
     }
 
     @Test
+    public void testFormatModuleWithModuleId() {
+        final LocalizedMessage message = new LocalizedMessage(1, 1, null, null, null,
+                SeverityLevel.WARNING, "ModuleId", TestModule.class, "Mocked message.");
+        final AuditEvent event = new AuditEvent("", "InputMockFile.java", message);
+        final AuditEventFormatter formatter = new AuditEventDefaultFormatter();
+
+        final String expected = "[WARN] InputMockFile.java:1:1: Mocked message. [ModuleId]";
+
+        assertEquals("Invalid format", expected, formatter.format(event));
+    }
+
+    @Test
     public void testCalculateBufferLength() throws Exception {
         final Method calculateBufferLengthMethod =
                 Whitebox.getMethod(AuditEventDefaultFormatter.class,
@@ -117,4 +123,27 @@ public class AuditEventDefaultFormatterTest {
 
         assertEquals("Buffer length is not expected", 54, result);
     }
+
+    /**
+     * Non meaningful javadoc just to contain "noinspection" tag.
+     * Till https://youtrack.jetbrains.com/issue/IDEA-187210
+     * @noinspection JUnitTestClassNamingConvention
+     */
+    private static class TestModuleCheck {
+
+        // no code
+
+    }
+
+    /**
+     * Non meaningful javadoc just to contain "noinspection" tag.
+     * Till https://youtrack.jetbrains.com/issue/IDEA-187210
+     * @noinspection JUnitTestClassNamingConvention
+     */
+    private static class TestModule {
+
+        // no code
+
+    }
+
 }

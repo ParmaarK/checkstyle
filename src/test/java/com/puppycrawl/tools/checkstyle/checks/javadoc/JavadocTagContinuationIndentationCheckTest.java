@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -27,10 +27,11 @@ import org.junit.Test;
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class JavadocTagContinuationIndentationCheckTest
         extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/javadoc/javadoctagcontinuationindentation";
@@ -48,8 +49,8 @@ public class JavadocTagContinuationIndentationCheckTest
     @Test
     public void testFp() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(JavadocTagContinuationIndentationCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+                createModuleConfig(JavadocTagContinuationIndentationCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig,
                getPath("InputJavadocTagContinuationIndentationGuavaFalsePositive.java"),
                expected);
@@ -58,7 +59,7 @@ public class JavadocTagContinuationIndentationCheckTest
     @Test
     public void testCheck() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(JavadocTagContinuationIndentationCheck.class);
+                createModuleConfig(JavadocTagContinuationIndentationCheck.class);
         final String[] expected = {
             "47: " + getCheckMessage(MSG_KEY, 4),
             "109: " + getCheckMessage(MSG_KEY, 4),
@@ -81,7 +82,7 @@ public class JavadocTagContinuationIndentationCheckTest
     @Test
     public void testCheckWithOffset3() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(JavadocTagContinuationIndentationCheck.class);
+                createModuleConfig(JavadocTagContinuationIndentationCheck.class);
         checkConfig.addAttribute("offset", "3");
         final String[] expected = {
             "7: " + getCheckMessage(MSG_KEY, 3),
@@ -90,4 +91,5 @@ public class JavadocTagContinuationIndentationCheckTest
         verify(checkConfig, getPath("InputJavadocTagContinuationIndentationOffset3.java"),
                 expected);
     }
+
 }

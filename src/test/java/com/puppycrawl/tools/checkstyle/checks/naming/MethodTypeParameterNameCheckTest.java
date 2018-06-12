@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -30,13 +30,24 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 public class MethodTypeParameterNameCheckTest
     extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/naming/methodtypeparametername";
     }
 
     @Test
-    public void testGetMethodRequiredTokens() {
+    public void testGetAcceptableTokens() {
+        final MethodTypeParameterNameCheck methodTypeParameterNameCheck =
+            new MethodTypeParameterNameCheck();
+        final int[] expected = {TokenTypes.TYPE_PARAMETER};
+
+        assertArrayEquals("Default acceptable tokens are invalid",
+                expected, methodTypeParameterNameCheck.getAcceptableTokens());
+    }
+
+    @Test
+    public void testGetRequiredTokens() {
         final MethodTypeParameterNameCheck checkObj =
             new MethodTypeParameterNameCheck();
         final int[] expected = {TokenTypes.TYPE_PARAMETER};
@@ -48,7 +59,7 @@ public class MethodTypeParameterNameCheckTest
     public void testMethodDefault()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(MethodTypeParameterNameCheck.class);
+            createModuleConfig(MethodTypeParameterNameCheck.class);
 
         final String pattern = "^[A-Z]$";
 
@@ -66,7 +77,7 @@ public class MethodTypeParameterNameCheckTest
     public void testMethodFooName()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(MethodTypeParameterNameCheck.class);
+            createModuleConfig(MethodTypeParameterNameCheck.class);
         checkConfig.addAttribute("format", "^foo$");
 
         final String pattern = "^foo$";
@@ -82,4 +93,5 @@ public class MethodTypeParameterNameCheckTest
         };
         verify(checkConfig, getPath("InputMethodTypeParameterName.java"), expected);
     }
+
 }

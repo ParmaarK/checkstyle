@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -24,28 +24,20 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
-import com.puppycrawl.tools.checkstyle.checks.AbstractTypeAwareCheck;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
-@SuppressWarnings("deprecation")
 public class AbstractTypeAwareCheckTest extends AbstractModuleTestSupport {
-    private DefaultConfiguration checkConfig;
-
-    @Before
-    public void setUp() {
-        checkConfig = createCheckConfig(JavadocMethodCheck.class);
-    }
 
     @Override
     protected String getPackageLocation() {
@@ -64,8 +56,8 @@ public class AbstractTypeAwareCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testTokenToString() throws Exception {
-        final Class<?> tokenType = Class
-                .forName("com.puppycrawl.tools.checkstyle.checks.AbstractTypeAwareCheck$Token");
+        final Class<?> tokenType = Class.forName("com.puppycrawl.tools.checkstyle.checks.javadoc."
+                + "AbstractTypeAwareCheck$Token");
         final Constructor<?> tokenConstructor = tokenType.getDeclaredConstructor(String.class,
                 int.class, int.class);
         final Object token = tokenConstructor.newInstance("blablabla", 1, 1);
@@ -76,18 +68,19 @@ public class AbstractTypeAwareCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testClassRegularClass() throws Exception {
-        final Class<?> tokenType = Class
-                .forName("com.puppycrawl.tools.checkstyle.checks.AbstractTypeAwareCheck$Token");
+        final Class<?> tokenType = Class.forName("com.puppycrawl.tools.checkstyle.checks.javadoc."
+                + "AbstractTypeAwareCheck$Token");
 
         final Class<?> regularClassType = Class
-                .forName(
-                    "com.puppycrawl.tools.checkstyle.checks.AbstractTypeAwareCheck$RegularClass");
+                .forName("com.puppycrawl.tools.checkstyle.checks.javadoc."
+                        + "AbstractTypeAwareCheck$RegularClass");
         final Constructor<?> regularClassConstructor = regularClassType.getDeclaredConstructor(
                 tokenType, String.class, AbstractTypeAwareCheck.class);
         regularClassConstructor.setAccessible(true);
 
         try {
             regularClassConstructor.newInstance(null, "", new JavadocMethodCheck());
+            fail("Exception is expected");
         }
         catch (InvocationTargetException ex) {
             assertTrue("Invalid exception class, expected: IllegalArgumentException.class",
@@ -124,12 +117,12 @@ public class AbstractTypeAwareCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testClassAliasToString() throws Exception {
-        final Class<?> tokenType = Class
-                .forName("com.puppycrawl.tools.checkstyle.checks.AbstractTypeAwareCheck$Token");
+        final Class<?> tokenType = Class.forName("com.puppycrawl.tools.checkstyle.checks.javadoc."
+                + "AbstractTypeAwareCheck$Token");
 
         final Class<?> regularClassType = Class
-                .forName(
-                    "com.puppycrawl.tools.checkstyle.checks.AbstractTypeAwareCheck$RegularClass");
+                .forName("com.puppycrawl.tools.checkstyle.checks.javadoc."
+                        + "AbstractTypeAwareCheck$RegularClass");
         final Constructor<?> regularClassConstructor = regularClassType.getDeclaredConstructor(
                 tokenType, String.class, AbstractTypeAwareCheck.class);
         regularClassConstructor.setAccessible(true);
@@ -142,9 +135,10 @@ public class AbstractTypeAwareCheckTest extends AbstractModuleTestSupport {
                 new JavadocMethodCheck());
 
         final Class<?> classAliasType = Class.forName(
-                "com.puppycrawl.tools.checkstyle.checks.AbstractTypeAwareCheck$ClassAlias");
-        final Class<?> abstractTypeInfoType = Class.forName(
-                "com.puppycrawl.tools.checkstyle.checks.AbstractTypeAwareCheck$AbstractClassInfo");
+                "com.puppycrawl.tools.checkstyle.checks.javadoc.AbstractTypeAwareCheck$ClassAlias");
+        final Class<?> abstractTypeInfoType = Class
+                .forName("com.puppycrawl.tools.checkstyle.checks.javadoc."
+                        + "AbstractTypeAwareCheck$AbstractClassInfo");
 
         final Constructor<?> classAliasConstructor = classAliasType
                 .getDeclaredConstructor(tokenType, abstractTypeInfoType);
@@ -160,7 +154,7 @@ public class AbstractTypeAwareCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testWithoutLogErrors() throws Exception {
-        final DefaultConfiguration config = createCheckConfig(JavadocMethodCheck.class);
+        final DefaultConfiguration config = createModuleConfig(JavadocMethodCheck.class);
         config.addAttribute("logLoadErrors", "false");
         config.addAttribute("allowUndeclaredRTE", "true");
         final String[] expected = {
@@ -168,6 +162,7 @@ public class AbstractTypeAwareCheckTest extends AbstractModuleTestSupport {
         };
         try {
             verify(config, getPath("InputAbstractTypeAwareLoadErrors.java"), expected);
+            fail("Exception is expected");
         }
         catch (CheckstyleException ex) {
             final IllegalStateException cause = (IllegalStateException) ex.getCause();
@@ -179,10 +174,12 @@ public class AbstractTypeAwareCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testWithSuppressLoadErrors() throws Exception {
+        final DefaultConfiguration checkConfig = createModuleConfig(JavadocMethodCheck.class);
         checkConfig.addAttribute("suppressLoadErrors", "true");
         checkConfig.addAttribute("allowUndeclaredRTE", "true");
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
         verify(checkConfig, getPath("InputAbstractTypeAwareLoadErrors.java"), expected);
     }
+
 }

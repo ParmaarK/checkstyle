@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,18 +21,25 @@ package com.puppycrawl.tools.checkstyle.checks.design;
 
 import static com.puppycrawl.tools.checkstyle.checks.design.MutableExceptionCheck.MSG_KEY;
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Test;
 
 import antlr.CommonHiddenStreamToken;
+import com.google.common.collect.ImmutableMap;
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class MutableExceptionCheckTest extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/design/mutableexception";
@@ -40,9 +47,9 @@ public class MutableExceptionCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testClassExtendsGenericClass() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(MutableExceptionCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(MutableExceptionCheck.class);
 
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
         verify(checkConfig, getPath("InputMutableExceptionClassExtendsGenericClass.java"),
             expected);
@@ -50,7 +57,7 @@ public class MutableExceptionCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testDefault() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(MutableExceptionCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(MutableExceptionCheck.class);
 
         final String[] expected = {
             "6:9: " + getCheckMessage(MSG_KEY, "errorCode"),
@@ -62,8 +69,28 @@ public class MutableExceptionCheckTest extends AbstractModuleTestSupport {
     }
 
     @Test
+    public void testMultipleInputs() throws Exception {
+        final DefaultConfiguration checkConfig = createModuleConfig(MutableExceptionCheck.class);
+        final String filePath1 = getPath("InputMutableException.java");
+        final String filePath2 = getPath("InputMutableExceptionMultipleInputs.java");
+
+        final List<String> expected1 = Arrays.asList(
+            "6:9: " + getCheckMessage(MSG_KEY, "errorCode"),
+            "23:9: " + getCheckMessage(MSG_KEY, "errorCode"),
+            "46:9: " + getCheckMessage(MSG_KEY, "errorCode"));
+        final List<String> expected2 = Arrays.asList(
+            "6:9: " + getCheckMessage(MSG_KEY, "errorCode"),
+            "10:9: " + getCheckMessage(MSG_KEY, "errorCode"));
+
+        final File[] inputs = {new File(filePath1), new File(filePath2)};
+
+        verify(createChecker(checkConfig), inputs,
+                ImmutableMap.of(filePath1, expected1, filePath2, expected2));
+    }
+
+    @Test
     public void testFormat() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(MutableExceptionCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(MutableExceptionCheck.class);
         checkConfig.addAttribute("format", "^.*Failure$");
         checkConfig.addAttribute("extendedClassNameFormat", "^.*ThreadDeath$");
         final String[] expected = {
@@ -99,7 +126,9 @@ public class MutableExceptionCheckTest extends AbstractModuleTestSupport {
             fail("IllegalStateException is expected");
         }
         catch (IllegalStateException ex) {
-            //expected
+            // exception is expected
+            assertEquals("Invalid exception message", "interface[0x-1]", ex.getMessage());
         }
     }
+
 }

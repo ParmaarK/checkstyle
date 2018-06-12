@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -31,7 +32,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * <p>
  * Checks that the order of modifiers conforms to the suggestions in the
  * <a
- * href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-8.html">
+ * href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-8.html">
  * Java Language specification, sections 8.1.1, 8.3.1 and 8.4.3</a>.
  * The correct order is:</p>
 
@@ -63,8 +64,8 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * <pre>
  * &lt;module name="ModifierOrder"/&gt;
  * </pre>
- * @author Lars Kühne
  */
+@StatelessCheck
 public class ModifierOrderCheck
     extends AbstractCheck {
 
@@ -91,17 +92,17 @@ public class ModifierOrderCheck
 
     @Override
     public int[] getDefaultTokens() {
-        return getAcceptableTokens();
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {TokenTypes.MODIFIERS};
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getAcceptableTokens();
+        return new int[] {TokenTypes.MODIFIERS};
     }
 
     @Override
@@ -117,15 +118,14 @@ public class ModifierOrderCheck
             final DetailAST error = checkOrderSuggestedByJls(mods);
             if (error != null) {
                 if (error.getType() == TokenTypes.ANNOTATION) {
-                    log(error.getLineNo(), error.getColumnNo(),
+                    log(error,
                             MSG_ANNOTATION_ORDER,
                              error.getFirstChild().getText()
                              + error.getFirstChild().getNextSibling()
                                 .getText());
                 }
                 else {
-                    log(error.getLineNo(), error.getColumnNo(),
-                            MSG_MODIFIER_ORDER, error.getText());
+                    log(error, MSG_MODIFIER_ORDER, error.getText());
                 }
             }
         }
@@ -153,7 +153,6 @@ public class ModifierOrderCheck
 
             while (modifier != null
                     && offendingModifier == null) {
-
                 if (modifier.getType() == TokenTypes.ANNOTATION) {
                     if (!isAnnotationOnType(modifier)) {
                         //Annotation not at start of modifiers, bad
@@ -220,4 +219,5 @@ public class ModifierOrderCheck
         }
         return annotationOnType;
     }
+
 }

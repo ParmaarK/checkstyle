@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,10 +19,11 @@
 
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CheckUtils;
+import com.puppycrawl.tools.checkstyle.utils.CheckUtil;
 
 /**
  * <p>
@@ -41,8 +42,8 @@ import com.puppycrawl.tools.checkstyle.utils.CheckUtils;
  * <pre>
  * &lt;module name="MultipleVariableDeclarations"/&gt;
  * </pre>
- * @author o_sukhodolsky
  */
+@StatelessCheck
 public class MultipleVariableDeclarationsCheck extends AbstractCheck {
 
     /**
@@ -59,17 +60,17 @@ public class MultipleVariableDeclarationsCheck extends AbstractCheck {
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {TokenTypes.VARIABLE_DEF};
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getDefaultTokens() {
-        return getAcceptableTokens();
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getAcceptableTokens();
+        return new int[] {TokenTypes.VARIABLE_DEF};
     }
 
     @Override
@@ -86,7 +87,7 @@ public class MultipleVariableDeclarationsCheck extends AbstractCheck {
 
             if (nextNode != null
                     && nextNode.getType() == TokenTypes.VARIABLE_DEF) {
-                final DetailAST firstNode = CheckUtils.getFirstNode(ast);
+                final DetailAST firstNode = CheckUtil.getFirstNode(ast);
                 if (isCommaSeparated) {
                     // Check if the multiple variable declarations are in a
                     // for loop initializer. If they are, then no warning
@@ -100,7 +101,7 @@ public class MultipleVariableDeclarationsCheck extends AbstractCheck {
                 }
                 else {
                     final DetailAST lastNode = getLastNode(ast);
-                    final DetailAST firstNextNode = CheckUtils.getFirstNode(nextNode);
+                    final DetailAST firstNextNode = CheckUtil.getFirstNode(nextNode);
 
                     if (firstNextNode.getLineNo() == lastNode.getLineNo()) {
                         log(firstNode, MSG_MULTIPLE);
@@ -130,4 +131,5 @@ public class MultipleVariableDeclarationsCheck extends AbstractCheck {
 
         return currentNode;
     }
+
 }

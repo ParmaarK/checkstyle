@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.regex.Pattern;
 
+import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -38,8 +39,8 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * thereby leading to code catching the exception to draw incorrect
  * conclusions based on the state.</p>
  *
- * @author <a href="mailto:simon@redhillconsulting.com.au">Simon Harris</a>
  */
+@FileStatefulCheck
 public final class MutableExceptionCheck extends AbstractCheck {
 
     /**
@@ -77,17 +78,17 @@ public final class MutableExceptionCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[] {TokenTypes.CLASS_DEF, TokenTypes.VARIABLE_DEF};
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getDefaultTokens();
+        return new int[] {TokenTypes.CLASS_DEF, TokenTypes.VARIABLE_DEF};
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {TokenTypes.CLASS_DEF, TokenTypes.VARIABLE_DEF};
+        return getRequiredTokens();
     }
 
     @Override
@@ -135,8 +136,7 @@ public final class MutableExceptionCheck extends AbstractCheck {
                 ast.findFirstToken(TokenTypes.MODIFIERS);
 
             if (modifiersAST.findFirstToken(TokenTypes.FINAL) == null) {
-                log(ast.getLineNo(), ast.getColumnNo(), MSG_KEY,
-                        ast.findFirstToken(TokenTypes.IDENT).getText());
+                log(ast, MSG_KEY, ast.findFirstToken(TokenTypes.IDENT).getText());
             }
         }
     }
@@ -169,4 +169,5 @@ public final class MutableExceptionCheck extends AbstractCheck {
         }
         return result;
     }
+
 }

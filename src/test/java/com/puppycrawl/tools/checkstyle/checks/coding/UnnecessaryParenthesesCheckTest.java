@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,7 @@ package com.puppycrawl.tools.checkstyle.checks.coding;
 import static com.puppycrawl.tools.checkstyle.checks.coding.UnnecessaryParenthesesCheck.MSG_ASSIGN;
 import static com.puppycrawl.tools.checkstyle.checks.coding.UnnecessaryParenthesesCheck.MSG_EXPR;
 import static com.puppycrawl.tools.checkstyle.checks.coding.UnnecessaryParenthesesCheck.MSG_IDENT;
+import static com.puppycrawl.tools.checkstyle.checks.coding.UnnecessaryParenthesesCheck.MSG_LAMBDA;
 import static com.puppycrawl.tools.checkstyle.checks.coding.UnnecessaryParenthesesCheck.MSG_LITERAL;
 import static com.puppycrawl.tools.checkstyle.checks.coding.UnnecessaryParenthesesCheck.MSG_RETURN;
 import static com.puppycrawl.tools.checkstyle.checks.coding.UnnecessaryParenthesesCheck.MSG_STRING;
@@ -31,14 +32,14 @@ import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * Test fixture for the UnnecessaryParenthesesCheck.
  *
- * @author  Eric K. Roe
  */
 public class UnnecessaryParenthesesCheckTest extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/coding/unnecessaryparentheses";
@@ -47,7 +48,7 @@ public class UnnecessaryParenthesesCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testDefault() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(UnnecessaryParenthesesCheck.class);
+            createModuleConfig(UnnecessaryParenthesesCheck.class);
 
         final String[] expected = {
             "5:22: " + getCheckMessage(MSG_ASSIGN),
@@ -94,6 +95,8 @@ public class UnnecessaryParenthesesCheckTest extends AbstractModuleTestSupport {
             "81:11: " + getCheckMessage(MSG_ASSIGN),
             "81:16: " + getCheckMessage(MSG_LITERAL, "3"),
             "82:39: " + getCheckMessage(MSG_ASSIGN),
+            "93:11: " + getCheckMessage(MSG_ASSIGN),
+            "93:14: " + getCheckMessage(MSG_STRING, "\"12345678901234567890123\""),
         };
 
         verify(checkConfig, getPath("InputUnnecessaryParenthesesOperatorsAndCasts.java"), expected);
@@ -102,16 +105,35 @@ public class UnnecessaryParenthesesCheckTest extends AbstractModuleTestSupport {
     @Test
     public void test15Extensions() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(UnnecessaryParenthesesCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+            createModuleConfig(UnnecessaryParenthesesCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputUnnecessaryParentheses15Extensions.java"), expected);
+    }
+
+    @Test
+    public void testLambdas() throws Exception {
+        final DefaultConfiguration checkConfig =
+            createModuleConfig(UnnecessaryParenthesesCheck.class);
+        checkConfig.addAttribute("tokens", "LAMBDA");
+        final String[] expected = {
+            "10:35: " + getCheckMessage(MSG_LAMBDA),
+            "11:35: " + getCheckMessage(MSG_LAMBDA),
+            "18:18: " + getCheckMessage(MSG_LAMBDA),
+            "19:57: " + getCheckMessage(MSG_LAMBDA),
+            "38:25: " + getCheckMessage(MSG_LAMBDA),
+            "38:33: " + getCheckMessage(MSG_LAMBDA),
+            "41:25: " + getCheckMessage(MSG_LAMBDA),
+            "44:31: " + getCheckMessage(MSG_LAMBDA),
+        };
+        verify(checkConfig, getPath("InputUnnecessaryParenthesesLambdas.java"), expected);
     }
 
     @Test
     public void testTokensNotNull() {
         final UnnecessaryParenthesesCheck check = new UnnecessaryParenthesesCheck();
-        Assert.assertNotNull(check.getDefaultTokens());
-        Assert.assertNotNull(check.getAcceptableTokens());
-        Assert.assertNotNull(check.getRequiredTokens());
+        Assert.assertNotNull("Acceptable tokens should not be null", check.getAcceptableTokens());
+        Assert.assertNotNull("Default tokens should not be null", check.getDefaultTokens());
+        Assert.assertNotNull("Required tokens should not be null", check.getRequiredTokens());
     }
+
 }

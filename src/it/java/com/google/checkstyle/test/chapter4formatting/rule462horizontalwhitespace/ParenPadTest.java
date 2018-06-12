@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,26 +19,21 @@
 
 package com.google.checkstyle.test.chapter4formatting.rule462horizontalwhitespace;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.junit.Test;
 
-import com.google.checkstyle.test.base.BaseCheckTestSupport;
+import com.google.checkstyle.test.base.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 import com.puppycrawl.tools.checkstyle.checks.whitespace.ParenPadCheck;
 
-public class ParenPadTest extends BaseCheckTestSupport {
+public class ParenPadTest extends AbstractModuleTestSupport {
 
     @Override
-    protected String getPath(String fileName) throws IOException {
-        return super.getPath("chapter4formatting" + File.separator + "rule462horizontalwhitespace"
-                + File.separator + fileName);
+    protected String getPackageLocation() {
+        return "com/google/checkstyle/test/chapter4formatting/rule462horizontalwhitespace";
     }
 
     @Test
     public void testMethodParen() throws Exception {
-
         final Class<ParenPadCheck> clazz = ParenPadCheck.class;
         final String messageKeyPreceded = "ws.preceded";
         final String messageKeyFollowed = "ws.followed";
@@ -162,11 +157,14 @@ public class ParenPadTest extends BaseCheckTestSupport {
             "212:49: " + getCheckMessage(clazz, messageKeyFollowed, "("),
             "212:51: " + getCheckMessage(clazz, messageKeyPreceded, ")"),
             "212:53: " + getCheckMessage(clazz, messageKeyPreceded, ")"),
+            "220:36: " + getCheckMessage(clazz, messageKeyPreceded, ")"),
+            "221:60: " + getCheckMessage(clazz, messageKeyPreceded, ")"),
         };
-        final Configuration checkConfig = getCheckConfig("ParenPad");
+        final Configuration checkConfig = getModuleConfig("ParenPad");
         final String filePath = getPath("InputParenPad.java");
 
         final Integer[] warnList = getLinesWithWarn(filePath);
         verify(checkConfig, filePath, expected, warnList);
     }
+
 }

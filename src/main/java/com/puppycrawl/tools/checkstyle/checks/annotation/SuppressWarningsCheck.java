@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,11 +22,12 @@ package com.puppycrawl.tools.checkstyle.checks.annotation;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.AnnotationUtility;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.AnnotationUtil;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * <p>
@@ -87,9 +88,10 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
  *        &quot;/&gt;
  * &lt;/module&gt;
  * </pre>
- * @author Travis Schneeberger
  */
+@StatelessCheck
 public class SuppressWarningsCheck extends AbstractCheck {
+
     /**
      * A key is pointing to the warning message text in "messages.properties"
      * file.
@@ -141,7 +143,7 @@ public class SuppressWarningsCheck extends AbstractCheck {
 
     @Override
     public int[] getRequiredTokens() {
-        return CommonUtils.EMPTY_INT_ARRAY;
+        return CommonUtil.EMPTY_INT_ARRAY;
     }
 
     @Override
@@ -167,8 +169,7 @@ public class SuppressWarningsCheck extends AbstractCheck {
             //rare case with empty array ex: @SuppressWarnings({})
             if (warning == null) {
                 //check to see if empty warnings are forbidden -- are by default
-                logMatch(warningHolder.getLineNo(),
-                    warningHolder.getColumnNo(), "");
+                logMatch(warningHolder, "");
             }
             else {
                 while (warning != null) {
@@ -179,8 +180,7 @@ public class SuppressWarningsCheck extends AbstractCheck {
                             case TokenTypes.STRING_LITERAL:
                                 final String warningText =
                                     removeQuotes(warning.getFirstChild().getText());
-                                logMatch(warning.getLineNo(),
-                                        warning.getColumnNo(), warningText);
+                                logMatch(warning, warningText);
                                 break;
                             // conditional case
                             // ex:
@@ -217,27 +217,25 @@ public class SuppressWarningsCheck extends AbstractCheck {
      * @return the {@link SuppressWarnings SuppressWarnings} annotation
      */
     private static DetailAST getSuppressWarnings(DetailAST ast) {
-        DetailAST annotation = AnnotationUtility.getAnnotation(ast, SUPPRESS_WARNINGS);
+        DetailAST annotation = AnnotationUtil.getAnnotation(ast, SUPPRESS_WARNINGS);
 
         if (annotation == null) {
-            annotation = AnnotationUtility.getAnnotation(ast, FQ_SUPPRESS_WARNINGS);
+            annotation = AnnotationUtil.getAnnotation(ast, FQ_SUPPRESS_WARNINGS);
         }
         return annotation;
     }
 
     /**
      * This method looks for a warning that matches a configured expression.
-     * If found it logs a violation at the given line and column number.
+     * If found it logs a violation at the given AST.
      *
-     * @param lineNo the line number
-     * @param colNum the column number
+     * @param ast the location to place the violation
      * @param warningText the warning.
      */
-    private void logMatch(final int lineNo,
-        final int colNum, final String warningText) {
+    private void logMatch(DetailAST ast, final String warningText) {
         final Matcher matcher = format.matcher(warningText);
         if (matcher.matches()) {
-            log(lineNo, colNum,
+            log(ast,
                     MSG_KEY_SUPPRESSED_WARNING_NOT_ALLOWED, warningText);
         }
     }
@@ -302,7 +300,7 @@ public class SuppressWarningsCheck extends AbstractCheck {
         else {
             final String warningText =
                     removeQuotes(cond.getText());
-            logMatch(cond.getLineNo(), cond.getColumnNo(), warningText);
+            logMatch(cond, warningText);
         }
     }
 
@@ -331,4 +329,5 @@ public class SuppressWarningsCheck extends AbstractCheck {
         final DetailAST colon = cond.findFirstToken(TokenTypes.COLON);
         return colon.getNextSibling();
     }
+
 }

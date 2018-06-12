@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -29,6 +29,7 @@ import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 
 public class MultipleVariableDeclarationsCheckTest extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/coding/multiplevariabledeclarations";
@@ -37,7 +38,7 @@ public class MultipleVariableDeclarationsCheckTest extends AbstractModuleTestSup
     @Test
     public void testIt() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(MultipleVariableDeclarationsCheck.class);
+            createModuleConfig(MultipleVariableDeclarationsCheck.class);
 
         final String[] expected = {
             "4:5: " + getCheckMessage(MSG_MULTIPLE_COMMA),
@@ -46,6 +47,9 @@ public class MultipleVariableDeclarationsCheckTest extends AbstractModuleTestSup
             "9:9: " + getCheckMessage(MSG_MULTIPLE),
             "13:5: " + getCheckMessage(MSG_MULTIPLE),
             "16:5: " + getCheckMessage(MSG_MULTIPLE),
+            "35:9: " + getCheckMessage(MSG_MULTIPLE),
+            "35:31: " + getCheckMessage(MSG_MULTIPLE),
+            "35:44: " + getCheckMessage(MSG_MULTIPLE),
         };
 
         verify(checkConfig,
@@ -56,8 +60,9 @@ public class MultipleVariableDeclarationsCheckTest extends AbstractModuleTestSup
     @Test
     public void testTokensNotNull() {
         final MultipleVariableDeclarationsCheck check = new MultipleVariableDeclarationsCheck();
-        Assert.assertNotNull(check.getAcceptableTokens());
-        Assert.assertNotNull(check.getDefaultTokens());
-        Assert.assertNotNull(check.getRequiredTokens());
+        Assert.assertNotNull("Acceptable tokens should not be null", check.getAcceptableTokens());
+        Assert.assertNotNull("Default tokens should not be null", check.getDefaultTokens());
+        Assert.assertNotNull("Required tokens should not be null", check.getRequiredTokens());
     }
+
 }

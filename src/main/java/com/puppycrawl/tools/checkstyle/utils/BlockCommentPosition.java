@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -24,7 +24,6 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
  * Utility class that has methods to check javadoc comment position in java file.
- * @author bizmailov
  *
  */
 public final class BlockCommentPosition {
@@ -33,6 +32,18 @@ public final class BlockCommentPosition {
      * Forbid new instances.
      */
     private BlockCommentPosition() {
+    }
+
+    /**
+     * Node is on type definition.
+     * @param blockComment DetailAST
+     * @return true if node is before class, interface, enum or annotation.
+     */
+    public static boolean isOnType(DetailAST blockComment) {
+        return isOnClass(blockComment)
+                || isOnInterface(blockComment)
+                || isOnEnum(blockComment)
+                || isOnAnnotationDef(blockComment);
     }
 
     /**
@@ -77,6 +88,20 @@ public final class BlockCommentPosition {
         return isOnPlainToken(blockComment, TokenTypes.ANNOTATION_DEF, TokenTypes.AT)
                 || isOnTokenWithModifiers(blockComment, TokenTypes.ANNOTATION_DEF)
                 || isOnTokenWithAnnotation(blockComment, TokenTypes.ANNOTATION_DEF);
+    }
+
+    /**
+     * Node is on type member declaration.
+     * @param blockComment DetailAST
+     * @return true if node is before method, field, constructor, enum constant
+     *     or annotation field
+     */
+    public static boolean isOnMember(DetailAST blockComment) {
+        return isOnMethod(blockComment)
+                || isOnField(blockComment)
+                || isOnConstructor(blockComment)
+                || isOnEnumConstant(blockComment)
+                || isOnAnnotationField(blockComment);
     }
 
     /**
@@ -130,6 +155,17 @@ public final class BlockCommentPosition {
     }
 
     /**
+     * Node is on annotation field declaration.
+     * @param blockComment DetailAST
+     * @return true if node is before annotation field
+     */
+    public static boolean isOnAnnotationField(DetailAST blockComment) {
+        return isOnPlainClassMember(blockComment, TokenTypes.ANNOTATION_FIELD_DEF)
+                || isOnTokenWithModifiers(blockComment, TokenTypes.ANNOTATION_FIELD_DEF)
+                || isOnTokenWithAnnotation(blockComment, TokenTypes.ANNOTATION_FIELD_DEF);
+    }
+
+    /**
      * Checks that block comment is on specified token without any modifiers.
      * @param blockComment block comment start DetailAST
      * @param parentTokenType parent token type
@@ -179,11 +215,16 @@ public final class BlockCommentPosition {
      * @return true if block comment is on specified token without modifiers
      */
     private static boolean isOnPlainClassMember(DetailAST blockComment, int memberType) {
-        return blockComment.getParent() != null
-                && blockComment.getParent().getType() == TokenTypes.TYPE
-                && blockComment.getParent().getParent().getType() == memberType
+        DetailAST parent = blockComment.getParent();
+        // type could be in fully qualified form, so we go up to Type token
+        while (parent != null && parent.getType() == TokenTypes.DOT) {
+            parent = parent.getParent();
+        }
+        return parent != null
+                && parent.getType() == TokenTypes.TYPE
+                && parent.getParent().getType() == memberType
                 // previous parent sibling is always TokenTypes.MODIFIERS
-                && blockComment.getParent().getPreviousSibling().getChildCount() == 0;
+                && parent.getPreviousSibling().getChildCount() == 0;
     }
 
     /**
@@ -214,4 +255,5 @@ public final class BlockCommentPosition {
         }
         return result;
     }
+
 }

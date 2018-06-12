@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,11 +19,12 @@
 
 package com.puppycrawl.tools.checkstyle.checks.imports;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FullIdent;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * <p>
@@ -60,8 +61,8 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
  * each static member in the Math class individually like
  * java.lang.Math.PI
  * </p>
- * @author Travis Schneeberger
  */
+@StatelessCheck
 public class AvoidStaticImportCheck
     extends AbstractCheck {
 
@@ -72,21 +73,21 @@ public class AvoidStaticImportCheck
     public static final String MSG_KEY = "import.avoidStatic";
 
     /** The classes/static members to exempt from this check. */
-    private String[] excludes = CommonUtils.EMPTY_STRING_ARRAY;
+    private String[] excludes = CommonUtil.EMPTY_STRING_ARRAY;
 
     @Override
     public int[] getDefaultTokens() {
-        return getAcceptableTokens();
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {TokenTypes.STATIC_IMPORT};
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getAcceptableTokens();
+        return new int[] {TokenTypes.STATIC_IMPORT};
     }
 
     /**
@@ -156,4 +157,5 @@ public class AvoidStaticImportCheck
         }
         return result;
     }
+
 }

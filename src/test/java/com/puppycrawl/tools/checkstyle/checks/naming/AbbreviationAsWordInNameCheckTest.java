@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,20 +25,19 @@ import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class AbbreviationAsWordInNameCheckTest extends AbstractModuleTestSupport {
 
     @Override
     protected String getPackageLocation() {
-        return "com/puppycrawl/tools/checkstyle/checks/naming/abbrevationaswordinname";
+        return "com/puppycrawl/tools/checkstyle/checks/naming/abbreviationaswordinname";
     }
 
     @Test
     public void testTypeNamesForThreePermittedCapitalLetters() throws Exception {
-
         final DefaultConfiguration checkConfig =
-            createCheckConfig(AbbreviationAsWordInNameCheck.class);
+            createModuleConfig(AbbreviationAsWordInNameCheck.class);
         checkConfig.addAttribute("allowedAbbreviationLength", "3");
         checkConfig.addAttribute("allowedAbbreviations", "III");
         checkConfig.addAttribute("tokens", "CLASS_DEF");
@@ -57,9 +56,8 @@ public class AbbreviationAsWordInNameCheckTest extends AbstractModuleTestSupport
 
     @Test
     public void testTypeNamesForFourPermittedCapitalLetters() throws Exception {
-
         final DefaultConfiguration checkConfig =
-            createCheckConfig(AbbreviationAsWordInNameCheck.class);
+            createModuleConfig(AbbreviationAsWordInNameCheck.class);
         checkConfig.addAttribute("allowedAbbreviationLength", "4");
         checkConfig.addAttribute("allowedAbbreviations", "CLASS,FACTORY");
         checkConfig.addAttribute("tokens", "CLASS_DEF");
@@ -75,9 +73,8 @@ public class AbbreviationAsWordInNameCheckTest extends AbstractModuleTestSupport
 
     @Test
     public void testTypeNamesForFivePermittedCapitalLetters() throws Exception {
-
         final DefaultConfiguration checkConfig =
-            createCheckConfig(AbbreviationAsWordInNameCheck.class);
+            createModuleConfig(AbbreviationAsWordInNameCheck.class);
         checkConfig.addAttribute("allowedAbbreviationLength", "5");
         checkConfig.addAttribute("allowedAbbreviations", "CLASS");
         checkConfig.addAttribute("tokens", "CLASS_DEF");
@@ -93,9 +90,8 @@ public class AbbreviationAsWordInNameCheckTest extends AbstractModuleTestSupport
 
     @Test
     public void testTypeAndVariablesAndMethodNames() throws Exception {
-
         final DefaultConfiguration checkConfig =
-            createCheckConfig(AbbreviationAsWordInNameCheck.class);
+            createModuleConfig(AbbreviationAsWordInNameCheck.class);
         checkConfig.addAttribute("allowedAbbreviationLength", "5");
         checkConfig.addAttribute("allowedAbbreviations", "CLASS");
         checkConfig.addAttribute("tokens", "CLASS_DEF"
@@ -119,9 +115,8 @@ public class AbbreviationAsWordInNameCheckTest extends AbstractModuleTestSupport
 
     @Test
     public void testTypeAndVariablesAndMethodNamesWithNoIgnores() throws Exception {
-
         final DefaultConfiguration checkConfig =
-            createCheckConfig(AbbreviationAsWordInNameCheck.class);
+            createModuleConfig(AbbreviationAsWordInNameCheck.class);
         checkConfig.addAttribute("allowedAbbreviationLength", "5");
         checkConfig.addAttribute("allowedAbbreviations", "NUMBER,MARAZMATIC,VARIABLE");
         checkConfig.addAttribute("ignoreStatic", "false");
@@ -148,9 +143,8 @@ public class AbbreviationAsWordInNameCheckTest extends AbstractModuleTestSupport
 
     @Test
     public void testTypeAndVariablesAndMethodNamesWithIgnores() throws Exception {
-
         final DefaultConfiguration checkConfig =
-            createCheckConfig(AbbreviationAsWordInNameCheck.class);
+            createModuleConfig(AbbreviationAsWordInNameCheck.class);
         checkConfig.addAttribute("allowedAbbreviationLength", "5");
         checkConfig.addAttribute("allowedAbbreviations", "NUMBER,MARAZMATIC,VARIABLE");
         checkConfig.addAttribute("ignoreStatic", "true");
@@ -173,9 +167,8 @@ public class AbbreviationAsWordInNameCheckTest extends AbstractModuleTestSupport
 
     @Test
     public void testTypeAndVariablesAndMethodNamesWithIgnoresFinal() throws Exception {
-
         final DefaultConfiguration checkConfig =
-            createCheckConfig(AbbreviationAsWordInNameCheck.class);
+            createModuleConfig(AbbreviationAsWordInNameCheck.class);
         checkConfig.addAttribute("allowedAbbreviationLength", "4");
         checkConfig.addAttribute("allowedAbbreviations", "MARAZMATIC,VARIABLE");
         checkConfig.addAttribute("ignoreStatic", "false");
@@ -202,9 +195,8 @@ public class AbbreviationAsWordInNameCheckTest extends AbstractModuleTestSupport
 
     @Test
     public void testTypeAndVariablesAndMethodNamesWithIgnoresStatic() throws Exception {
-
         final DefaultConfiguration checkConfig =
-            createCheckConfig(AbbreviationAsWordInNameCheck.class);
+            createModuleConfig(AbbreviationAsWordInNameCheck.class);
         checkConfig.addAttribute("allowedAbbreviationLength", "5");
         checkConfig.addAttribute("allowedAbbreviations", "MARAZMATIC,VARIABLE");
         checkConfig.addAttribute("ignoreStatic", "true");
@@ -231,9 +223,8 @@ public class AbbreviationAsWordInNameCheckTest extends AbstractModuleTestSupport
     @Test
     public void testTypeNamesForThreePermittedCapitalLettersWithOverriddenMethod()
             throws Exception {
-
         final DefaultConfiguration checkConfig =
-            createCheckConfig(AbbreviationAsWordInNameCheck.class);
+            createModuleConfig(AbbreviationAsWordInNameCheck.class);
         checkConfig.addAttribute("allowedAbbreviationLength", "3");
         checkConfig.addAttribute("allowedAbbreviations", "");
         checkConfig.addAttribute("tokens", "CLASS_DEF, METHOD_DEF");
@@ -251,7 +242,7 @@ public class AbbreviationAsWordInNameCheckTest extends AbstractModuleTestSupport
     @Test
     public void testTypeNamesForZeroPermittedCapitalLetter() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(AbbreviationAsWordInNameCheck.class);
+                createModuleConfig(AbbreviationAsWordInNameCheck.class);
         checkConfig.addAttribute("allowedAbbreviationLength",
                 "0");
         checkConfig.addAttribute("allowedAbbreviations", "");
@@ -299,14 +290,13 @@ public class AbbreviationAsWordInNameCheckTest extends AbstractModuleTestSupport
 
     @Test
     public void testNullPointerException() throws Exception {
-
         final DefaultConfiguration checkConfig =
-            createCheckConfig(AbbreviationAsWordInNameCheck.class);
+            createModuleConfig(AbbreviationAsWordInNameCheck.class);
         checkConfig.addAttribute("allowedAbbreviationLength", "2");
         checkConfig.addAttribute("ignoreFinal", "false");
         checkConfig.addAttribute("allowedAbbreviations", null);
 
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
         verify(checkConfig,
                 getPath("InputAbbreviationAsWordInNameAbstractMultisetSetCount.java"),
@@ -320,10 +310,11 @@ public class AbbreviationAsWordInNameCheckTest extends AbstractModuleTestSupport
     @Test
     public void testReceiver() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(AbbreviationAsWordInNameCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+            createModuleConfig(AbbreviationAsWordInNameCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
         verify(checkConfig, getPath("InputAbbreviationAsWordInNameReceiver.java"),
                 expected);
     }
+
 }

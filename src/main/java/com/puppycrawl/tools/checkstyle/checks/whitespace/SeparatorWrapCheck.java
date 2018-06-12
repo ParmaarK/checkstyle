@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,10 +21,11 @@ package com.puppycrawl.tools.checkstyle.checks.whitespace;
 
 import java.util.Locale;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * <p>
@@ -78,8 +79,8 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
  * &lt;/module&gt;
  * </pre>
  *
- * @author maxvetrenko
  */
+@StatelessCheck
 public class SeparatorWrapCheck
     extends AbstractCheck {
 
@@ -138,7 +139,7 @@ public class SeparatorWrapCheck
 
     @Override
     public int[] getRequiredTokens() {
-        return CommonUtils.EMPTY_INT_ARRAY;
+        return CommonUtil.EMPTY_INT_ARRAY;
     }
 
     @Override
@@ -154,11 +155,12 @@ public class SeparatorWrapCheck
 
         if (option == WrapOption.EOL
                 && substringBeforeToken.isEmpty()) {
-            log(lineNo, colNo, MSG_LINE_PREVIOUS, text);
+            log(ast, MSG_LINE_PREVIOUS, text);
         }
         else if (option == WrapOption.NL
                  && substringAfterToken.isEmpty()) {
-            log(lineNo, colNo, MSG_LINE_NEW, text);
+            log(ast, MSG_LINE_NEW, text);
         }
     }
+
 }

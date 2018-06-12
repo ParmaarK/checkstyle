@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -30,9 +30,10 @@ import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class ClassFanOutComplexityCheckTest extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/metrics/classfanoutcomplexity";
@@ -41,7 +42,7 @@ public class ClassFanOutComplexityCheckTest extends AbstractModuleTestSupport {
     @Test
     public void test() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ClassFanOutComplexityCheck.class);
+            createModuleConfig(ClassFanOutComplexityCheck.class);
 
         checkConfig.addAttribute("max", "0");
 
@@ -56,12 +57,12 @@ public class ClassFanOutComplexityCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testExcludedPackagesDirectPackages() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ClassFanOutComplexityCheck.class);
+            createModuleConfig(ClassFanOutComplexityCheck.class);
 
         checkConfig.addAttribute("max", "0");
         checkConfig.addAttribute("excludedPackages",
-            "com.puppycrawl.tools.checkstyle.checks.metrics.inputs.c,"
-                + "com.puppycrawl.tools.checkstyle.checks.metrics.inputs.b");
+            "com.puppycrawl.tools.checkstyle.checks.metrics.classfanoutcomplexity.inputs.c,"
+                + "com.puppycrawl.tools.checkstyle.checks.metrics.classfanoutcomplexity.inputs.b");
 
         final String[] expected = {
             "8:1: " + getCheckMessage(MSG_KEY, 2, 0),
@@ -74,7 +75,7 @@ public class ClassFanOutComplexityCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testExcludedPackagesCommonPackages() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ClassFanOutComplexityCheck.class);
+            createModuleConfig(ClassFanOutComplexityCheck.class);
 
         checkConfig.addAttribute("max", "0");
         checkConfig.addAttribute("excludedPackages",
@@ -92,7 +93,7 @@ public class ClassFanOutComplexityCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testExcludedPackagesCommonPackagesWithEndingDot() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ClassFanOutComplexityCheck.class);
+            createModuleConfig(ClassFanOutComplexityCheck.class);
 
         checkConfig.addAttribute("max", "0");
         checkConfig.addAttribute("excludedPackages",
@@ -118,16 +119,17 @@ public class ClassFanOutComplexityCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testExcludedPackagesAllIgnored() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ClassFanOutComplexityCheck.class);
+            createModuleConfig(ClassFanOutComplexityCheck.class);
 
         checkConfig.addAttribute("max", "0");
         checkConfig.addAttribute("excludedPackages",
-            "com.puppycrawl.tools.checkstyle.checks.metrics.inputs.a.aa,"
-                + "com.puppycrawl.tools.checkstyle.checks.metrics.inputs.a.ab,"
-                + "com.puppycrawl.tools.checkstyle.checks.metrics.inputs.b,"
-                + "com.puppycrawl.tools.checkstyle.checks.metrics.inputs.c");
+            "com.puppycrawl.tools.checkstyle.checks.metrics.classfanoutcomplexity.inputs.a.aa,"
+                + "com.puppycrawl.tools.checkstyle.checks.metrics.classfanoutcomplexity."
+                    + "inputs.a.ab,"
+                + "com.puppycrawl.tools.checkstyle.checks.metrics.classfanoutcomplexity.inputs.b,"
+                + "com.puppycrawl.tools.checkstyle.checks.metrics.classfanoutcomplexity.inputs.c");
 
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig,
             getPath("InputClassFanOutComplexityExcludedPackagesAllIgnored.java"), expected);
     }
@@ -135,11 +137,11 @@ public class ClassFanOutComplexityCheckTest extends AbstractModuleTestSupport {
     @Test
     public void test15() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ClassFanOutComplexityCheck.class);
+            createModuleConfig(ClassFanOutComplexityCheck.class);
 
         checkConfig.addAttribute("max", "0");
 
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
         verify(checkConfig, getPath("InputClassFanOutComplexity15Extensions.java"), expected);
     }
@@ -147,10 +149,10 @@ public class ClassFanOutComplexityCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testDefaultConfiguration() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ClassFanOutComplexityCheck.class);
+            createModuleConfig(ClassFanOutComplexityCheck.class);
 
         createChecker(checkConfig);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputClassFanOutComplexity.java"), expected);
     }
 
@@ -177,7 +179,7 @@ public class ClassFanOutComplexityCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testRegularExpression() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(ClassFanOutComplexityCheck.class);
+                createModuleConfig(ClassFanOutComplexityCheck.class);
 
         checkConfig.addAttribute("max", "0");
         checkConfig.addAttribute("excludeClassesRegexps", "^Inner.*");
@@ -193,7 +195,7 @@ public class ClassFanOutComplexityCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testEmptyRegularExpression() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(ClassFanOutComplexityCheck.class);
+                createModuleConfig(ClassFanOutComplexityCheck.class);
 
         checkConfig.addAttribute("max", "0");
         checkConfig.addAttribute("excludeClassesRegexps", "");
@@ -205,4 +207,27 @@ public class ClassFanOutComplexityCheckTest extends AbstractModuleTestSupport {
 
         verify(checkConfig, getPath("InputClassFanOutComplexity.java"), expected);
     }
+
+    @Test
+    public void testWithMultiDimensionalArray() throws Exception {
+        final DefaultConfiguration moduleConfig =
+                createModuleConfig(ClassFanOutComplexityCheck.class);
+        moduleConfig.addAttribute("max", "0");
+
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
+        verify(moduleConfig,
+                getPath("InputClassFanOutComplexityMultiDimensionalArray.java"), expected);
+    }
+
+    @Test
+    public void testPackageName() throws Exception {
+        final DefaultConfiguration moduleConfig =
+                createModuleConfig(ClassFanOutComplexityCheck.class);
+        moduleConfig.addAttribute("max", "0");
+
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
+        verify(moduleConfig,
+                getPath("InputClassFanOutComplexityPackageName.java"), expected);
+    }
+
 }

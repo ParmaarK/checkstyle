@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -29,11 +29,11 @@ public class PropertiesExpanderTest {
     @Test
     public void testCtorException() {
         try {
-            new PropertiesExpander(null);
-            Assert.fail("exception expected");
+            final Object test = new PropertiesExpander(null);
+            Assert.fail("exception expected but got " + test);
         }
         catch (IllegalArgumentException ex) {
-            Assert.assertEquals("cannot pass null", ex.getMessage());
+            Assert.assertEquals("Invalid exception message", "cannot pass null", ex.getMessage());
         }
     }
 
@@ -41,11 +41,16 @@ public class PropertiesExpanderTest {
     public void testDefaultProperties() {
         final Properties properties = new Properties(System.getProperties());
         properties.setProperty("test", "checkstyle");
-        Assert.assertEquals(System.getProperty("user.home"), properties.getProperty("user.home"));
-        Assert.assertEquals("checkstyle", properties.getProperty("test"));
+        Assert.assertEquals("Invalid user.home property",
+                System.getProperty("user.home"), properties.getProperty("user.home"));
+        Assert.assertEquals("Invalid checkstyle property",
+                "checkstyle", properties.getProperty("test"));
 
         final PropertiesExpander expander = new PropertiesExpander(properties);
-        Assert.assertEquals(System.getProperty("user.home"), expander.resolve("user.home"));
-        Assert.assertEquals("checkstyle", expander.resolve("test"));
+        Assert.assertEquals("Invalid user.home property",
+                System.getProperty("user.home"), expander.resolve("user.home"));
+        Assert.assertEquals("Invalid checkstyle property",
+                "checkstyle", expander.resolve("test"));
     }
+
 }

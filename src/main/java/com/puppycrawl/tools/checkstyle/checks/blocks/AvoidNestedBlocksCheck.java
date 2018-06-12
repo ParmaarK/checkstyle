@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,6 +19,7 @@
 
 package com.puppycrawl.tools.checkstyle.checks.blocks;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -82,9 +83,10 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * }
  * </pre>
  *
- * @author lkuehne
  */
+@StatelessCheck
 public class AvoidNestedBlocksCheck extends AbstractCheck {
+
     /**
      * A key is pointing to the warning message text in "messages.properties"
      * file.
@@ -99,17 +101,17 @@ public class AvoidNestedBlocksCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return getAcceptableTokens();
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {TokenTypes.SLIST};
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getAcceptableTokens();
+        return new int[] {TokenTypes.SLIST};
     }
 
     @Override
@@ -119,7 +121,7 @@ public class AvoidNestedBlocksCheck extends AbstractCheck {
                 && (!allowInSwitchCase
                     || parent.getParent().getType() != TokenTypes.CASE_GROUP
                     || parent.getNumberOfChildren() != 1)) {
-            log(ast.getLineNo(), ast.getColumnNo(), MSG_KEY_BLOCK_NESTED);
+            log(ast, MSG_KEY_BLOCK_NESTED);
         }
     }
 
@@ -131,4 +133,5 @@ public class AvoidNestedBlocksCheck extends AbstractCheck {
     public void setAllowInSwitchCase(boolean allowInSwitchCase) {
         this.allowInSwitchCase = allowInSwitchCase;
     }
+
 }

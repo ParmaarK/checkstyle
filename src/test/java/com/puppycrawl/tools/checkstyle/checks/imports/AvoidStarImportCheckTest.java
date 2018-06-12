@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -30,6 +30,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 public class AvoidStarImportCheckTest
     extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/imports/avoidstarimport";
@@ -39,7 +40,7 @@ public class AvoidStarImportCheckTest
     public void testDefaultOperation()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(AvoidStarImportCheck.class);
+            createModuleConfig(AvoidStarImportCheck.class);
         final String[] expected = {
             "7: " + getCheckMessage(MSG_KEY, "com.puppycrawl.tools.checkstyle.checks.imports.*"),
             "9: " + getCheckMessage(MSG_KEY, "java.io.*"),
@@ -57,7 +58,7 @@ public class AvoidStarImportCheckTest
     public void testExcludes()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(AvoidStarImportCheck.class);
+            createModuleConfig(AvoidStarImportCheck.class);
         checkConfig.addAttribute("excludes",
             "java.io,java.lang,javax.swing.WindowConstants.*, javax.swing.WindowConstants");
         // allow the java.io/java.lang,javax.swing.WindowConstants star imports
@@ -71,7 +72,7 @@ public class AvoidStarImportCheckTest
 
     @Test
     public void testAllowClassImports() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(AvoidStarImportCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(AvoidStarImportCheck.class);
         checkConfig.addAttribute("allowClassImports", "true");
         // allow all class star imports
         final String[] expected2 = {
@@ -83,7 +84,7 @@ public class AvoidStarImportCheckTest
 
     @Test
     public void testAllowStaticMemberImports() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(AvoidStarImportCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(AvoidStarImportCheck.class);
         checkConfig.addAttribute("allowStaticMemberImports", "true");
         // allow all static star imports
         final String[] expected2 = {
@@ -112,4 +113,5 @@ public class AvoidStarImportCheckTest
 
         assertArrayEquals("Default required tokens are invalid", expected, actual);
     }
+
 }

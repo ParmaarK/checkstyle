@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,26 +21,50 @@ package com.puppycrawl.tools.checkstyle.checks.naming;
 
 import java.util.regex.Pattern;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
  * <p>
- * Ensures that the names of abstract classes conforming to some
- * regular expression and check that {@code abstract} modifier exists.
+ * Ensures that the names of abstract classes conforming to some regular
+ * expression and check that {@code abstract} modifier exists.
  * </p>
  * <p>
- * Rationale: Abstract classes are convenience base class
- * implementations of interfaces, not types as such. As such
- * they should be named to indicate this. Also if names of classes
- * starts with 'Abstract' it's very convenient that they will
- * have abstract modifier.
+ * Rationale: Abstract classes are convenience base class implementations of
+ * interfaces, not types as such. As such they should be named to indicate this.
+ * Also if names of classes starts with 'Abstract' it's very convenient that
+ * they will have abstract modifier.
+ * </p>
+ * <ul>
+ * <li>
+ * Property {@code format} - Specify valid identifiers. Default value is
+ * {@code "^Abstract.+$"}.</li>
+ * <li>
+ * Property {@code ignoreModifier} - Control whether to ignore checking for the
+ * {@code abstract} modifier on classes that match the name. Default value is
+ * {@code false}.</li>
+ * <li>
+ * Property {@code ignoreName} - Control whether to ignore checking the name.
+ * Realistically only useful if using the check to identify that match name and
+ * do not have the {@code abstract} modifier. Default value is
+ * {@code false}.</li>
+ * </ul>
+ * <p>
+ * The following example shows how to configure the {@code AbstractClassName} to
+ * checks names, but ignore missing {@code abstract} modifiers:
  * </p>
  *
- * @author <a href="mailto:simon@redhillconsulting.com.au">Simon Harris</a>
- * @author <a href="mailto:solid.danil@gmail.com">Danil Lopatin</a>
+ * <pre>
+ * &lt;module name="AbstractClassName"&gt;
+ *   &lt;property name="ignoreModifier" value="true"/&gt;
+ * &lt;/module&gt;
+ * </pre>
+ *
+ * @since 3.2
  */
+@StatelessCheck
 public final class AbstractClassNameCheck extends AbstractCheck {
 
     /**
@@ -55,17 +79,25 @@ public final class AbstractClassNameCheck extends AbstractCheck {
      */
     public static final String MSG_NO_ABSTRACT_CLASS_MODIFIER = "no.abstract.class.modifier";
 
-    /** Whether to ignore checking the modifier. */
+    /**
+     * Control whether to ignore checking for the {@code abstract} modifier on
+     * classes that match the name.
+     */
     private boolean ignoreModifier;
 
-    /** Whether to ignore checking the name. */
+    /**
+     * Control whether to ignore checking the name. Realistically only useful
+     * if using the check to identify that match name and do not have the
+     * {@code abstract} modifier.
+     */
     private boolean ignoreName;
 
-    /** The regexp to match against. */
+    /** Specify valid identifiers. */
     private Pattern format = Pattern.compile("^Abstract.+$");
 
     /**
-     * Whether to ignore checking for the {@code abstract} modifier.
+     * Setter to control whether to ignore checking for the {@code abstract} modifier on
+     * classes that match the name.
      * @param value new value
      */
     public void setIgnoreModifier(boolean value) {
@@ -73,7 +105,8 @@ public final class AbstractClassNameCheck extends AbstractCheck {
     }
 
     /**
-     * Whether to ignore checking the name.
+     * Setter to control whether to ignore checking the name. Realistically only useful if
+     * using the check to identify that match name and do not have the {@code abstract} modifier.
      * @param value new value.
      */
     public void setIgnoreName(boolean value) {
@@ -81,7 +114,7 @@ public final class AbstractClassNameCheck extends AbstractCheck {
     }
 
     /**
-     * Set the format for the specified regular expression.
+     * Setter to specify valid identifiers.
      * @param pattern the new pattern
      */
     public void setFormat(Pattern pattern) {
@@ -90,7 +123,7 @@ public final class AbstractClassNameCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[] {TokenTypes.CLASS_DEF};
+        return getRequiredTokens();
     }
 
     @Override
@@ -100,7 +133,7 @@ public final class AbstractClassNameCheck extends AbstractCheck {
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {TokenTypes.CLASS_DEF};
+        return getRequiredTokens();
     }
 
     @Override
@@ -118,13 +151,11 @@ public final class AbstractClassNameCheck extends AbstractCheck {
         if (isAbstract(ast)) {
             // if class has abstract modifier
             if (!ignoreName && !isMatchingClassName(className)) {
-                log(ast.getLineNo(), ast.getColumnNo(),
-                    MSG_ILLEGAL_ABSTRACT_CLASS_NAME, className, format.pattern());
+                log(ast, MSG_ILLEGAL_ABSTRACT_CLASS_NAME, className, format.pattern());
             }
         }
         else if (!ignoreModifier && isMatchingClassName(className)) {
-            log(ast.getLineNo(), ast.getColumnNo(),
-                MSG_NO_ABSTRACT_CLASS_MODIFIER, className);
+            log(ast, MSG_NO_ABSTRACT_CLASS_MODIFIER, className);
         }
     }
 
@@ -148,4 +179,5 @@ public final class AbstractClassNameCheck extends AbstractCheck {
     private boolean isMatchingClassName(String className) {
         return format.matcher(className).find();
     }
+
 }

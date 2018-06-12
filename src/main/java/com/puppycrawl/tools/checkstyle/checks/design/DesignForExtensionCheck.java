@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,19 +25,20 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.Scope;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.ScopeUtils;
-import com.puppycrawl.tools.checkstyle.utils.TokenUtils;
+import com.puppycrawl.tools.checkstyle.utils.ScopeUtil;
+import com.puppycrawl.tools.checkstyle.utils.TokenUtil;
 
 /**
  * The check finds classes that are designed for extension (subclass creation).
  *
  * <p>
  * Nothing wrong could be with founded classes.
- * This check makes sense only for library projects (not an application projects)
+ * This check makes sense only for library projects (not application projects)
  * which care of ideal OOP-design to make sure that class works in all cases even misusage.
  * Even in library projects this check most likely will find classes that are designed for extension
  * by somebody. User needs to use suppressions extensively to got a benefit from this check,
@@ -87,9 +88,8 @@ import com.puppycrawl.tools.checkstyle.utils.TokenUtils;
  * </li>
  * </ul>
  *
- * @author lkuehne
- * @author Andrei Selkin
  */
+@StatelessCheck
 public class DesignForExtensionCheck extends AbstractCheck {
 
     /**
@@ -114,20 +114,20 @@ public class DesignForExtensionCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return getAcceptableTokens();
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        // The check does not subscribe to CLASS_DEF token as now it is stateless. If the check
-        // subscribes to CLASS_DEF token it will become stateful, since we need to have additional
-        // stack to hold CLASS_DEF tokens.
-        return new int[] {TokenTypes.METHOD_DEF};
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getAcceptableTokens();
+        // The check does not subscribe to CLASS_DEF token as now it is stateless. If the check
+        // subscribes to CLASS_DEF token it will become stateful, since we need to have additional
+        // stack to hold CLASS_DEF tokens.
+        return new int[] {TokenTypes.METHOD_DEF};
     }
 
     @Override
@@ -142,12 +142,11 @@ public class DesignForExtensionCheck extends AbstractCheck {
                 && (isNativeMethod(ast)
                     || !hasEmptyImplementation(ast))
                 && !hasIgnoredAnnotation(ast, ignoredAnnotations)) {
-
             final DetailAST classDef = getNearestClassOrEnumDefinition(ast);
             if (canBeSubclassed(classDef)) {
                 final String className = classDef.findFirstToken(TokenTypes.IDENT).getText();
                 final String methodName = ast.findFirstToken(TokenTypes.IDENT).getText();
-                log(ast.getLineNo(), ast.getColumnNo(), MSG_KEY, className, methodName);
+                log(ast, MSG_KEY, className, methodName);
             }
         }
     }
@@ -158,8 +157,20 @@ public class DesignForExtensionCheck extends AbstractCheck {
      * @return true if a method has a javadoc comment.
      */
     private static boolean hasJavadocComment(DetailAST methodDef) {
-        final DetailAST modifiers = methodDef.findFirstToken(TokenTypes.MODIFIERS);
-        return modifiers.branchContains(TokenTypes.BLOCK_COMMENT_BEGIN);
+        return hasJavadocCommentOnToken(methodDef, TokenTypes.MODIFIERS)
+                || hasJavadocCommentOnToken(methodDef, TokenTypes.TYPE);
+    }
+
+    /**
+     * Checks whether a token has a javadoc comment.
+     *
+     * @param methodDef method definition token.
+     * @param tokenType token type.
+     * @return true if a token has a javadoc comment.
+     */
+    private static boolean hasJavadocCommentOnToken(DetailAST methodDef, int tokenType) {
+        final DetailAST token = methodDef.findFirstToken(tokenType);
+        return token.branchContains(TokenTypes.BLOCK_COMMENT_BEGIN);
     }
 
     /**
@@ -169,7 +180,7 @@ public class DesignForExtensionCheck extends AbstractCheck {
      */
     private static boolean isNativeMethod(DetailAST ast) {
         final DetailAST mods = ast.findFirstToken(TokenTypes.MODIFIERS);
-        return mods.branchContains(TokenTypes.LITERAL_NATIVE);
+        return mods.findFirstToken(TokenTypes.LITERAL_NATIVE) != null;
     }
 
     /**
@@ -184,10 +195,10 @@ public class DesignForExtensionCheck extends AbstractCheck {
         final DetailAST methodImplCloseBrace = methodImplOpenBrace.getLastChild();
         final Predicate<DetailAST> predicate = currentNode -> {
             return currentNode != methodImplCloseBrace
-                && !TokenUtils.isCommentType(currentNode.getType());
+                && !TokenUtil.isCommentType(currentNode.getType());
         };
         final Optional<DetailAST> methodBody =
-            TokenUtils.findFirstTokenByPredicate(methodImplOpenBrace, predicate);
+            TokenUtil.findFirstTokenByPredicate(methodImplOpenBrace, predicate);
         if (methodBody.isPresent()) {
             hasEmptyBody = false;
         }
@@ -203,12 +214,12 @@ public class DesignForExtensionCheck extends AbstractCheck {
      */
     private static boolean canBeOverridden(DetailAST methodDef) {
         final DetailAST modifiers = methodDef.findFirstToken(TokenTypes.MODIFIERS);
-        return ScopeUtils.getSurroundingScope(methodDef).isIn(Scope.PROTECTED)
-            && !ScopeUtils.isInInterfaceOrAnnotationBlock(methodDef)
-            && !modifiers.branchContains(TokenTypes.LITERAL_PRIVATE)
-            && !modifiers.branchContains(TokenTypes.ABSTRACT)
-            && !modifiers.branchContains(TokenTypes.FINAL)
-            && !modifiers.branchContains(TokenTypes.LITERAL_STATIC);
+        return ScopeUtil.getSurroundingScope(methodDef).isIn(Scope.PROTECTED)
+            && !ScopeUtil.isInInterfaceOrAnnotationBlock(methodDef)
+            && modifiers.findFirstToken(TokenTypes.LITERAL_PRIVATE) == null
+            && modifiers.findFirstToken(TokenTypes.ABSTRACT) == null
+            && modifiers.findFirstToken(TokenTypes.FINAL) == null
+            && modifiers.findFirstToken(TokenTypes.LITERAL_STATIC) == null;
     }
 
     /**
@@ -220,8 +231,8 @@ public class DesignForExtensionCheck extends AbstractCheck {
     private static boolean hasIgnoredAnnotation(DetailAST methodDef, Set<String> annotations) {
         final DetailAST modifiers = methodDef.findFirstToken(TokenTypes.MODIFIERS);
         boolean hasIgnoredAnnotation = false;
-        if (modifiers.branchContains(TokenTypes.ANNOTATION)) {
-            final Optional<DetailAST> annotation = TokenUtils.findFirstTokenByPredicate(modifiers,
+        if (modifiers.findFirstToken(TokenTypes.ANNOTATION) != null) {
+            final Optional<DetailAST> annotation = TokenUtil.findFirstTokenByPredicate(modifiers,
                 currentToken -> {
                     return currentToken.getType() == TokenTypes.ANNOTATION
                         && annotations.contains(getAnnotationName(currentToken));
@@ -273,7 +284,7 @@ public class DesignForExtensionCheck extends AbstractCheck {
     private static boolean canBeSubclassed(DetailAST classDef) {
         final DetailAST modifiers = classDef.findFirstToken(TokenTypes.MODIFIERS);
         return classDef.getType() != TokenTypes.ENUM_DEF
-            && !modifiers.branchContains(TokenTypes.FINAL)
+            && modifiers.findFirstToken(TokenTypes.FINAL) == null
             && hasDefaultOrExplicitNonPrivateCtor(classDef);
     }
 
@@ -297,7 +308,7 @@ public class DesignForExtensionCheck extends AbstractCheck {
 
                 final DetailAST ctorMods =
                         candidate.findFirstToken(TokenTypes.MODIFIERS);
-                if (!ctorMods.branchContains(TokenTypes.LITERAL_PRIVATE)) {
+                if (ctorMods.findFirstToken(TokenTypes.LITERAL_PRIVATE) == null) {
                     hasExplicitNonPrivateCtor = true;
                     break;
                 }
@@ -307,4 +318,5 @@ public class DesignForExtensionCheck extends AbstractCheck {
 
         return hasDefaultConstructor || hasExplicitNonPrivateCtor;
     }
+
 }

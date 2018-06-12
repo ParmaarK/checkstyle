@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,15 +19,16 @@
 
 package com.puppycrawl.tools.checkstyle.filters;
 
+import static com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocTypeCheck.MSG_JAVADOC_MISSING;
+import static com.puppycrawl.tools.checkstyle.checks.naming.AbstractNameCheck.MSG_INVALID_PATTERN;
+
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
-import com.puppycrawl.tools.checkstyle.Checker;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.TreeWalker;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
@@ -35,120 +36,142 @@ import com.puppycrawl.tools.checkstyle.checks.SuppressWarningsHolder;
 import com.puppycrawl.tools.checkstyle.checks.UncommentedMainCheck;
 import com.puppycrawl.tools.checkstyle.checks.coding.IllegalCatchCheck;
 import com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocTypeCheck;
+import com.puppycrawl.tools.checkstyle.checks.naming.AbstractNameCheck;
 import com.puppycrawl.tools.checkstyle.checks.naming.ConstantNameCheck;
 import com.puppycrawl.tools.checkstyle.checks.naming.MemberNameCheck;
 import com.puppycrawl.tools.checkstyle.checks.sizes.ParameterNumberCheck;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class SuppressWarningsFilterTest
     extends AbstractModuleTestSupport {
+
     private static final String[] ALL_MESSAGES = {
-        "16: Missing a Javadoc comment.",
-        "17: Missing a Javadoc comment.",
-        "19: Missing a Javadoc comment.",
-        "22:45: Name 'I' must match pattern '^[a-z][a-zA-Z0-9]*$'.",
-        "24:17: Name 'J' must match pattern '^[a-z][a-zA-Z0-9]*$'.",
-        "25:17: Name 'K' must match pattern '^[a-z][a-zA-Z0-9]*$'.",
-        "29:17: Name 'L' must match pattern '^[a-z][a-zA-Z0-9]*$'.",
-        "29:32: Name 'X' must match pattern '^[a-z][a-zA-Z0-9]*$'.",
-        "33:30: Name 'm' must match pattern '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.",
-        "34:30: Name 'n' must match pattern '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.",
-        "39:17: More than 7 parameters (found 8).",
-        "45:9: Catching 'Exception' is not allowed.",
-        "56:9: Catching 'Exception' is not allowed.",
-        "61: Missing a Javadoc comment.",
-        "71: Uncommented main method found.",
-        "76: Missing a Javadoc comment.",
-        "77: Uncommented main method found.",
-        "83: Missing a Javadoc comment.",
-        "84: Uncommented main method found.",
-        "90: Missing a Javadoc comment.",
-        "91: Uncommented main method found.",
-        "97: Missing a Javadoc comment.",
+        "16: " + getCheckMessage(JavadocTypeCheck.class, MSG_JAVADOC_MISSING),
+        "17: " + getCheckMessage(JavadocTypeCheck.class, MSG_JAVADOC_MISSING),
+        "19: " + getCheckMessage(JavadocTypeCheck.class, MSG_JAVADOC_MISSING),
+        "22:45: "
+            + getCheckMessage(AbstractNameCheck.class,
+                MSG_INVALID_PATTERN, "I", "^[a-z][a-zA-Z0-9]*$"),
+        "24:17: "
+            + getCheckMessage(AbstractNameCheck.class,
+                MSG_INVALID_PATTERN, "J", "^[a-z][a-zA-Z0-9]*$"),
+        "25:17: "
+            + getCheckMessage(AbstractNameCheck.class,
+                MSG_INVALID_PATTERN, "K", "^[a-z][a-zA-Z0-9]*$"),
+        "29:17: "
+            + getCheckMessage(AbstractNameCheck.class,
+                MSG_INVALID_PATTERN, "L", "^[a-z][a-zA-Z0-9]*$"),
+        "29:32: "
+            + getCheckMessage(AbstractNameCheck.class,
+                MSG_INVALID_PATTERN, "X", "^[a-z][a-zA-Z0-9]*$"),
+        "33:30: "
+            + getCheckMessage(AbstractNameCheck.class,
+                MSG_INVALID_PATTERN, "m", "^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$"),
+        "34:30: "
+            + getCheckMessage(AbstractNameCheck.class,
+                MSG_INVALID_PATTERN, "n", "^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$"),
+        "39:17: "
+            + getCheckMessage(ParameterNumberCheck.class, ParameterNumberCheck.MSG_KEY, 7, 8),
+        "45:9: "
+            + getCheckMessage(IllegalCatchCheck.class, IllegalCatchCheck.MSG_KEY, "Exception"),
+        "56:9: "
+            + getCheckMessage(IllegalCatchCheck.class, IllegalCatchCheck.MSG_KEY, "Exception"),
+        "61: " + getCheckMessage(JavadocTypeCheck.class, MSG_JAVADOC_MISSING),
+        "71: " + getCheckMessage(UncommentedMainCheck.class, UncommentedMainCheck.MSG_KEY),
+        "76: " + getCheckMessage(JavadocTypeCheck.class, MSG_JAVADOC_MISSING),
+        "77: " + getCheckMessage(UncommentedMainCheck.class, UncommentedMainCheck.MSG_KEY),
+        "83: " + getCheckMessage(JavadocTypeCheck.class, MSG_JAVADOC_MISSING),
+        "84: " + getCheckMessage(UncommentedMainCheck.class, UncommentedMainCheck.MSG_KEY),
+        "90: " + getCheckMessage(JavadocTypeCheck.class, MSG_JAVADOC_MISSING),
+        "91: " + getCheckMessage(UncommentedMainCheck.class, UncommentedMainCheck.MSG_KEY),
+        "97: " + getCheckMessage(JavadocTypeCheck.class, MSG_JAVADOC_MISSING),
     };
 
     @Override
     protected String getPackageLocation() {
-        return "com/puppycrawl/tools/checkstyle/filters";
+        return "com/puppycrawl/tools/checkstyle/filters/suppresswarningsfilter";
     }
 
     @Test
     public void testNone() throws Exception {
         final DefaultConfiguration filterConfig = null;
-        final String[] suppressed = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] suppressed = CommonUtil.EMPTY_STRING_ARRAY;
         verifySuppressed(filterConfig, suppressed);
     }
 
     @Test
     public void testDefault() throws Exception {
         final DefaultConfiguration filterConfig =
-            createFilterConfig(SuppressWarningsFilter.class);
+            createModuleConfig(SuppressWarningsFilter.class);
         final String[] suppressed = {
-            "24:17: Name 'J' must match pattern '^[a-z][a-zA-Z0-9]*$'.",
-            "29:17: Name 'L' must match pattern '^[a-z][a-zA-Z0-9]*$'.",
-            "33:30: Name 'm' must match pattern '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.",
-            "39:17: More than 7 parameters (found 8).",
-            "56:9: Catching 'Exception' is not allowed.",
-            "71: Uncommented main method found.",
-            "77: Uncommented main method found.",
-            "84: Uncommented main method found.",
-            "91: Uncommented main method found.",
-            "97: Missing a Javadoc comment.",
+            "24:17: "
+                + getCheckMessage(AbstractNameCheck.class,
+                    MSG_INVALID_PATTERN, "J", "^[a-z][a-zA-Z0-9]*$"),
+            "29:17: "
+                + getCheckMessage(AbstractNameCheck.class,
+                    MSG_INVALID_PATTERN, "L", "^[a-z][a-zA-Z0-9]*$"),
+            "33:30: "
+                + getCheckMessage(AbstractNameCheck.class,
+                    MSG_INVALID_PATTERN, "m", "^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$"),
+            "39:17: "
+                + getCheckMessage(ParameterNumberCheck.class, ParameterNumberCheck.MSG_KEY, 7, 8),
+            "56:9: "
+                + getCheckMessage(IllegalCatchCheck.class, IllegalCatchCheck.MSG_KEY, "Exception"),
+            "71: " + getCheckMessage(UncommentedMainCheck.class, UncommentedMainCheck.MSG_KEY),
+            "77: " + getCheckMessage(UncommentedMainCheck.class, UncommentedMainCheck.MSG_KEY),
+            "84: " + getCheckMessage(UncommentedMainCheck.class, UncommentedMainCheck.MSG_KEY),
+            "91: " + getCheckMessage(UncommentedMainCheck.class, UncommentedMainCheck.MSG_KEY),
+            "97: " + getCheckMessage(JavadocTypeCheck.class, MSG_JAVADOC_MISSING),
         };
         verifySuppressed(filterConfig, suppressed);
     }
 
-    private static DefaultConfiguration createFilterConfig(Class<?> classObj) {
-        return new DefaultConfiguration(classObj.getName());
-    }
-
-    private void verifySuppressed(Configuration aFilterConfig,
-            String... aSuppressed) throws Exception {
-        verify(createChecker(aFilterConfig),
-            getPath("InputSuppressWarningsFilter.java"),
-            removeSuppressed(ALL_MESSAGES, aSuppressed));
-    }
-
-    @Override
-    public Checker createChecker(Configuration checkConfig)
+    private void verifySuppressed(Configuration moduleConfig,
+            String... aSuppressed)
             throws Exception {
-        final DefaultConfiguration checkerConfig =
-            new DefaultConfiguration("configuration");
-        final DefaultConfiguration checksConfig =
-            createCheckConfig(TreeWalker.class);
+        verifySuppressed(moduleConfig, getPath("InputSuppressWarningsFilter.java"),
+               ALL_MESSAGES, aSuppressed);
+    }
+
+    private void verifySuppressed(Configuration moduleConfig, String fileName,
+            String[] expectedViolations, String... suppressedViolations) throws Exception {
         final DefaultConfiguration holderConfig =
-            createCheckConfig(SuppressWarningsHolder.class);
+            createModuleConfig(SuppressWarningsHolder.class);
         holderConfig.addAttribute("aliasList",
             "com.puppycrawl.tools.checkstyle.checks.sizes."
                 + "ParameterNumberCheck=paramnum");
-        checksConfig.addChild(holderConfig);
-        final DefaultConfiguration memberNameCheckConfig = createCheckConfig(MemberNameCheck.class);
+
+        final DefaultConfiguration memberNameCheckConfig =
+                createModuleConfig(MemberNameCheck.class);
         memberNameCheckConfig.addAttribute("id", "ignore");
-        checksConfig.addChild(memberNameCheckConfig);
+
         final DefaultConfiguration constantNameCheckConfig =
-            createCheckConfig(ConstantNameCheck.class);
+            createModuleConfig(ConstantNameCheck.class);
         constantNameCheckConfig.addAttribute("id", "");
-        checksConfig.addChild(constantNameCheckConfig);
-        checksConfig.addChild(createCheckConfig(ParameterNumberCheck.class));
-        checksConfig.addChild(createCheckConfig(IllegalCatchCheck.class));
+
         final DefaultConfiguration uncommentedMainCheckConfig =
-            createCheckConfig(UncommentedMainCheck.class);
+            createModuleConfig(UncommentedMainCheck.class);
         uncommentedMainCheckConfig.addAttribute("id", "ignore");
-        checksConfig.addChild(uncommentedMainCheckConfig);
-        checksConfig.addChild(createCheckConfig(JavadocTypeCheck.class));
-        checkerConfig.addChild(checksConfig);
-        if (checkConfig != null) {
-            checkerConfig.addChild(checkConfig);
+
+        final DefaultConfiguration treewalkerConfig =
+                createModuleConfig(TreeWalker.class);
+        treewalkerConfig.addChild(holderConfig);
+        treewalkerConfig.addChild(memberNameCheckConfig);
+        treewalkerConfig.addChild(constantNameCheckConfig);
+        treewalkerConfig.addChild(createModuleConfig(ParameterNumberCheck.class));
+        treewalkerConfig.addChild(createModuleConfig(IllegalCatchCheck.class));
+        treewalkerConfig.addChild(uncommentedMainCheckConfig);
+        treewalkerConfig.addChild(createModuleConfig(JavadocTypeCheck.class));
+
+        final DefaultConfiguration checkerConfig =
+                createRootConfig(treewalkerConfig);
+        if (moduleConfig != null) {
+            checkerConfig.addChild(moduleConfig);
         }
-        final Checker checker = new Checker();
-        final Locale locale = Locale.ROOT;
-        checker.setLocaleCountry(locale.getCountry());
-        checker.setLocaleLanguage(locale.getLanguage());
-        checker.setModuleClassLoader(Thread.currentThread()
-            .getContextClassLoader());
-        checker.configure(checkerConfig);
-        checker.addListener(getBriefUtLogger());
-        return checker;
+
+        verify(checkerConfig,
+                fileName,
+            removeSuppressed(expectedViolations, suppressedViolations));
     }
 
     private static String[] removeSuppressed(String[] from, String... remove) {
@@ -160,19 +183,25 @@ public class SuppressWarningsFilterTest
     @Test
     public void testSuppressById() throws Exception {
         final DefaultConfiguration filterConfig =
-            createFilterConfig(SuppressWarningsFilter.class);
+            createModuleConfig(SuppressWarningsFilter.class);
         final String[] suppressedViolationMessages = {
-            "6:17: Name 'A1' must match pattern '^[a-z][a-zA-Z0-9]*$'.",
-            "8: Uncommented main method found.",
+            "6:17: "
+                + getCheckMessage(AbstractNameCheck.class,
+                    MSG_INVALID_PATTERN, "A1", "^[a-z][a-zA-Z0-9]*$"),
+            "8: "
+                + getCheckMessage(UncommentedMainCheck.class, UncommentedMainCheck.MSG_KEY),
         };
         final String[] expectedViolationMessages = {
-            "3: Missing a Javadoc comment.",
-            "6:17: Name 'A1' must match pattern '^[a-z][a-zA-Z0-9]*$'.",
-            "8: Uncommented main method found.",
+            "3: " + getCheckMessage(JavadocTypeCheck.class, MSG_JAVADOC_MISSING),
+            "6:17: "
+                + getCheckMessage(AbstractNameCheck.class,
+                    MSG_INVALID_PATTERN, "A1", "^[a-z][a-zA-Z0-9]*$"),
+            "8: "
+                + getCheckMessage(UncommentedMainCheck.class, UncommentedMainCheck.MSG_KEY),
         };
 
-        verify(createChecker(filterConfig),
-            getPath("InputSuppressByIdWithWarningsFilter.java"),
-            removeSuppressed(expectedViolationMessages, suppressedViolationMessages));
+        verifySuppressed(filterConfig, getPath("InputSuppressWarningsFilterById.java"),
+                expectedViolationMessages, suppressedViolationMessages);
     }
+
 }

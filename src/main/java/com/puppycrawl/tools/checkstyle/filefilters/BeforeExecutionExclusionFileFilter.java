@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -65,7 +65,6 @@ import com.puppycrawl.tools.checkstyle.api.BeforeExecutionFileFilter;
  * &lt;/module&gt;
  * </pre>
  *
- * @author Richard Veach
  */
 public final class BeforeExecutionExclusionFileFilter extends AutomaticBean
         implements BeforeExecutionFileFilter {
@@ -83,7 +82,13 @@ public final class BeforeExecutionExclusionFileFilter extends AutomaticBean
     }
 
     @Override
+    protected void finishLocalSetup() {
+        // No code by default
+    }
+
+    @Override
     public boolean accept(String uri) {
         return fileNamePattern == null || !fileNamePattern.matcher(uri).find();
     }
+
 }

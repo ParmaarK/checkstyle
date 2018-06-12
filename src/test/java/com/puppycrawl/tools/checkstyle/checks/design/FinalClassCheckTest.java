@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -32,6 +32,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 public class FinalClassCheckTest
     extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/design/finalclass";
@@ -48,7 +49,7 @@ public class FinalClassCheckTest
     @Test
     public void testFinalClass() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(FinalClassCheck.class);
+            createModuleConfig(FinalClassCheck.class);
         final String[] expected = {
             "7: " + getCheckMessage(MSG_KEY, "InputFinalClass"),
             "15: " + getCheckMessage(MSG_KEY, "test4"),
@@ -60,7 +61,7 @@ public class FinalClassCheckTest
     @Test
     public void testClassWithPrivateCtorAndNestedExtendingSubclass() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(FinalClassCheck.class);
+                createModuleConfig(FinalClassCheck.class);
         final String[] expected = {
             "15: " + getCheckMessage(MSG_KEY, "C"),
         };
@@ -74,7 +75,7 @@ public class FinalClassCheckTest
     public void testClassWithPrivateCtorAndNestedExtendingSubclassWithoutPackage()
             throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(FinalClassCheck.class);
+                createModuleConfig(FinalClassCheck.class);
         final String[] expected = {
             "7: " + getCheckMessage(MSG_KEY, "C"),
         };
@@ -106,4 +107,5 @@ public class FinalClassCheckTest
         assertArrayEquals("Default acceptable tokens are invalid",
             expected, obj.getAcceptableTokens());
     }
+
 }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,25 +20,37 @@
 package com.puppycrawl.tools.checkstyle.checks.naming;
 
 import static com.puppycrawl.tools.checkstyle.checks.naming.AbstractNameCheck.MSG_INVALID_PATTERN;
+import static org.junit.Assert.assertArrayEquals;
 
 import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class LocalVariableNameCheckTest
     extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/naming/localvariablename";
     }
 
     @Test
+    public void testGetAcceptableTokens() {
+        final LocalVariableNameCheck localVariableNameCheck = new LocalVariableNameCheck();
+        final int[] expected = {TokenTypes.VARIABLE_DEF};
+
+        assertArrayEquals("Default acceptable tokens are invalid",
+                expected, localVariableNameCheck.getAcceptableTokens());
+    }
+
+    @Test
     public void testDefault()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(LocalVariableNameCheck.class);
+            createModuleConfig(LocalVariableNameCheck.class);
 
         final String pattern = "^[a-z][a-zA-Z0-9]*$";
 
@@ -55,8 +67,8 @@ public class LocalVariableNameCheckTest
     public void testInnerClass()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(LocalVariableNameCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+            createModuleConfig(LocalVariableNameCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputLocalVariableNameInnerClass.java"), expected);
     }
 
@@ -64,7 +76,7 @@ public class LocalVariableNameCheckTest
     public void testLoopVariables()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(LocalVariableNameCheck.class);
+            createModuleConfig(LocalVariableNameCheck.class);
         checkConfig.addAttribute("format", "^[a-z]{2,}[a-zA-Z0-9]*$");
         checkConfig.addAttribute("allowOneCharVarInForLoop", "true");
 
@@ -76,4 +88,5 @@ public class LocalVariableNameCheckTest
         };
         verify(checkConfig, getPath("InputLocalVariableNameOneCharInitVarName.java"), expected);
     }
+
 }

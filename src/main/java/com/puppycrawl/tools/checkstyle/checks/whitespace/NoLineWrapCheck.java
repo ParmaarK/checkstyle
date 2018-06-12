@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,10 +19,11 @@
 
 package com.puppycrawl.tools.checkstyle.checks.whitespace;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * <p>Checks that chosen statements are not line-wrapped.
@@ -60,8 +61,8 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
  * <pre>{@code import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
  * }</pre>
  *
- * @author maxvetrenko
  */
+@StatelessCheck
 public class NoLineWrapCheck extends AbstractCheck {
 
     /**
@@ -91,7 +92,7 @@ public class NoLineWrapCheck extends AbstractCheck {
 
     @Override
     public int[] getRequiredTokens() {
-        return CommonUtils.EMPTY_INT_ARRAY;
+        return CommonUtil.EMPTY_INT_ARRAY;
     }
 
     @Override
@@ -100,4 +101,5 @@ public class NoLineWrapCheck extends AbstractCheck {
             log(ast.getLineNo(), MSG_KEY, ast.getText());
         }
     }
+
 }

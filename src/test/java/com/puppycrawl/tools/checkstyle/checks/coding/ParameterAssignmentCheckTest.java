@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,17 +20,26 @@
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import static com.puppycrawl.tools.checkstyle.checks.coding.ParameterAssignmentCheck.MSG_KEY;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import com.puppycrawl.tools.checkstyle.JavaParser;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.internal.utils.TestUtil;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class ParameterAssignmentCheckTest extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/coding/parameterassignment";
@@ -40,7 +49,7 @@ public class ParameterAssignmentCheckTest extends AbstractModuleTestSupport {
     public void testDefault()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ParameterAssignmentCheck.class);
+            createModuleConfig(ParameterAssignmentCheck.class);
         final String[] expected = {
             "9:15: " + getCheckMessage(MSG_KEY, "field"),
             "10:15: " + getCheckMessage(MSG_KEY, "field"),
@@ -53,17 +62,17 @@ public class ParameterAssignmentCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testReceiverParameter() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(ParameterAssignmentCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final DefaultConfiguration checkConfig = createModuleConfig(ParameterAssignmentCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputParameterAssignmentReceiver.java"), expected);
     }
 
     @Test
     public void testTokensNotNull() {
         final ParameterAssignmentCheck check = new ParameterAssignmentCheck();
-        Assert.assertNotNull(check.getAcceptableTokens());
-        Assert.assertNotNull(check.getDefaultTokens());
-        Assert.assertNotNull(check.getRequiredTokens());
+        Assert.assertNotNull("Acceptable tokens should not be null", check.getAcceptableTokens());
+        Assert.assertNotNull("Default tokens should not be null", check.getDefaultTokens());
+        Assert.assertNotNull("Required tokens should not be null", check.getRequiredTokens());
     }
 
     @Test
@@ -89,4 +98,28 @@ public class ParameterAssignmentCheckTest extends AbstractModuleTestSupport {
             // it is OK
         }
     }
+
+    /**
+     * We cannot reproduce situation when visitToken is called and leaveToken is not.
+     * So, we have to use reflection to be sure that even in such situation
+     * state of the field will be cleared.
+     *
+     * @throws Exception when code tested throws exception
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testClearState() throws Exception {
+        final ParameterAssignmentCheck check = new ParameterAssignmentCheck();
+        final Optional<DetailAST> methodDef = TestUtil.findTokenInAstByPredicate(
+            JavaParser.parseFile(new File(getPath("InputParameterAssignmentReceiver.java")),
+                JavaParser.Options.WITHOUT_COMMENTS),
+            ast -> ast.getType() == TokenTypes.METHOD_DEF);
+
+        assertTrue("Ast should contain METHOD_DEF", methodDef.isPresent());
+        assertTrue("State is not cleared on beginTree",
+            TestUtil.isStatefulFieldClearedDuringBeginTree(check, methodDef.get(),
+                "parameterNamesStack",
+                parameterNamesStack -> ((Collection<Set<String>>) parameterNamesStack).isEmpty()));
+    }
+
 }

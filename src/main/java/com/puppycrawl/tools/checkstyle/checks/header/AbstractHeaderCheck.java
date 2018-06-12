@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -28,25 +28,25 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import com.google.common.io.Closeables;
 import com.puppycrawl.tools.checkstyle.api.AbstractFileSetCheck;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.ExternalResourceHolder;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * Abstract super class for header checks.
  * Provides support for header and headerFile properties.
- * @author o_sukhosolsky
  */
 public abstract class AbstractHeaderCheck extends AbstractFileSetCheck
     implements ExternalResourceHolder {
+
     /** Pattern to detect occurrences of '\n' in text. */
     private static final Pattern ESCAPED_LINE_FEED_PATTERN = Pattern.compile("\\\\n");
 
@@ -57,7 +57,7 @@ public abstract class AbstractHeaderCheck extends AbstractFileSetCheck
     private URI headerFile;
 
     /** Name of a charset to use for loading the header from a file. */
-    private String charset = System.getProperty("file.encoding", "UTF-8");
+    private String charset = System.getProperty("file.encoding", StandardCharsets.UTF_8.name());
 
     /**
      * Hook method for post processing header lines.
@@ -108,18 +108,13 @@ public abstract class AbstractHeaderCheck extends AbstractFileSetCheck
      */
     private void loadHeaderFile() throws CheckstyleException {
         checkHeaderNotInitialized();
-        Reader headerReader = null;
-        try {
-            headerReader = new InputStreamReader(new BufferedInputStream(
-                    headerFile.toURL().openStream()), charset);
+        try (Reader headerReader = new InputStreamReader(new BufferedInputStream(
+                    headerFile.toURL().openStream()), charset)) {
             loadHeader(headerReader);
         }
         catch (final IOException ex) {
             throw new CheckstyleException(
                     "unable to load header file " + headerFile, ex);
-        }
-        finally {
-            Closeables.closeQuietly(headerReader);
         }
     }
 
@@ -142,21 +137,17 @@ public abstract class AbstractHeaderCheck extends AbstractFileSetCheck
      * @throws IllegalArgumentException if the header cannot be interpreted
      */
     public void setHeader(String header) {
-        if (!CommonUtils.isBlank(header)) {
+        if (!CommonUtil.isBlank(header)) {
             checkHeaderNotInitialized();
 
             final String headerExpandedNewLines = ESCAPED_LINE_FEED_PATTERN
                     .matcher(header).replaceAll("\n");
 
-            final Reader headerReader = new StringReader(headerExpandedNewLines);
-            try {
+            try (Reader headerReader = new StringReader(headerExpandedNewLines)) {
                 loadHeader(headerReader);
             }
             catch (final IOException ex) {
                 throw new IllegalArgumentException("unable to load header", ex);
-            }
-            finally {
-                Closeables.closeQuietly(headerReader);
             }
         }
     }
@@ -167,21 +158,16 @@ public abstract class AbstractHeaderCheck extends AbstractFileSetCheck
      * @throws IOException if
      */
     private void loadHeader(final Reader headerReader) throws IOException {
-        final LineNumberReader lnr = new LineNumberReader(headerReader);
-        try {
-            while (true) {
-                final String line = lnr.readLine();
-                if (line == null) {
-                    break;
+        try (LineNumberReader lnr = new LineNumberReader(headerReader)) {
+            String line;
+            do {
+                line = lnr.readLine();
+                if (line != null) {
+                    readerLines.add(line);
                 }
-                readerLines.add(line);
-            }
+            } while (line != null);
             postProcessHeaderLines();
         }
-        finally {
-            Closeables.closeQuietly(lnr);
-        }
-
     }
 
     @Override
@@ -204,4 +190,5 @@ public abstract class AbstractHeaderCheck extends AbstractFileSetCheck
 
         return result;
     }
+
 }

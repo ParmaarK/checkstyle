@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,11 +20,11 @@
 package com.puppycrawl.tools.checkstyle;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,20 +45,21 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.google.common.io.Closeables;
+import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import com.puppycrawl.tools.checkstyle.api.AuditListener;
+import com.puppycrawl.tools.checkstyle.api.AutomaticBean;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 import com.puppycrawl.tools.checkstyle.api.LocalizedMessage;
 import com.puppycrawl.tools.checkstyle.api.RootModule;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * Wrapper command line program for the Checker.
- * @author the original author or authors.
  * @noinspection UseOfSystemOutOrSystemErr
  **/
 public final class Main {
+
     /**
      * A key pointing to the error counter
      * message in the "messages.properties" file.
@@ -98,11 +99,17 @@ public final class Main {
     /** Name for the option 'o'. */
     private static final String OPTION_O_NAME = "o";
 
+    /** Name for the option 's'. */
+    private static final String OPTION_S_NAME = "s";
+
     /** Name for the option 't'. */
     private static final String OPTION_T_NAME = "t";
 
     /** Name for the option '--tree'. */
     private static final String OPTION_TREE_NAME = "tree";
+
+    /** Name for the option 'tabWidth'. */
+    private static final String OPTION_TAB_WIDTH_NAME = "tabWidth";
 
     /** Name for the option '-T'. */
     private static final String OPTION_CAPITAL_T_NAME = "T";
@@ -165,6 +172,9 @@ public final class Main {
     /** A string value of 1. */
     private static final String ONE_STRING_VALUE = "1";
 
+    /** Default distance between tab stops. */
+    private static final String DEFAULT_TAB_WIDTH = "8";
+
     /** Don't create instance of this class, use {@link #main(String[])} method instead. */
     private Main() {
     }
@@ -174,7 +184,7 @@ public final class Main {
      * is the number of errors found in all the files.
      * @param args the command line arguments.
      * @throws IOException if there is a problem with files access
-     * @noinspection CallToPrintStackTrace
+     * @noinspection CallToPrintStackTrace, CallToSystemExit
      **/
     public static void main(String... args) throws IOException {
         int errorCounter = 0;
@@ -226,11 +236,14 @@ public final class Main {
         }
         finally {
             // return exit code base on validation of Checker
-            if (errorCounter != 0 && !cliViolations) {
-                final LocalizedMessage errorCounterMessage = new LocalizedMessage(0,
-                        Definitions.CHECKSTYLE_BUNDLE, ERROR_COUNTER,
-                        new String[] {String.valueOf(errorCounter)}, null, Main.class, null);
-                System.out.println(errorCounterMessage.getMessage());
+            // two ifs exist till https://github.com/hcoles/pitest/issues/377
+            if (errorCounter != 0) {
+                if (!cliViolations) {
+                    final LocalizedMessage errorCounterMessage = new LocalizedMessage(0,
+                            Definitions.CHECKSTYLE_BUNDLE, ERROR_COUNTER,
+                            new String[] {String.valueOf(errorCounter)}, null, Main.class, null);
+                    System.out.println(errorCounterMessage.getMessage());
+                }
             }
             if (exitStatus != 0) {
                 System.exit(exitStatus);
@@ -293,12 +306,22 @@ public final class Main {
         // ensure there is no conflicting options
         else if (cmdLine.hasOption(OPTION_T_NAME) || cmdLine.hasOption(OPTION_CAPITAL_T_NAME)
                 || cmdLine.hasOption(OPTION_J_NAME) || cmdLine.hasOption(OPTION_CAPITAL_J_NAME)) {
-            if (cmdLine.hasOption(OPTION_C_NAME) || cmdLine.hasOption(OPTION_P_NAME)
-                    || cmdLine.hasOption(OPTION_F_NAME) || cmdLine.hasOption(OPTION_O_NAME)) {
+            if (cmdLine.hasOption(OPTION_S_NAME) || cmdLine.hasOption(OPTION_C_NAME)
+                    || cmdLine.hasOption(OPTION_P_NAME) || cmdLine.hasOption(OPTION_F_NAME)
+                    || cmdLine.hasOption(OPTION_O_NAME)) {
                 result.add("Option '-t' cannot be used with other options.");
             }
             else if (filesToProcess.size() > 1) {
                 result.add("Printing AST is allowed for only one file.");
+            }
+        }
+        else if (cmdLine.hasOption(OPTION_S_NAME)) {
+            if (cmdLine.hasOption(OPTION_C_NAME) || cmdLine.hasOption(OPTION_P_NAME)
+                    || cmdLine.hasOption(OPTION_F_NAME) || cmdLine.hasOption(OPTION_O_NAME)) {
+                result.add("Option '-s' cannot be used with other options.");
+            }
+            else if (filesToProcess.size() > 1) {
+                result.add("Printing xpath suppressions is allowed for only one file.");
             }
         }
         // ensure a configuration file is specified
@@ -306,7 +329,7 @@ public final class Main {
             final String configLocation = cmdLine.getOptionValue(OPTION_C_NAME);
             try {
                 // test location only
-                CommonUtils.getUriByFilename(configLocation);
+                CommonUtil.getUriByFilename(configLocation);
             }
             catch (CheckstyleException ignored) {
                 result.add(String.format("Could not find config XML file '%s'.", configLocation));
@@ -358,7 +381,7 @@ public final class Main {
         if (cmdLine.hasOption(cliParameterName)) {
             final String checkerThreadsNumberStr =
                 cmdLine.getOptionValue(cliParameterName);
-            if (CommonUtils.isInt(checkerThreadsNumberStr)) {
+            if (CommonUtil.isInt(checkerThreadsNumberStr)) {
                 final int checkerThreadsNumber = Integer.parseInt(checkerThreadsNumberStr);
                 if (checkerThreadsNumber < 1) {
                     result.add(mustBeGreaterThanZeroMessage);
@@ -387,12 +410,14 @@ public final class Main {
         if (commandLine.hasOption(OPTION_T_NAME)) {
             // print AST
             final File file = config.files.get(0);
-            final String stringAst = AstTreeStringPrinter.printFileAst(file, false);
+            final String stringAst = AstTreeStringPrinter.printFileAst(file,
+                    JavaParser.Options.WITHOUT_COMMENTS);
             System.out.print(stringAst);
         }
         else if (commandLine.hasOption(OPTION_CAPITAL_T_NAME)) {
             final File file = config.files.get(0);
-            final String stringAst = AstTreeStringPrinter.printFileAst(file, true);
+            final String stringAst = AstTreeStringPrinter.printFileAst(file,
+                    JavaParser.Options.WITH_COMMENTS);
             System.out.print(stringAst);
         }
         else if (commandLine.hasOption(OPTION_J_NAME)) {
@@ -404,6 +429,15 @@ public final class Main {
             final File file = config.files.get(0);
             final String stringAst = AstTreeStringPrinter.printJavaAndJavadocTree(file);
             System.out.print(stringAst);
+        }
+        else if (commandLine.hasOption(OPTION_S_NAME)) {
+            final File file = config.files.get(0);
+            final String suppressionLineColumnNumber = config.suppressionLineColumnNumber;
+            final int tabWidth = config.tabWidth;
+            final String stringSuppressions =
+                    SuppressionsStringPrinter.printSuppressions(file,
+                            suppressionLineColumnNumber, tabWidth);
+            System.out.print(stringSuppressions);
         }
         else {
             if (commandLine.hasOption(OPTION_D_NAME)) {
@@ -449,6 +483,7 @@ public final class Main {
         conf.outputLocation = cmdLine.getOptionValue(OPTION_O_NAME);
         conf.configLocation = cmdLine.getOptionValue(OPTION_C_NAME);
         conf.propertiesLocation = cmdLine.getOptionValue(OPTION_P_NAME);
+        conf.suppressionLineColumnNumber = cmdLine.getOptionValue(OPTION_S_NAME);
         conf.files = filesToProcess;
         conf.executeIgnoredModules = cmdLine.hasOption(OPTION_EXECUTE_IGNORED_MODULES_NAME);
         final String checkerThreadsNumber = cmdLine.getOptionValue(
@@ -457,6 +492,9 @@ public final class Main {
         final String treeWalkerThreadsNumber = cmdLine.getOptionValue(
                 OPTION_CAPITAL_W_NAME, ONE_STRING_VALUE);
         conf.treeWalkerThreadsNumber = Integer.parseInt(treeWalkerThreadsNumber);
+        final String tabWidth =
+                cmdLine.getOptionValue(OPTION_TAB_WIDTH_NAME, DEFAULT_TAB_WIDTH);
+        conf.tabWidth = Integer.parseInt(tabWidth);
         return conf;
     }
 
@@ -465,13 +503,13 @@ public final class Main {
      * @param cliOptions
      *        pojo object that contains all options
      * @return number of violations of ERROR level
-     * @throws FileNotFoundException
+     * @throws IOException
      *         when output file could not be found
      * @throws CheckstyleException
      *         when properties file could not be loaded
      */
     private static int runCheckstyle(CliOptions cliOptions)
-            throws CheckstyleException, FileNotFoundException {
+            throws CheckstyleException, IOException {
         // setup the properties
         final Properties props;
 
@@ -486,9 +524,18 @@ public final class Main {
         final ThreadModeSettings multiThreadModeSettings =
                 new ThreadModeSettings(
                         cliOptions.checkerThreadsNumber, cliOptions.treeWalkerThreadsNumber);
+
+        final ConfigurationLoader.IgnoredModulesOptions ignoredModulesOptions;
+        if (cliOptions.executeIgnoredModules) {
+            ignoredModulesOptions = ConfigurationLoader.IgnoredModulesOptions.EXECUTE;
+        }
+        else {
+            ignoredModulesOptions = ConfigurationLoader.IgnoredModulesOptions.OMIT;
+        }
+
         final Configuration config = ConfigurationLoader.loadConfiguration(
                 cliOptions.configLocation, new PropertiesExpander(props),
-                !cliOptions.executeIgnoredModules, multiThreadModeSettings);
+                ignoredModulesOptions, multiThreadModeSettings);
 
         // create a listener for output
         final AuditListener listener = createListener(cliOptions.format, cliOptions.outputLocation);
@@ -499,14 +546,12 @@ public final class Main {
         final RootModule rootModule = getRootModule(config.getName(), moduleClassLoader);
 
         try {
-
             rootModule.setModuleClassLoader(moduleClassLoader);
             rootModule.configure(config);
             rootModule.addListener(listener);
 
             // run RootModule
             errorCounter = rootModule.process(cliOptions.files);
-
         }
         finally {
             rootModule.destroy();
@@ -544,10 +589,8 @@ public final class Main {
             throws CheckstyleException {
         final Properties properties = new Properties();
 
-        FileInputStream fis = null;
-        try {
-            fis = new FileInputStream(file);
-            properties.load(fis);
+        try (InputStream stream = Files.newInputStream(file.toPath())) {
+            properties.load(stream);
         }
         catch (final IOException ex) {
             final LocalizedMessage loadPropertiesExceptionMessage = new LocalizedMessage(0,
@@ -555,52 +598,35 @@ public final class Main {
                     new String[] {file.getAbsolutePath()}, null, Main.class, null);
             throw new CheckstyleException(loadPropertiesExceptionMessage.getMessage(), ex);
         }
-        finally {
-            Closeables.closeQuietly(fis);
-        }
 
         return properties;
     }
 
     /**
-     * Creates the audit listener.
-     *
+     * This method creates in AuditListener an open stream for validation data, it must be closed by
+     * {@link RootModule} (default implementation is {@link Checker}) by calling
+     * {@link AuditListener#auditFinished(AuditEvent)}.
      * @param format format of the audit listener
      * @param outputLocation the location of output
      * @return a fresh new {@code AuditListener}
-     * @exception FileNotFoundException when provided output location is not found
-     * @noinspection IOResourceOpenedButNotSafelyClosed
+     * @exception IOException when provided output location is not found
      */
-    private static AuditListener createListener(String format,
-                                                String outputLocation)
-            throws FileNotFoundException {
-
-        // setup the output stream
-        final OutputStream out;
-        final boolean closeOutputStream;
-        if (outputLocation == null) {
-            out = System.out;
-            closeOutputStream = false;
-        }
-        else {
-            out = new FileOutputStream(outputLocation);
-            closeOutputStream = true;
-        }
-
-        // setup a listener
+    private static AuditListener createListener(String format, String outputLocation)
+            throws IOException {
         final AuditListener listener;
         if (XML_FORMAT_NAME.equals(format)) {
-            listener = new XMLLogger(out, closeOutputStream);
-
+            final OutputStream out = getOutputStream(outputLocation);
+            final AutomaticBean.OutputStreamOptions closeOutputStreamOption =
+                    getOutputStreamOptions(outputLocation);
+            listener = new XMLLogger(out, closeOutputStreamOption);
         }
         else if (PLAIN_FORMAT_NAME.equals(format)) {
-            listener = new DefaultLogger(out, closeOutputStream, out, false);
-
+            final OutputStream out = getOutputStream(outputLocation);
+            final AutomaticBean.OutputStreamOptions closeOutputStreamOption =
+                    getOutputStreamOptions(outputLocation);
+            listener = new DefaultLogger(out, closeOutputStreamOption);
         }
         else {
-            if (closeOutputStream) {
-                CommonUtils.close(out);
-            }
             final LocalizedMessage outputFormatExceptionMessage = new LocalizedMessage(0,
                     Definitions.CHECKSTYLE_BUNDLE, CREATE_LISTENER_EXCEPTION,
                     new String[] {format, PLAIN_FORMAT_NAME, XML_FORMAT_NAME}, null,
@@ -609,6 +635,40 @@ public final class Main {
         }
 
         return listener;
+    }
+
+    /**
+     * Create output stream or return System.out
+     * @param outputLocation output location
+     * @return output stream
+     * @throws IOException might happen
+     */
+    @SuppressWarnings("resource")
+    private static OutputStream getOutputStream(String outputLocation) throws IOException {
+        final OutputStream result;
+        if (outputLocation == null) {
+            result = System.out;
+        }
+        else {
+            result = Files.newOutputStream(Paths.get(outputLocation));
+        }
+        return result;
+    }
+
+    /**
+     * Create {@link AutomaticBean.OutputStreamOptions} for the given location.
+     * @param outputLocation output location
+     * @return output stream options
+     */
+    private static AutomaticBean.OutputStreamOptions getOutputStreamOptions(String outputLocation) {
+        final AutomaticBean.OutputStreamOptions result;
+        if (outputLocation == null) {
+            result = AutomaticBean.OutputStreamOptions.NONE;
+        }
+        else {
+            result = AutomaticBean.OutputStreamOptions.CLOSE;
+        }
+        return result;
     }
 
     /**
@@ -697,6 +757,14 @@ public final class Main {
         options.addOption(OPTION_C_NAME, true, "Sets the check configuration file to use.");
         options.addOption(OPTION_O_NAME, true, "Sets the output file. Defaults to stdout");
         options.addOption(OPTION_P_NAME, true, "Loads the properties file");
+        options.addOption(OPTION_S_NAME, true,
+                "Print xpath suppressions at the file's line and column position. "
+                        + "Argument is the line and column number (separated by a : ) in the file "
+                        + "that the suppression should be generated for");
+        options.addOption(OPTION_TAB_WIDTH_NAME, true,
+                String.format("Sets the length of the tab character. Used only with \"-s\" option. "
+                        + "Default value is %s",
+                        DEFAULT_TAB_WIDTH));
         options.addOption(OPTION_F_NAME, true, String.format(
                 "Sets the output format. (%s|%s). Defaults to %s",
                 PLAIN_FORMAT_NAME, XML_FORMAT_NAME, PLAIN_FORMAT_NAME));
@@ -726,6 +794,7 @@ public final class Main {
 
     /** Helper structure to clear show what is required for Checker to run. **/
     private static class CliOptions {
+
         /** Properties file location. */
         private String propertiesLocation;
         /** Config file location. */
@@ -742,5 +811,11 @@ public final class Main {
         private int checkerThreadsNumber;
         /** The tree walker threads number. */
         private int treeWalkerThreadsNumber;
+        /** LineNo and columnNo for the suppression. */
+        private String suppressionLineColumnNumber;
+        /** Tab character length. */
+        private int tabWidth;
+
     }
+
 }

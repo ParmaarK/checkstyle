@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -28,14 +28,14 @@ import java.util.SortedSet;
 import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * Tests to ensure that default message bundle is determined correctly.
  *
- * @author lkuehne
  */
 public class AbstractViolationReporterTest {
+
     private final AbstractCheck emptyCheck = new EmptyCheck();
 
     private static Method getGetMessageBundleMethod() throws Exception {
@@ -47,7 +47,7 @@ public class AbstractViolationReporterTest {
         return getMessageBundleMethod;
     }
 
-    protected static DefaultConfiguration createCheckConfig(Class<?> clazz) {
+    protected static DefaultConfiguration createModuleConfig(Class<?> clazz) {
         return new DefaultConfiguration(clazz.getName());
     }
 
@@ -73,7 +73,7 @@ public class AbstractViolationReporterTest {
 
     @Test
     public void testCustomMessage() throws Exception {
-        final DefaultConfiguration config = createCheckConfig(emptyCheck.getClass());
+        final DefaultConfiguration config = createModuleConfig(emptyCheck.getClass());
         config.addMessage("msgKey", "This is a custom message.");
         emptyCheck.configure(config);
 
@@ -90,7 +90,7 @@ public class AbstractViolationReporterTest {
 
     @Test
     public void testCustomMessageWithParameters() throws Exception {
-        final DefaultConfiguration config = createCheckConfig(emptyCheck.getClass());
+        final DefaultConfiguration config = createModuleConfig(emptyCheck.getClass());
         config.addMessage("msgKey", "This is a custom message with {0}.");
         emptyCheck.configure(config);
 
@@ -107,7 +107,7 @@ public class AbstractViolationReporterTest {
 
     @Test
     public void testCustomMessageWithParametersNegative() throws Exception {
-        final DefaultConfiguration config = createCheckConfig(emptyCheck.getClass());
+        final DefaultConfiguration config = createModuleConfig(emptyCheck.getClass());
         config.addMessage("msgKey", "This is a custom message {0.");
         emptyCheck.configure(config);
 
@@ -122,19 +122,22 @@ public class AbstractViolationReporterTest {
     }
 
     private static class EmptyCheck extends AbstractCheck {
+
         @Override
         public int[] getDefaultTokens() {
-            return CommonUtils.EMPTY_INT_ARRAY;
+            return CommonUtil.EMPTY_INT_ARRAY;
         }
 
         @Override
         public int[] getAcceptableTokens() {
-            return CommonUtils.EMPTY_INT_ARRAY;
+            return CommonUtil.EMPTY_INT_ARRAY;
         }
 
         @Override
         public int[] getRequiredTokens() {
-            return CommonUtils.EMPTY_INT_ARRAY;
+            return CommonUtil.EMPTY_INT_ARRAY;
         }
+
     }
+
 }

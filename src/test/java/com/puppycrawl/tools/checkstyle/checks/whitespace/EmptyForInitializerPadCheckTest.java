@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -26,23 +26,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class EmptyForInitializerPadCheckTest
     extends AbstractModuleTestSupport {
-    private DefaultConfiguration checkConfig;
-
-    @Before
-    public void setUp() {
-        checkConfig = createCheckConfig(EmptyForInitializerPadCheck.class);
-    }
 
     @Override
     protected String getPackageLocation() {
@@ -59,6 +52,8 @@ public class EmptyForInitializerPadCheckTest
 
     @Test
     public void testDefault() throws Exception {
+        final DefaultConfiguration checkConfig =
+                createModuleConfig(EmptyForInitializerPadCheck.class);
         final String[] expected = {
             "48:14: " + getCheckMessage(MSG_PRECEDED, ";"),
         };
@@ -67,6 +62,8 @@ public class EmptyForInitializerPadCheckTest
 
     @Test
     public void testSpaceOption() throws Exception {
+        final DefaultConfiguration checkConfig =
+                createModuleConfig(EmptyForInitializerPadCheck.class);
         checkConfig.addAttribute("option", PadOption.SPACE.toString());
         final String[] expected = {
             "51:13: " + getCheckMessage(MSG_NOT_PRECEDED, ";"),
@@ -107,10 +104,12 @@ public class EmptyForInitializerPadCheckTest
 
     @Test
     public void testInvalidOption() throws Exception {
+        final DefaultConfiguration checkConfig =
+                createModuleConfig(EmptyForInitializerPadCheck.class);
         checkConfig.addAttribute("option", "invalid_option");
 
         try {
-            final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+            final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
             verify(checkConfig, getPath("InputEmptyForInitializerPad.java"), expected);
             fail("exception expected");
@@ -123,4 +122,5 @@ public class EmptyForInitializerPadCheckTest
                 ex.getMessage().startsWith(messageStart));
         }
     }
+
 }

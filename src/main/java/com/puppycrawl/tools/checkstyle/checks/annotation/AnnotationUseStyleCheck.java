@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,7 @@ import java.util.Locale;
 
 import org.apache.commons.beanutils.ConversionException;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -69,8 +70,8 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * array comma preference a {@link TrailingArrayComma#IGNORE IGNORE} type
  * is provided.  Set this through the {@code trailingArrayComma} property.
  *
- * <p>By default the ElementStyle is set to EXPANDED, the TrailingArrayComma
- * is set to NEVER, and the ClosingParens is set to ALWAYS.
+ * <p>By default the ElementStyle is set to COMPACT_NO_ARRAY, the
+ * TrailingArrayComma is set to NEVER, and the ClosingParens is set to NEVER.
  *
  * <p>According to the JLS, it is legal to include a trailing comma
  * in arrays used in annotations but Sun's Java 5 &amp; 6 compilers will not
@@ -81,7 +82,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * 3.4.1.
  *
  * <p>See <a
- * href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-9.html#jls-9.7">
+ * href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-9.html#jls-9.7">
  * Java Language specification, &sect;9.7</a>.
  *
  * <p>An example shown below is set to enforce an EXPANDED style, with a
@@ -99,13 +100,12 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * &lt;/module&gt;
  * </pre>
  *
- * @author Travis Schneeberger
  */
+@StatelessCheck
 public final class AnnotationUseStyleCheck extends AbstractCheck {
 
     /**
      * Defines the styles for defining elements in an annotation.
-     * @author Travis Schneeberger
      */
     public enum ElementStyle {
 
@@ -136,13 +136,13 @@ public final class AnnotationUseStyleCheck extends AbstractCheck {
          * Mixed styles.
          */
         IGNORE,
+
     }
 
     /**
      * Defines the two styles for defining
      * elements in an annotation.
      *
-     * @author Travis Schneeberger
      */
     public enum TrailingArrayComma {
 
@@ -164,13 +164,13 @@ public final class AnnotationUseStyleCheck extends AbstractCheck {
          * Mixed styles.
          */
         IGNORE,
+
     }
 
     /**
      * Defines the two styles for defining
      * elements in an annotation.
      *
-     * @author Travis Schneeberger
      */
     public enum ClosingParens {
 
@@ -192,6 +192,7 @@ public final class AnnotationUseStyleCheck extends AbstractCheck {
          * Mixed styles.
          */
         IGNORE,
+
     }
 
     /**
@@ -334,7 +335,6 @@ public final class AnnotationUseStyleCheck extends AbstractCheck {
      * @param annotation the annotation token
      */
     private void checkStyleType(final DetailAST annotation) {
-
         switch (elementStyle) {
             case COMPACT_NO_ARRAY:
                 checkCompactNoArrayStyle(annotation);
@@ -466,13 +466,11 @@ public final class AnnotationUseStyleCheck extends AbstractCheck {
 
         if (trailingArrayComma == TrailingArrayComma.ALWAYS
             && (comma == null || comma.getType() != TokenTypes.COMMA)) {
-            log(rCurly.getLineNo(),
-                rCurly.getColumnNo(), MSG_KEY_ANNOTATION_TRAILING_COMMA_MISSING);
+            log(rCurly, MSG_KEY_ANNOTATION_TRAILING_COMMA_MISSING);
         }
         else if (trailingArrayComma == TrailingArrayComma.NEVER
             && comma != null && comma.getType() == TokenTypes.COMMA) {
-            log(comma.getLineNo(),
-                comma.getColumnNo(), MSG_KEY_ANNOTATION_TRAILING_COMMA_PRESENT);
+            log(comma, MSG_KEY_ANNOTATION_TRAILING_COMMA_PRESENT);
         }
     }
 
@@ -500,4 +498,5 @@ public final class AnnotationUseStyleCheck extends AbstractCheck {
             }
         }
     }
+
 }

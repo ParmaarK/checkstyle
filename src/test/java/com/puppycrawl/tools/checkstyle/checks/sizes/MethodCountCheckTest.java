@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -31,9 +31,10 @@ import org.junit.Test;
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class MethodCountCheckTest extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/sizes/methodcount";
@@ -67,9 +68,9 @@ public class MethodCountCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testDefaults() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(MethodCountCheck.class);
+            createModuleConfig(MethodCountCheck.class);
 
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
         verify(checkConfig, getPath("InputMethodCount.java"), expected);
     }
@@ -77,7 +78,7 @@ public class MethodCountCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testThrees() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(MethodCountCheck.class);
+            createModuleConfig(MethodCountCheck.class);
         checkConfig.addAttribute("maxPrivate", "3");
         checkConfig.addAttribute("maxPackage", "3");
         checkConfig.addAttribute("maxProtected", "3");
@@ -102,7 +103,7 @@ public class MethodCountCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testEnum() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(MethodCountCheck.class);
+            createModuleConfig(MethodCountCheck.class);
         checkConfig.addAttribute("maxPrivate", "0");
         checkConfig.addAttribute("maxTotal", "2");
 
@@ -116,7 +117,7 @@ public class MethodCountCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testWithPackageModifier() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(MethodCountCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(MethodCountCheck.class);
         checkConfig.addAttribute("maxPrivate", "0");
         checkConfig.addAttribute("maxTotal", "2");
 
@@ -130,16 +131,16 @@ public class MethodCountCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testOnInterfaceDefinitionWithField() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(MethodCountCheck.class);
+                createModuleConfig(MethodCountCheck.class);
 
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
         verify(checkConfig, getPath("InputMethodCount4.java"), expected);
     }
 
     @Test
     public void testWithInterfaceDefinitionInClass() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(MethodCountCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(MethodCountCheck.class);
         checkConfig.addAttribute("maxTotal", "1");
 
         final String[] expected = {
@@ -151,12 +152,26 @@ public class MethodCountCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testPartialTokens() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(MethodCountCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(MethodCountCheck.class);
         checkConfig.addAttribute("maxTotal", "1");
         checkConfig.addAttribute("tokens", "ENUM_DEF");
 
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
         verify(checkConfig, getPath("InputMethodCount6.java"), expected);
     }
+
+    @Test
+    public void testCountMethodToCorrectDefinition() throws Exception {
+        final DefaultConfiguration checkConfig = createModuleConfig(MethodCountCheck.class);
+        checkConfig.addAttribute("maxTotal", "1");
+        checkConfig.addAttribute("tokens", "ENUM_DEF");
+
+        final String[] expected = {
+            "8: " + getCheckMessage(MSG_MANY_METHODS, 2, 1),
+        };
+
+        verify(checkConfig, getPath("InputMethodCount7.java"), expected);
+    }
+
 }

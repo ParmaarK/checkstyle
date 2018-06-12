@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,6 +19,7 @@
 
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
+import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -38,9 +39,9 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  *    &lt;property name=&quot;max&quot; value=&quot;1&quot;/&gt;
  *  &lt;/module&gt;
  * </pre>
- * @author Alexander Jesse
  * @see NestedIfDepthCheck
  */
+@FileStatefulCheck
 public final class NestedForDepthCheck extends AbstractCheck {
 
     /**
@@ -64,17 +65,17 @@ public final class NestedForDepthCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return getAcceptableTokens();
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {TokenTypes.LITERAL_FOR};
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getAcceptableTokens();
+        return new int[] {TokenTypes.LITERAL_FOR};
     }
 
     @Override
@@ -94,4 +95,5 @@ public final class NestedForDepthCheck extends AbstractCheck {
     public void leaveToken(DetailAST ast) {
         --depth;
     }
+
 }

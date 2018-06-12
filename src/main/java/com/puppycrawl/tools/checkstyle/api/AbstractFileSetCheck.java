@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -24,27 +24,28 @@ import java.util.Arrays;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * Provides common functionality for many FileSetChecks.
  *
- * @author lkuehne
- * @author oliver
  * @noinspection NoopMethodInAbstractClass
  */
 public abstract class AbstractFileSetCheck
     extends AbstractViolationReporter
     implements FileSetCheck {
 
-    /** Collects the error messages. */
-    private final SortedSet<LocalizedMessage> messageCollector = new TreeSet<>();
+    /**
+     * Collects the error messages.
+     */
+    private static final ThreadLocal<SortedSet<LocalizedMessage>> MESSAGE_COLLECTOR =
+            ThreadLocal.withInitial(TreeSet::new);
 
     /** The dispatcher errors are fired to. */
     private MessageDispatcher messageDispatcher;
 
     /** The file extensions that are accepted by this filter. */
-    private String[] fileExtensions = CommonUtils.EMPTY_STRING_ARRAY;
+    private String[] fileExtensions = CommonUtil.EMPTY_STRING_ARRAY;
 
     /**
      * Called to process a file that matches the specified file extensions.
@@ -73,12 +74,15 @@ public abstract class AbstractFileSetCheck
     @Override
     public final SortedSet<LocalizedMessage> process(File file, FileText fileText)
             throws CheckstyleException {
-        messageCollector.clear();
+        final SortedSet<LocalizedMessage> messages = MESSAGE_COLLECTOR.get();
+        messages.clear();
         // Process only what interested in
-        if (CommonUtils.matchesFileExtension(file, fileExtensions)) {
+        if (CommonUtil.matchesFileExtension(file, fileExtensions)) {
             processFiltered(file, fileText);
         }
-        return new TreeSet<>(messageCollector);
+        final SortedSet<LocalizedMessage> result = new TreeSet<>(messages);
+        messages.clear();
+        return result;
     }
 
     @Override
@@ -125,7 +129,7 @@ public abstract class AbstractFileSetCheck
         fileExtensions = new String[extensions.length];
         for (int i = 0; i < extensions.length; i++) {
             final String extension = extensions[i];
-            if (CommonUtils.startsWithChar(extension, '.')) {
+            if (CommonUtil.startsWithChar(extension, '.')) {
                 fileExtensions[i] = extension;
             }
             else {
@@ -138,8 +142,8 @@ public abstract class AbstractFileSetCheck
      * Adds the sorted set of {@link LocalizedMessage} to the message collector.
      * @param messages the sorted set of {@link LocalizedMessage}.
      */
-    protected final void addMessages(SortedSet<LocalizedMessage> messages) {
-        messageCollector.addAll(messages);
+    protected static void addMessages(SortedSet<LocalizedMessage> messages) {
+        MESSAGE_COLLECTOR.get().addAll(messages);
     }
 
     @Override
@@ -150,7 +154,7 @@ public abstract class AbstractFileSetCheck
     @Override
     public final void log(int lineNo, int colNo, String key,
             Object... args) {
-        messageCollector.add(
+        MESSAGE_COLLECTOR.get().add(
                 new LocalizedMessage(lineNo,
                         colNo,
                         getMessageBundle(),
@@ -169,8 +173,9 @@ public abstract class AbstractFileSetCheck
      * @param fileName the audited file
      */
     protected final void fireErrors(String fileName) {
-        final SortedSet<LocalizedMessage> errors = new TreeSet<>(messageCollector);
-        messageCollector.clear();
+        final SortedSet<LocalizedMessage> errors = new TreeSet<>(MESSAGE_COLLECTOR.get());
+        MESSAGE_COLLECTOR.get().clear();
         messageDispatcher.fireErrors(fileName, errors);
     }
+
 }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,13 +21,14 @@ package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import java.util.Arrays;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CheckUtils;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
-import com.puppycrawl.tools.checkstyle.utils.ScopeUtils;
-import com.puppycrawl.tools.checkstyle.utils.TokenUtils;
+import com.puppycrawl.tools.checkstyle.utils.CheckUtil;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
+import com.puppycrawl.tools.checkstyle.utils.ScopeUtil;
+import com.puppycrawl.tools.checkstyle.utils.TokenUtil;
 
 /**
  * <p>
@@ -133,10 +134,8 @@ import com.puppycrawl.tools.checkstyle.utils.TokenUtils;
  * }
  * }
  * </pre>
- * @author Rick Giles
- * @author Lars Kühne
- * @author Daniel Solano Gómez
  */
+@StatelessCheck
 public class MagicNumberCheck extends AbstractCheck {
 
     /**
@@ -202,7 +201,7 @@ public class MagicNumberCheck extends AbstractCheck {
 
     @Override
     public int[] getRequiredTokens() {
-        return CommonUtils.EMPTY_INT_ARRAY;
+        return CommonUtil.EMPTY_INT_ARRAY;
     }
 
     @Override
@@ -263,7 +262,7 @@ public class MagicNumberCheck extends AbstractCheck {
         // no containing variable definition?
         if (varDefAST != null) {
             // implicit constant?
-            if (ScopeUtils.isInInterfaceOrAnnotationBlock(varDefAST)
+            if (ScopeUtil.isInInterfaceOrAnnotationBlock(varDefAST)
                     || varDefAST.getType() == TokenTypes.ENUM_CONSTANT_DEF) {
                 constantDef = varDefAST;
             }
@@ -271,7 +270,7 @@ public class MagicNumberCheck extends AbstractCheck {
                 // explicit constant
                 final DetailAST modifiersAST = varDefAST.findFirstToken(TokenTypes.MODIFIERS);
 
-                if (modifiersAST.branchContains(TokenTypes.FINAL)) {
+                if (modifiersAST.findFirstToken(TokenTypes.FINAL) != null) {
                     constantDef = varDefAST;
                 }
             }
@@ -295,8 +294,7 @@ public class MagicNumberCheck extends AbstractCheck {
             reportAST = parent;
             text = "+" + text;
         }
-        log(reportAST.getLineNo(),
-                reportAST.getColumnNo(),
+        log(reportAST,
                 MSG_KEY,
                 text);
     }
@@ -315,7 +313,7 @@ public class MagicNumberCheck extends AbstractCheck {
         boolean inHashCodeMethod = false;
 
         // if not in a code block, can't be in hashCode()
-        if (ScopeUtils.isInCodeBlock(ast)) {
+        if (ScopeUtil.isInCodeBlock(ast)) {
             // find the method definition AST
             DetailAST methodDefAST = ast.getParent();
             while (methodDefAST != null
@@ -346,7 +344,7 @@ public class MagicNumberCheck extends AbstractCheck {
      * @return true if the number of ast is in the ignore list of this check.
      */
     private boolean isInIgnoreList(DetailAST ast) {
-        double value = CheckUtils.parseDouble(ast.getText(), ast.getType());
+        double value = CheckUtil.parseDouble(ast.getText(), ast.getType());
         final DetailAST parent = ast.getParent();
         if (parent.getType() == TokenTypes.UNARY_MINUS) {
             value = -1 * value;
@@ -381,7 +379,7 @@ public class MagicNumberCheck extends AbstractCheck {
     public void setConstantWaiverParentToken(String... tokens) {
         constantWaiverParentToken = new int[tokens.length];
         for (int i = 0; i < tokens.length; i++) {
-            constantWaiverParentToken[i] = TokenUtils.getTokenId(tokens[i]);
+            constantWaiverParentToken[i] = TokenUtil.getTokenId(tokens[i]);
         }
         Arrays.sort(constantWaiverParentToken);
     }
@@ -393,7 +391,7 @@ public class MagicNumberCheck extends AbstractCheck {
      */
     public void setIgnoreNumbers(double... list) {
         if (list.length == 0) {
-            ignoreNumbers = CommonUtils.EMPTY_DOUBLE_ARRAY;
+            ignoreNumbers = CommonUtil.EMPTY_DOUBLE_ARRAY;
         }
         else {
             ignoreNumbers = new double[list.length];
@@ -449,4 +447,5 @@ public class MagicNumberCheck extends AbstractCheck {
 
         return result;
     }
+
 }

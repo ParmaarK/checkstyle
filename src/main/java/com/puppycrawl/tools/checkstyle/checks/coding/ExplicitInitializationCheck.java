@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,11 +19,12 @@
 
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CheckUtils;
-import com.puppycrawl.tools.checkstyle.utils.ScopeUtils;
+import com.puppycrawl.tools.checkstyle.utils.CheckUtil;
+import com.puppycrawl.tools.checkstyle.utils.ScopeUtil;
 
 /**
  * <p>
@@ -46,8 +47,8 @@ import com.puppycrawl.tools.checkstyle.utils.ScopeUtils;
  * values.
  * </p>
  *
- * @author o_sukhodolsky
  */
+@StatelessCheck
 public class ExplicitInitializationCheck extends AbstractCheck {
 
     /**
@@ -61,17 +62,17 @@ public class ExplicitInitializationCheck extends AbstractCheck {
 
     @Override
     public final int[] getDefaultTokens() {
-        return new int[] {TokenTypes.VARIABLE_DEF};
+        return getRequiredTokens();
     }
 
     @Override
     public final int[] getRequiredTokens() {
-        return getDefaultTokens();
+        return new int[] {TokenTypes.VARIABLE_DEF};
     }
 
     @Override
     public final int[] getAcceptableTokens() {
-        return new int[] {TokenTypes.VARIABLE_DEF};
+        return getRequiredTokens();
     }
 
     /**
@@ -146,13 +147,13 @@ public class ExplicitInitializationCheck extends AbstractCheck {
 
         // do not check local variables and
         // fields declared in interface/annotations
-        if (!ScopeUtils.isLocalVariableDef(ast)
-                && !ScopeUtils.isInInterfaceOrAnnotationBlock(ast)) {
+        if (!ScopeUtil.isLocalVariableDef(ast)
+                && !ScopeUtil.isInInterfaceOrAnnotationBlock(ast)) {
             final DetailAST assign = ast.findFirstToken(TokenTypes.ASSIGN);
 
             if (assign != null) {
                 final DetailAST modifiers = ast.findFirstToken(TokenTypes.MODIFIERS);
-                skipCase = modifiers.branchContains(TokenTypes.FINAL);
+                skipCase = modifiers.findFirstToken(TokenTypes.FINAL) != null;
             }
         }
         return skipCase;
@@ -192,16 +193,19 @@ public class ExplicitInitializationCheck extends AbstractCheck {
      */
     private static boolean isZero(DetailAST expr) {
         final int type = expr.getType();
+        final boolean isZero;
         switch (type) {
             case TokenTypes.NUM_FLOAT:
             case TokenTypes.NUM_DOUBLE:
             case TokenTypes.NUM_INT:
             case TokenTypes.NUM_LONG:
                 final String text = expr.getText();
-                return Double.compare(
-                    CheckUtils.parseDouble(text, type), 0.0) == 0;
+                isZero = Double.compare(CheckUtil.parseDouble(text, type), 0.0) == 0;
+                break;
             default:
-                return false;
+                isZero = false;
         }
+        return isZero;
     }
+
 }

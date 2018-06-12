@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -42,9 +42,9 @@ import java.util.List;
  * <MY_FOO_TYPE>}, etc. According to this class they are valid tags.
  * </p>
  *
- * @author Chris Stillwell
  */
 class TagParser {
+
     /** List of HtmlTags found on the input line of text. */
     private final List<HtmlTag> tags = new LinkedList<>();
 
@@ -173,7 +173,6 @@ class TagParser {
         int column = tagStart.getColumnNo() + 1;
         String text = javadocText[tagStart.getLineNo()];
         if (column < text.length()) {
-
             if (text.charAt(column) == '/') {
                 column++;
             }
@@ -274,9 +273,9 @@ class TagParser {
 
     /**
      * Represents current position in the text.
-     * @author o_sukholsky
      */
     private static final class Point {
+
         /** Line number. */
         private final int lineNo;
         /** Column number.*/
@@ -307,5 +306,7 @@ class TagParser {
         public int getColumnNo() {
             return columnNo;
         }
+
     }
+
 }

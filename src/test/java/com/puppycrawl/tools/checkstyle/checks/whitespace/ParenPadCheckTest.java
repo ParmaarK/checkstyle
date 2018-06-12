@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -26,12 +26,17 @@ import static com.puppycrawl.tools.checkstyle.checks.whitespace.AbstractParenPad
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.lang.reflect.Method;
+
 import org.junit.Test;
+import org.powermock.reflect.Whitebox;
 
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
+import com.puppycrawl.tools.checkstyle.utils.TokenUtil;
 
 public class ParenPadCheckTest
     extends AbstractModuleTestSupport {
@@ -45,7 +50,7 @@ public class ParenPadCheckTest
     public void testDefault()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ParenPadCheck.class);
+            createModuleConfig(ParenPadCheck.class);
         final String[] expected = {
             "58:12: " + getCheckMessage(MSG_WS_FOLLOWED, "("),
             "58:36: " + getCheckMessage(MSG_WS_PRECEDED, ")"),
@@ -64,7 +69,7 @@ public class ParenPadCheckTest
     public void testSpace()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ParenPadCheck.class);
+            createModuleConfig(ParenPadCheck.class);
         checkConfig.addAttribute("option", PadOption.SPACE.toString());
         final String[] expected = {
             "29:20: " + getCheckMessage(MSG_WS_NOT_FOLLOWED, "("),
@@ -110,7 +115,7 @@ public class ParenPadCheckTest
     public void testDefaultForIterator()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ParenPadCheck.class);
+            createModuleConfig(ParenPadCheck.class);
         final String[] expected = {
             "17:34: " + getCheckMessage(MSG_WS_PRECEDED, ")"),
             "20:35: " + getCheckMessage(MSG_WS_PRECEDED, ")"),
@@ -127,7 +132,7 @@ public class ParenPadCheckTest
     public void testSpaceEmptyForIterator()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ParenPadCheck.class);
+            createModuleConfig(ParenPadCheck.class);
         checkConfig.addAttribute("option", PadOption.SPACE.toString());
         final String[] expected = {
             "11:14: " + getCheckMessage(MSG_WS_NOT_FOLLOWED, "("),
@@ -146,9 +151,9 @@ public class ParenPadCheckTest
     @Test
     public void test1322879() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ParenPadCheck.class);
+            createModuleConfig(ParenPadCheck.class);
         checkConfig.addAttribute("option", PadOption.SPACE.toString());
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputParenPadWithSpace.java"),
                expected);
     }
@@ -156,7 +161,7 @@ public class ParenPadCheckTest
     @Test
     public void testNospaceWithComplexInput() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ParenPadCheck.class);
+            createModuleConfig(ParenPadCheck.class);
         checkConfig.addAttribute("option", PadOption.NOSPACE.toString());
         final String[] expected = {
             "44:27: " + getCheckMessage(MSG_WS_FOLLOWED, "("),
@@ -284,7 +289,7 @@ public class ParenPadCheckTest
     @Test
     public void testConfigureTokens() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(ParenPadCheck.class);
+                createModuleConfig(ParenPadCheck.class);
         checkConfig.addAttribute("tokens", "METHOD_CALL");
         final String[] expected = {
             "90:38: " + getCheckMessage(MSG_WS_PRECEDED, ")"),
@@ -319,11 +324,11 @@ public class ParenPadCheckTest
 
     @Test
     public void testInvalidOption() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(ParenPadCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(ParenPadCheck.class);
         checkConfig.addAttribute("option", "invalid_option");
 
         try {
-            final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+            final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
             verify(checkConfig, getPath("InputParenPadLeftRightAndNoSpace.java"), expected);
             fail("exception expected");
@@ -339,7 +344,7 @@ public class ParenPadCheckTest
 
     @Test
     public void testLambdaAssignment() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(ParenPadCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(ParenPadCheck.class);
         final String[] expected = {
             "9:42: " + getCheckMessage(MSG_WS_FOLLOWED, "("),
             "9:44: " + getCheckMessage(MSG_WS_PRECEDED, ")"),
@@ -359,7 +364,7 @@ public class ParenPadCheckTest
 
     @Test
     public void testLambdaAssignmentWithSpace() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(ParenPadCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(ParenPadCheck.class);
         checkConfig.addAttribute("option", PadOption.SPACE.toString());
         final String[] expected = {
             "9:42: " + getCheckMessage(MSG_WS_NOT_FOLLOWED, "("),
@@ -378,7 +383,7 @@ public class ParenPadCheckTest
 
     @Test
     public void testLambdaCheckDisabled() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(ParenPadCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(ParenPadCheck.class);
         checkConfig.addAttribute("tokens", "EXPR, METHOD_CALL, METHOD_DEF");
         final String[] expected = {
             "19:62: " + getCheckMessage(MSG_WS_FOLLOWED, "("),
@@ -391,7 +396,7 @@ public class ParenPadCheckTest
 
     @Test
     public void testLambdaCheckDisabledWithSpace() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(ParenPadCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(ParenPadCheck.class);
         checkConfig.addAttribute("option", PadOption.SPACE.toString());
         checkConfig.addAttribute("tokens", "EXPR, METHOD_CALL, METHOD_DEF");
         final String[] expected = {
@@ -403,7 +408,7 @@ public class ParenPadCheckTest
 
     @Test
     public void testLambdaCheckOnly() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(ParenPadCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(ParenPadCheck.class);
         checkConfig.addAttribute("tokens", "LAMBDA");
         final String[] expected = {
             "9:42: " + getCheckMessage(MSG_WS_FOLLOWED, "("),
@@ -420,7 +425,7 @@ public class ParenPadCheckTest
 
     @Test
     public void testLambdaCheckOnlyWithSpace() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(ParenPadCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(ParenPadCheck.class);
         checkConfig.addAttribute("option", PadOption.SPACE.toString());
         checkConfig.addAttribute("tokens", "LAMBDA");
         final String[] expected = {
@@ -435,4 +440,50 @@ public class ParenPadCheckTest
         };
         verify(checkConfig, getPath("InputParenPadLambdaOnlyWithSpace.java"), expected);
     }
+
+    @Test
+    public void testLambdaCheckOnlyWithSpace1() throws Exception {
+        final DefaultConfiguration checkConfig = createModuleConfig(ParenPadCheck.class);
+        checkConfig.addAttribute("option", PadOption.SPACE.toString());
+        final String[] expected = {
+            "5:2: " + getCheckMessage(MSG_WS_NOT_PRECEDED, ")"),
+        };
+        verify(checkConfig, getPath("InputParenPadStartOfTheLine.java"), expected);
+    }
+
+    @Test
+    public void testTryWithResources() throws Exception {
+        final DefaultConfiguration checkConfig = createModuleConfig(ParenPadCheck.class);
+        final String[] expected = {
+            "9:36: " + getCheckMessage(MSG_WS_PRECEDED, ")"),
+            "10:60: " + getCheckMessage(MSG_WS_PRECEDED, ")"),
+        };
+        verify(checkConfig, getPath("InputParenPadTryWithResources.java"), expected);
+    }
+
+    /**
+     * Pitest requires us to specify more concrete lower bound for condition for
+     * ParenPadCheck#isAcceptableToken as nodes of first several types like CTOR_DEF,
+     * METHOD_DEF will never reach this method. It is hard to recreate conditions for
+     * all tokens to go through this method. We do not want to change main code to have
+     * this set ok tokens more exact, because it will not be ease to understand.
+     * So we have to use reflection to be sure all
+     * acceptable tokens pass that check.
+     */
+    @Test
+    public void testIsAcceptableToken() throws Exception {
+        final ParenPadCheck check = new ParenPadCheck();
+        final Method method = Whitebox.getMethod(ParenPadCheck.class,
+            "isAcceptableToken", DetailAST.class);
+        final DetailAST ast = new DetailAST();
+        final String message = "Expected that all acceptable tokens will pass isAcceptableToken "
+            + "method, but some token don't: ";
+
+        for (int token : check.getAcceptableTokens()) {
+            ast.setType(token);
+            assertTrue(message + TokenUtil.getTokenName(token),
+                    (boolean) method.invoke(check, ast));
+        }
+    }
+
 }

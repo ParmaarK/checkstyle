@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,8 +25,6 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 /**
  * <p>
  * Checks that {@code catch} parameter names conform to a format specified by the format property.
- * The format is a {@link java.util.regex.Pattern regular expression} and defaults to
- * <strong>^(e|t|ex|[a-z][a-z][a-zA-Z]+)$</strong>.
  * </p>
  * <p>
  * Default pattern has the following characteristic:
@@ -42,6 +40,12 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * <li>prohibits two letter abbreviations like {@code ie} or {@code ee}</li>
  * <li>prohibits any other characters than letters</li>
  * </ul>
+ * <ul>
+ * <li>
+ * Property {@code format} - Specifies valid identifiers. Default value is
+ * {@code "^(e|t|ex|[a-z][a-z][a-zA-Z]+)$"}.
+ * </li>
+ * </ul>
  * <p>
  * An example of how to configure the check is:
  * </p>
@@ -54,11 +58,11 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * </p>
  * <pre>
  * &lt;module name="CatchParameterName"&gt;
- *    &lt;property name="format" value="^[a-z][a-zA-Z0-9]+$"/&gt;
+ *   &lt;property name="format" value="^[a-z][a-zA-Z0-9]+$"/&gt;
  * &lt;/module&gt;
  * </pre>
  *
- * @author Michal Kordas
+ * @since 6.14
  */
 public class CatchParameterNameCheck extends AbstractNameCheck {
 
@@ -71,21 +75,22 @@ public class CatchParameterNameCheck extends AbstractNameCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return getAcceptableTokens();
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {TokenTypes.PARAMETER_DEF};
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getAcceptableTokens();
+        return new int[] {TokenTypes.PARAMETER_DEF};
     }
 
     @Override
     protected boolean mustCheckName(DetailAST ast) {
         return ast.getParent().getType() == TokenTypes.LITERAL_CATCH;
     }
+
 }

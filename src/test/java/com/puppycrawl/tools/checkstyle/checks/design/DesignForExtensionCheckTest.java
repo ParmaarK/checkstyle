@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -27,10 +27,11 @@ import org.junit.Test;
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class DesignForExtensionCheckTest
     extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/design/designforextension";
@@ -47,13 +48,12 @@ public class DesignForExtensionCheckTest
     @Test
     public void testIt() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(DesignForExtensionCheck.class);
+            createModuleConfig(DesignForExtensionCheck.class);
         final String[] expected = {
             "46:5: " + getCheckMessage(MSG_KEY, "InputDesignForExtension", "doh"),
             "100:9: " + getCheckMessage(MSG_KEY, "anotherNonFinalClass", "someMethod"),
         };
         verify(checkConfig, getPath("InputDesignForExtension.java"), expected);
-
     }
 
     @Test
@@ -66,7 +66,7 @@ public class DesignForExtensionCheckTest
 
     @Test
     public void testOverridableMethods() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(DesignForExtensionCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(DesignForExtensionCheck.class);
         final String[] expected = {
             "6:9: " + getCheckMessage(MSG_KEY, "A", "foo1"),
             "30:9: " + getCheckMessage(MSG_KEY, "A", "foo8"),
@@ -80,13 +80,14 @@ public class DesignForExtensionCheckTest
             "96:9: " + getCheckMessage(MSG_KEY, "A", "foo23"),
             "110:9: " + getCheckMessage(MSG_KEY, "A", "foo26"),
             "117:9: " + getCheckMessage(MSG_KEY, "A", "foo27"),
+            "197:9: " + getCheckMessage(MSG_KEY, "A", "foo41"),
         };
         verify(checkConfig, getPath("InputDesignForExtensionOverridableMethods.java"), expected);
     }
 
     @Test
     public void testIgnoredAnnotationsOption() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(DesignForExtensionCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(DesignForExtensionCheck.class);
         checkConfig.addAttribute("ignoredAnnotations", "Override, Deprecated, MyAnnotation");
         final String[] expected = {
             "31:5: "
@@ -103,20 +104,21 @@ public class DesignForExtensionCheckTest
 
     @Test
     public void testIgnoreAnnotationsOptionWithMultipleAnnotations() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(DesignForExtensionCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(DesignForExtensionCheck.class);
         checkConfig.addAttribute("ignoredAnnotations",
             "Override, Deprecated, Before, After, BeforeClass, AfterClass");
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputDesignForExtensionMultipleAnnotations.java"), expected);
     }
 
     @Test
     public void testNativeMethods() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(DesignForExtensionCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(DesignForExtensionCheck.class);
         checkConfig.addAttribute("ignoredAnnotations", "Deprecated");
         final String[] expected = {
             "8:5: " + getCheckMessage(MSG_KEY, "InputDesignForExtensionNativeMethods", "foo1"),
         };
         verify(checkConfig, getPath("InputDesignForExtensionNativeMethods.java"), expected);
     }
+
 }

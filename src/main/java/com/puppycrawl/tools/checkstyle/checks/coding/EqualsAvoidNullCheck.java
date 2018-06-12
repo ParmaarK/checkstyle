@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -55,9 +56,8 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  *  }
  * </pre>
  *
- * @author Travis Schneeberger
- * @author Vladislav Lisetskiy
  */
+@FileStatefulCheck
 public class EqualsAvoidNullCheck extends AbstractCheck {
 
     /**
@@ -86,11 +86,16 @@ public class EqualsAvoidNullCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return getAcceptableTokens();
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getAcceptableTokens() {
+        return getRequiredTokens();
+    }
+
+    @Override
+    public int[] getRequiredTokens() {
         return new int[] {
             TokenTypes.METHOD_CALL,
             TokenTypes.CLASS_DEF,
@@ -109,11 +114,6 @@ public class EqualsAvoidNullCheck extends AbstractCheck {
             TokenTypes.ENUM_CONSTANT_DEF,
             TokenTypes.LITERAL_NEW,
         };
-    }
-
-    @Override
-    public int[] getRequiredTokens() {
-        return getAcceptableTokens();
     }
 
     /**
@@ -160,7 +160,7 @@ public class EqualsAvoidNullCheck extends AbstractCheck {
                 && astType != TokenTypes.SLIST
                 && astType != TokenTypes.LITERAL_NEW
                 || astType == TokenTypes.LITERAL_NEW
-                    && ast.branchContains(TokenTypes.LCURLY)) {
+                    && ast.findFirstToken(TokenTypes.OBJBLOCK) != null) {
             currentFrame = currentFrame.getParent();
         }
         else if (astType == TokenTypes.SLIST) {
@@ -241,7 +241,7 @@ public class EqualsAvoidNullCheck extends AbstractCheck {
      * @param ast LITERAL_NEW ast.
      */
     private void processLiteralNew(DetailAST ast) {
-        if (ast.branchContains(TokenTypes.LCURLY)) {
+        if (ast.findFirstToken(TokenTypes.OBJBLOCK) != null) {
             final FieldFrame frame = new FieldFrame(currentFrame);
             currentFrame.addChild(frame);
             currentFrame = frame;
@@ -278,12 +278,10 @@ public class EqualsAvoidNullCheck extends AbstractCheck {
                 && isCalledOnStringFieldOrVariable(objCalledOn)) {
             final String methodName = methodCall.getFirstChild().getLastChild().getText();
             if (EQUALS.equals(methodName)) {
-                log(methodCall.getLineNo(), methodCall.getColumnNo(),
-                    MSG_EQUALS_AVOID_NULL);
+                log(methodCall, MSG_EQUALS_AVOID_NULL);
             }
             else {
-                log(methodCall.getLineNo(), methodCall.getColumnNo(),
-                    MSG_EQUALS_IGNORE_CASE_AVOID_NULL);
+                log(methodCall, MSG_EQUALS_IGNORE_CASE_AVOID_NULL);
             }
         }
     }
@@ -361,11 +359,12 @@ public class EqualsAvoidNullCheck extends AbstractCheck {
      * @return the next relevant token
      */
     private static DetailAST skipVariableAssign(final DetailAST currentAST) {
+        DetailAST result = currentAST;
         if (currentAST.getType() == TokenTypes.ASSIGN
                 && currentAST.getFirstChild().getType() == TokenTypes.IDENT) {
-            return currentAST.getFirstChild().getNextSibling();
+            result = currentAST.getFirstChild().getNextSibling();
         }
-        return currentAST;
+        return result;
     }
 
     /**
@@ -474,9 +473,18 @@ public class EqualsAvoidNullCheck extends AbstractCheck {
      */
     private static boolean checkLineNo(DetailAST field, DetailAST objCalledOn) {
         boolean result = false;
+        // Required for pitest coverage. We should specify columnNo passing condition
+        // in such a way, so that the minimal possible distance between field and
+        // objCalledOn will be the maximal condition to pass this check.
+        // The minimal distance between objCalledOn and field (of type String) initialization
+        // is calculated as follows:
+        // String(6) + space(1) + variableName(1) + assign(1) +
+        // anotherStringVariableName(1) + semicolon(1) = 11
+        // Example: length of "String s=d;" is 11 symbols.
+        final int minimumSymbolsBetween = 11;
         if (field.getLineNo() < objCalledOn.getLineNo()
                 || field.getLineNo() == objCalledOn.getLineNo()
-                    && field.getColumnNo() < objCalledOn.getColumnNo()) {
+                    && field.getColumnNo() + minimumSymbolsBetween <= objCalledOn.getColumnNo()) {
             result = true;
         }
         return result;
@@ -501,6 +509,7 @@ public class EqualsAvoidNullCheck extends AbstractCheck {
      * Holds the names of fields of a type.
      */
     private static class FieldFrame {
+
         /** Parent frame. */
         private final FieldFrame parent;
 
@@ -605,12 +614,14 @@ public class EqualsAvoidNullCheck extends AbstractCheck {
          * @return true if this FieldFrame contains instance field field.
          */
         public DetailAST findField(String name) {
+            DetailAST resultField = null;
             for (DetailAST field: fields) {
                 if (getFieldName(field).equals(name)) {
-                    return field;
+                    resultField = field;
+                    break;
                 }
             }
-            return null;
+            return resultField;
         }
 
         /**
@@ -629,5 +640,7 @@ public class EqualsAvoidNullCheck extends AbstractCheck {
         private static String getFieldName(DetailAST field) {
             return field.findFirstToken(TokenTypes.IDENT).getText();
         }
+
     }
+
 }

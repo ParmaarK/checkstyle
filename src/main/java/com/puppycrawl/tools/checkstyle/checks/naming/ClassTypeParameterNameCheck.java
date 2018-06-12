@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,10 +25,13 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 /**
  * <p>
  * Checks that class type parameter names conform to a format specified
- * by the format property.  The format is a
- * {@link java.util.regex.Pattern regular expression} and defaults to
- * <strong>^[A-Z]$</strong>.
+ * by the format property.
  * </p>
+ * <ul>
+ * <li>
+ * Property {@code format} - Specifies valid identifiers. Default value is {@code "^[A-Z]$"}.
+ * </li>
+ * </ul>
  * <p>
  * An example of how to configure the check is:
  * </p>
@@ -37,18 +40,19 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * </pre>
  * <p>
  * An example of how to configure the check for names that are only a single
- * letter is
+ * letter is:
  * </p>
  * <pre>
  * &lt;module name="ClassTypeParameterName"&gt;
- *    &lt;property name="format" value="^[a-zA-Z]$"/&gt;
+ *   &lt;property name="format" value="^[a-zA-Z]$"/&gt;
  * &lt;/module&gt;
  * </pre>
  *
- * @author Travis Schneeberger
+ * @since 5.0
  */
 public class ClassTypeParameterNameCheck
     extends AbstractNameCheck {
+
     /** Creates a new {@code ClassTypeParameterNameCheck} instance. */
     public ClassTypeParameterNameCheck() {
         super("^[A-Z]$");
@@ -56,19 +60,19 @@ public class ClassTypeParameterNameCheck
 
     @Override
     public int[] getDefaultTokens() {
-        return getAcceptableTokens();
+        return getRequiredTokens();
     }
 
     @Override
     public final int[] getAcceptableTokens() {
-        return new int[] {
-            TokenTypes.TYPE_PARAMETER,
-        };
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getAcceptableTokens();
+        return new int[] {
+            TokenTypes.TYPE_PARAMETER,
+        };
     }
 
     @Override
@@ -77,4 +81,5 @@ public class ClassTypeParameterNameCheck
             ast.getParent().getParent();
         return location.getType() == TokenTypes.CLASS_DEF;
     }
+
 }

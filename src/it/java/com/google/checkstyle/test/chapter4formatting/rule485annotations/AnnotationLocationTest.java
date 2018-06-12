@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,29 +19,24 @@
 
 package com.google.checkstyle.test.chapter4formatting.rule485annotations;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.junit.Test;
 
-import com.google.checkstyle.test.base.BaseCheckTestSupport;
+import com.google.checkstyle.test.base.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 import com.puppycrawl.tools.checkstyle.checks.annotation.AnnotationLocationCheck;
 
-public class AnnotationLocationTest extends BaseCheckTestSupport {
+public class AnnotationLocationTest extends AbstractModuleTestSupport {
 
     @Override
-    protected String getPath(String fileName) throws IOException {
-        return super.getPath("chapter4formatting" + File.separator + "rule485annotations"
-                + File.separator + fileName);
+    protected String getPackageLocation() {
+        return "com/google/checkstyle/test/chapter4formatting/rule485annotations";
     }
 
     @Test
     public void testAnnotation() throws Exception {
-
         final Class<AnnotationLocationCheck> clazz = AnnotationLocationCheck.class;
         getCheckMessage(clazz, "annotation.location.alone");
-        final Configuration checkConfig = getCheckConfig("AnnotationLocation",
+        final Configuration checkConfig = getModuleConfig("AnnotationLocation",
                 "AnnotationLocationMostCases");
 
         final String msgLocationAlone = "annotation.location.alone";
@@ -68,10 +63,9 @@ public class AnnotationLocationTest extends BaseCheckTestSupport {
 
     @Test
     public void testAnnotationVariables() throws Exception {
-
         final Class<AnnotationLocationCheck> clazz = AnnotationLocationCheck.class;
         getCheckMessage(clazz, "annotation.location.alone");
-        final Configuration checkConfig = getCheckConfig("AnnotationLocation",
+        final Configuration checkConfig = getModuleConfig("AnnotationLocation",
                 "AnnotationLocationVariables");
 
         final String msgLocation = "annotation.location";
@@ -84,4 +78,5 @@ public class AnnotationLocationTest extends BaseCheckTestSupport {
         final Integer[] warnList = getLinesWithWarn(filePath);
         verify(checkConfig, filePath, expected, warnList);
     }
+
 }

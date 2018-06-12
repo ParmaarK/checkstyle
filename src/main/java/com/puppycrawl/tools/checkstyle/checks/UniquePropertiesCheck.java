@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,17 +20,18 @@
 package com.puppycrawl.tools.checkstyle.checks;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.ImmutableMultiset;
-import com.google.common.collect.Multiset;
-import com.google.common.collect.Multiset.Entry;
-import com.google.common.io.Closeables;
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractFileSetCheck;
 import com.puppycrawl.tools.checkstyle.api.FileText;
 
@@ -38,8 +39,8 @@ import com.puppycrawl.tools.checkstyle.api.FileText;
  * Checks the uniqueness of property keys (left from equal sign) in the
  * properties file.
  *
- * @author Pavel Baranchikov
  */
+@StatelessCheck
 public class UniquePropertiesCheck extends AbstractFileSetCheck {
 
     /**
@@ -66,25 +67,20 @@ public class UniquePropertiesCheck extends AbstractFileSetCheck {
     @Override
     protected void processFiltered(File file, FileText fileText) {
         final UniqueProperties properties = new UniqueProperties();
-        FileInputStream fileInputStream = null;
-        try {
-            fileInputStream = new FileInputStream(file);
-            properties.load(fileInputStream);
+        try (InputStream inputStream = Files.newInputStream(file.toPath())) {
+            properties.load(inputStream);
         }
         catch (IOException ex) {
             log(0, MSG_IO_EXCEPTION_KEY, file.getPath(),
                     ex.getLocalizedMessage());
         }
-        finally {
-            Closeables.closeQuietly(fileInputStream);
-        }
 
-        for (Entry<String> duplication : properties
+        for (Entry<String, AtomicInteger> duplication : properties
                 .getDuplicatedKeys().entrySet()) {
-            final String keyName = duplication.getElement();
+            final String keyName = duplication.getKey();
             final int lineNumber = getLineNumber(fileText, keyName);
             // Number of occurrences is number of duplications + 1
-            log(lineNumber, MSG_KEY, keyName, duplication.getCount() + 1);
+            log(lineNumber, MSG_KEY, keyName, duplication.getValue().get() + 1);
         }
     }
 
@@ -111,7 +107,9 @@ public class UniquePropertiesCheck extends AbstractFileSetCheck {
             }
             ++lineNumber;
         }
-        if (lineNumber > fileText.size()) {
+        // -1 as check seeks for the first duplicate occurrence in file,
+        // so it cannot be the last line.
+        if (lineNumber > fileText.size() - 1) {
             lineNumber = 0;
         }
         return lineNumber;
@@ -133,24 +131,29 @@ public class UniquePropertiesCheck extends AbstractFileSetCheck {
     /**
      * Properties subclass to store duplicated property keys in a separate map.
      *
-     * @author Pavel Baranchikov
      * @noinspection ClassExtendsConcreteCollection, SerializableHasSerializationMethods
      */
     private static class UniqueProperties extends Properties {
+
         private static final long serialVersionUID = 1L;
         /**
-         * Multiset, holding duplicated keys. Keys are added here only if they
+         * Map, holding duplicated keys and their count. Keys are added here only if they
          * already exist in Properties' inner map.
          */
-        private final Multiset<String> duplicatedKeys = HashMultiset
-                .create();
+        private final Map<String, AtomicInteger> duplicatedKeys = new HashMap<>();
 
+        /**
+         * Puts the value into properties by the key specified.
+         * @noinspection UseOfPropertiesAsHashtable
+         */
         @Override
         public synchronized Object put(Object key, Object value) {
             final Object oldValue = super.put(key, value);
             if (oldValue != null && key instanceof String) {
                 final String keyString = (String) key;
-                duplicatedKeys.add(keyString);
+
+                duplicatedKeys.computeIfAbsent(keyString, empty -> new AtomicInteger(0))
+                        .incrementAndGet();
             }
             return oldValue;
         }
@@ -160,8 +163,10 @@ public class UniquePropertiesCheck extends AbstractFileSetCheck {
          *
          * @return A collection of duplicated keys.
          */
-        public Multiset<String> getDuplicatedKeys() {
-            return ImmutableMultiset.copyOf(duplicatedKeys);
+        public Map<String, AtomicInteger> getDuplicatedKeys() {
+            return new HashMap<>(duplicatedKeys);
         }
+
     }
+
 }

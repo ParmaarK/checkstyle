@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,7 @@ package com.puppycrawl.tools.checkstyle.checks.sizes;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -29,8 +30,8 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 /**
  * Restricts the number of executable statements to a specified limit
  * (default = 30).
- * @author Simon Harris
  */
+@FileStatefulCheck
 public final class ExecutableStatementCountCheck
     extends AbstractCheck {
 
@@ -149,8 +150,7 @@ public final class ExecutableStatementCountCheck
     private void leaveMemberDef(DetailAST ast) {
         final int count = context.getCount();
         if (count > max) {
-            log(ast.getLineNo(), ast.getColumnNo(),
-                    MSG_KEY, count, max);
+            log(ast, MSG_KEY, count, max);
         }
         context = contextStack.pop();
     }
@@ -170,7 +170,6 @@ public final class ExecutableStatementCountCheck
                 && type != TokenTypes.METHOD_DEF
                 && type != TokenTypes.INSTANCE_INIT
                 && type != TokenTypes.STATIC_INIT) {
-
                 parent = parent.getParent();
                 type = parent.getType();
             }
@@ -182,9 +181,9 @@ public final class ExecutableStatementCountCheck
 
     /**
      * Class to encapsulate counting information about one member.
-     * @author Simon Harris
      */
     private static class Context {
+
         /** Member AST node. */
         private final DetailAST ast;
 
@@ -223,5 +222,7 @@ public final class ExecutableStatementCountCheck
         public int getCount() {
             return count;
         }
+
     }
+
 }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,9 +25,9 @@ import com.puppycrawl.tools.checkstyle.api.FileText;
 
 /**
  * A detector that matches individual lines.
- * @author oliver
  */
 class SinglelineDetector {
+
     /**
      * A key is pointing to the warning message text in "messages.properties"
      * file.
@@ -108,10 +108,7 @@ class SinglelineDetector {
             // So we need to use (endCol - 1) here.
             if (options.getSuppressor()
                     .shouldSuppress(lineNo, startCol, lineNo, endCol - 1)) {
-                if (endCol < line.length()) {
-                    // check if the expression is on the rest of the line
-                    checkLine(lineNo, line, matcher, endCol);
-                }
+                checkLine(lineNo, line, matcher, endCol);
             }
             else {
                 currentMatches++;
@@ -127,4 +124,5 @@ class SinglelineDetector {
             }
         }
     }
+
 }

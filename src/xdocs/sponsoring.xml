@@ -6,7 +6,8 @@
 
   <head>
     <title>Sponsoring</title>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"/>
+    <script type="text/javascript"
+            src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"/>
     <script type="text/javascript" src="js/anchors.js"/>
     <script type="text/javascript" src="js/google-analytics.js"/>
     <link rel="icon" href="images/favicon.png" type="image/x-icon" />
@@ -18,25 +19,42 @@
     <section name="Sponsoring">
 
       <p>
-        If you want to speed up fixing of issue and want to encourage somebody in internet to resolve any issue:
+        If you want to speed up fixing of issue and want to encourage somebody in
+        internet to resolve any issue:
       </p>
 
       <p>
-        <!-- "502 Bad Gateway" for more than a day
-        <a href="https://freedomsponsors.org/search/?project_name=checkstyle">freedomsponsors - checkstyle</a>
+        <a href="https://freedomsponsors.org/search/?project_name=checkstyle">
+          freedomsponsors - checkstyle</a>
         <br/>
-        -->
         <a href="https://www.bountysource.com/teams/checkstyle/issues">bountysource - checkstyle</a>
         <br/>
-        <a href="https://salt.bountysource.com/teams/checkstyle">bountysource (salt) - checkstyle</a>
+        <a href="https://salt.bountysource.com/teams/checkstyle">
+          bountysource (salt) - checkstyle</a>
         <br/>
-        <a href="https://gratipay.com/checkstyle/">gratipay - checkstyle</a>
+        <a href="https://flattr.com/submit/auto?fid=g39d10&amp;url=http%3A%2F%2Fcheckstyle.sourceforge.net"
+           target="_blank">
+          <img src="https://button.flattr.com/flattr-badge-large.png"
+               alt="Flattr this" title="Flattr this" border="0"/>
+        </a>
         <br/>
-        <a href="https://flattr.com/submit/auto?fid=g39d10&amp;url=http%3A%2F%2Fcheckstyle.sourceforge.net" target="_blank"><img src="https://button.flattr.com/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0"/></a>
+        Donate by <a href="https://liberapay.com/checkstyle/">Liberapay</a>:
+        <script src="https://liberapay.com/~150680/widgets/button.js" />
+        <noscript>
+          <a href="https://liberapay.com/~150680/donate">
+            <img alt="Donate using Liberapay"
+               src="https://liberapay.com/assets/widgets/donate.svg"/>
+          </a>
+        </noscript>
+        <br/>
+        <object type="image/svg+xml"
+        data="https://opencollective.com/checkstyle/tiers/backer.svg?avatarHeight=76&amp;width=600">
+        </object>
       </p>
 
       <p>
-        For any other proposal please do not hesitate to contact me (Roman Ivanov) by email "ivanov-jr['a']mail[dot]ru".
+        For any other proposal please do not hesitate to contact me (Roman Ivanov) by email
+        "ivanov-jr['a']mail[dot]ru".
       </p>
 
     </section>

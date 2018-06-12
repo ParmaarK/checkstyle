@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.DetailNode;
 import com.puppycrawl.tools.checkstyle.api.JavadocTokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.JavadocUtils;
+import com.puppycrawl.tools.checkstyle.utils.JavadocUtil;
 
 /**
  * Checks that a JavaDoc block can fit on a single line and doesn't
@@ -53,9 +53,6 @@ import com.puppycrawl.tools.checkstyle.utils.JavadocUtils;
  * &lt;/module&gt;
  * </pre>
  *
- * @author baratali
- * @author maxvetrenko
- * @author vladlis
  *
  */
 public class SingleLineJavadocCheck extends AbstractJavadocCheck {
@@ -131,12 +128,12 @@ public class SingleLineJavadocCheck extends AbstractJavadocCheck {
      * @param javadocRoot javadoc root node.
      * @return true, if comment has javadoc tags which are not ignored.
      * @see <a href=
-     * http://docs.oracle.com/javase/7/docs/technotes/tools/windows/javadoc.html#blockandinlinetags>
+     * https://docs.oracle.com/javase/7/docs/technotes/tools/windows/javadoc.html#blockandinlinetags>
      * Block and inline tags</a>
      */
     private boolean hasJavadocTags(DetailNode javadocRoot) {
         final DetailNode javadocTagSection =
-                JavadocUtils.findFirstToken(javadocRoot, JavadocTokenTypes.JAVADOC_TAG);
+                JavadocUtil.findFirstToken(javadocRoot, JavadocTokenTypes.JAVADOC_TAG);
         return javadocTagSection != null && !isTagIgnored(javadocTagSection);
     }
 
@@ -146,19 +143,19 @@ public class SingleLineJavadocCheck extends AbstractJavadocCheck {
      * @param javadocRoot javadoc root node.
      * @return true, if comment has in-line tags which are not ignored.
      * @see <a href=
-     * http://docs.oracle.com/javase/7/docs/technotes/tools/windows/javadoc.html#javadoctags>
+     * https://docs.oracle.com/javase/7/docs/technotes/tools/windows/javadoc.html#javadoctags>
      * JavadocTags</a>
      */
     private boolean hasJavadocInlineTags(DetailNode javadocRoot) {
         DetailNode javadocTagSection =
-                JavadocUtils.findFirstToken(javadocRoot, JavadocTokenTypes.JAVADOC_INLINE_TAG);
+                JavadocUtil.findFirstToken(javadocRoot, JavadocTokenTypes.JAVADOC_INLINE_TAG);
         boolean foundTag = false;
         while (javadocTagSection != null) {
             if (!isTagIgnored(javadocTagSection)) {
                 foundTag = true;
                 break;
             }
-            javadocTagSection = JavadocUtils.getNextSibling(
+            javadocTagSection = JavadocUtil.getNextSibling(
                     javadocTagSection, JavadocTokenTypes.JAVADOC_INLINE_TAG);
         }
         return foundTag;
@@ -171,6 +168,7 @@ public class SingleLineJavadocCheck extends AbstractJavadocCheck {
      * @return true, if ignoredTags contains javadocTagSection's javadoc tag.
      */
     private boolean isTagIgnored(DetailNode javadocTagSection) {
-        return ignoredTags.contains(JavadocUtils.getTagName(javadocTagSection));
+        return ignoredTags.contains(JavadocUtil.getTagName(javadocTagSection));
     }
+
 }

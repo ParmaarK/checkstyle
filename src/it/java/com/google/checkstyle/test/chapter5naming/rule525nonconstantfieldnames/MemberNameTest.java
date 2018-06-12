@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,37 +19,24 @@
 
 package com.google.checkstyle.test.chapter5naming.rule525nonconstantfieldnames;
 
-import java.io.File;
-import java.io.IOException;
-
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.google.checkstyle.test.base.BaseCheckTestSupport;
-import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+import com.google.checkstyle.test.base.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 
-public class MemberNameTest extends BaseCheckTestSupport {
+public class MemberNameTest extends AbstractModuleTestSupport {
 
     private static final String MSG_KEY = "name.invalidPattern";
-    private static Configuration checkConfig;
-    private static String format;
 
     @Override
-    protected String getPath(String fileName) throws IOException {
-        return super.getPath("chapter5naming" + File.separator + "rule525nonconstantfieldnames"
-                + File.separator + fileName);
-    }
-
-    @BeforeClass
-    public static void setConfigurationBuilder() throws CheckstyleException {
-        checkConfig = getCheckConfig("MemberName");
-        format = checkConfig.getAttribute("format");
+    protected String getPackageLocation() {
+        return "com/google/checkstyle/test/chapter5naming/rule525nonconstantfieldnames";
     }
 
     @Test
     public void testMemberName() throws Exception {
-
+        final Configuration checkConfig = getModuleConfig("MemberName");
+        final String format = checkConfig.getAttribute("format");
         final String[] expected = {
             "5:16: " + getCheckMessage(checkConfig.getMessages(), MSG_KEY, "mPublic", format),
             "6:19: " + getCheckMessage(checkConfig.getMessages(), MSG_KEY, "mProtected", format),
@@ -74,7 +61,8 @@ public class MemberNameTest extends BaseCheckTestSupport {
 
     @Test
     public void testSimple() throws Exception {
-
+        final Configuration checkConfig = getModuleConfig("MemberName");
+        final String format = checkConfig.getAttribute("format");
         final String[] expected = {
             "12:17: " + getCheckMessage(checkConfig.getMessages(), MSG_KEY, "bad$Static", format),
             "17:17: " + getCheckMessage(checkConfig.getMessages(), MSG_KEY, "bad_Member", format),
@@ -115,4 +103,5 @@ public class MemberNameTest extends BaseCheckTestSupport {
         final Integer[] warnList = getLinesWithWarn(filePath);
         verify(checkConfig, filePath, expected, warnList);
     }
+
 }

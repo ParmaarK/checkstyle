@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,10 +19,11 @@
 
 package com.puppycrawl.tools.checkstyle.checks.whitespace;
 
+import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * <p>
@@ -65,8 +66,8 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
  * List&lt;T&gt; list = ImmutableList.Builder&lt;T&gt;::new;     // Method reference
  * sort(list, Comparable::&lt;String&gt;compareTo);              // Method reference
  * </pre>
- * @author Oliver Burn
  */
+@FileStatefulCheck
 public class GenericWhitespaceCheck extends AbstractCheck {
 
     /**
@@ -104,17 +105,17 @@ public class GenericWhitespaceCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return getAcceptableTokens();
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {TokenTypes.GENERIC_START, TokenTypes.GENERIC_END};
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getAcceptableTokens();
+        return new int[] {TokenTypes.GENERIC_START, TokenTypes.GENERIC_END};
     }
 
     @Override
@@ -150,12 +151,11 @@ public class GenericWhitespaceCheck extends AbstractCheck {
         final int after = ast.getColumnNo() + 1;
 
         if (before >= 0 && Character.isWhitespace(line.charAt(before))
-                && !CommonUtils.hasWhitespaceBefore(before, line)) {
+                && !containsWhitespaceBefore(before, line)) {
             log(ast.getLineNo(), before, MSG_WS_PRECEDED, CLOSE_ANGLE_BRACKET);
         }
 
         if (after < line.length()) {
-
             // Check if the last Generic, in which case must be a whitespace
             // or a '(),[.'.
             if (depth == 1) {
@@ -183,7 +183,7 @@ public class GenericWhitespaceCheck extends AbstractCheck {
         //   should be whitespace if followed by & -+
         //
         final int indexOfAmp = line.indexOf('&', after);
-        if (indexOfAmp >= 0
+        if (indexOfAmp >= 1
             && containsWhitespaceBetween(after, indexOfAmp, line)) {
             if (indexOfAmp - after == 0) {
                 log(ast.getLineNo(), after, MSG_WS_NOT_PRECEDED, "&");
@@ -271,7 +271,7 @@ public class GenericWhitespaceCheck extends AbstractCheck {
             }
             // Whitespace not required
             else if (Character.isWhitespace(line.charAt(before))
-                && !CommonUtils.hasWhitespaceBefore(before, line)) {
+                && !containsWhitespaceBefore(before, line)) {
                 log(ast.getLineNo(), before, MSG_WS_PRECEDED, OPEN_ANGLE_BRACKET);
             }
         }
@@ -303,6 +303,18 @@ public class GenericWhitespaceCheck extends AbstractCheck {
     }
 
     /**
+     * Returns whether the specified string contains only whitespace up to specified index.
+     *
+     * @param before the index to start the search from. Inclusive
+     * @param line   the index to finish the search. Exclusive
+     * @return {@code true} if there are only whitespaces,
+     *     false if there is nothing before or some other characters
+     */
+    private static boolean containsWhitespaceBefore(int before, String line) {
+        return before != 0 && CommonUtil.hasWhitespaceBefore(before, line);
+    }
+
+    /**
      * Checks whether given character is valid to be right after generic ends.
      * @param charAfter character to check
      * @return checks if given character is valid
@@ -314,4 +326,5 @@ public class GenericWhitespaceCheck extends AbstractCheck {
             || charAfter == ';'
             || Character.isWhitespace(charAfter);
     }
+
 }

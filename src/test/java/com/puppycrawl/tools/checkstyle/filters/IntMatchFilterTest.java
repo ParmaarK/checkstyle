@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -27,8 +27,8 @@ import org.junit.Test;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 
-/** Tests IntMatchFilter. */
 public class IntMatchFilterTest {
+
     @Test
     public void testDecide() {
         final IntFilter filter = new IntMatchFilter(0);
@@ -45,6 +45,7 @@ public class IntMatchFilterTest {
     @Test
     public void testToString() {
         final IntFilter filter = new IntMatchFilter(6);
-        assertEquals("IntMatchFilter[6]", filter.toString());
+        assertEquals("Invalid toString result", "IntMatchFilter[6]", filter.toString());
     }
+
 }

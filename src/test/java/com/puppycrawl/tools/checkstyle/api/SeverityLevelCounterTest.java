@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -29,11 +29,12 @@ public class SeverityLevelCounterTest {
     @Test
     public void testCtorException() {
         try {
-            new SeverityLevelCounter(null);
-            fail("exception expected");
+            final Object test = new SeverityLevelCounter(null);
+            fail("exception expected but got " + test);
         }
         catch (IllegalArgumentException ex) {
-            assertEquals("'level' cannot be null", ex.getMessage());
+            assertEquals("Invalid exception message",
+                    "'level' cannot be null", ex.getMessage());
         }
     }
 
@@ -41,17 +42,34 @@ public class SeverityLevelCounterTest {
     public void testAddException() {
         final SeverityLevelCounter counter = new SeverityLevelCounter(SeverityLevel.ERROR);
         final AuditEvent event = new AuditEvent(this, "ATest.java", null);
-        assertEquals(0, counter.getCount());
+        assertEquals("Invalid severity level count", 0, counter.getCount());
         counter.addException(event, new IllegalStateException("Test IllegalStateException"));
-        assertEquals(1, counter.getCount());
+        assertEquals("Invalid severity level count", 1, counter.getCount());
     }
 
     @Test
     public void testAddExceptionWarning() {
         final SeverityLevelCounter counter = new SeverityLevelCounter(SeverityLevel.WARNING);
         final AuditEvent event = new AuditEvent(this, "ATest.java", null);
-        assertEquals(0, counter.getCount());
+        assertEquals("Invalid severity level count", 0, counter.getCount());
         counter.addException(event, new IllegalStateException("Test IllegalStateException"));
-        assertEquals(0, counter.getCount());
+        assertEquals("Invalid severity level count", 0, counter.getCount());
     }
+
+    @Test
+    public void testAuditStartedClearsState() {
+        final SeverityLevelCounter counter = new SeverityLevelCounter(SeverityLevel.ERROR);
+        final AuditEvent event = new AuditEvent(this, "ATest.java", null);
+        final AuditEvent secondEvent = new AuditEvent(this, "BTest.java", null);
+
+        counter.auditStarted(event);
+        assertEquals("Invalid severity level count", 0, counter.getCount());
+
+        counter.addException(event, new IllegalStateException("Test IllegalStateException"));
+        assertEquals("Invalid severity level count", 1, counter.getCount());
+
+        counter.auditStarted(secondEvent);
+        assertEquals("Invalid severity level count", 0, counter.getCount());
+    }
+
 }

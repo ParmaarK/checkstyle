@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,16 +25,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.ImmutableMap;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 
 /**
  * Default implementation of the Configuration interface.
- * @author lkuehne
  * @noinspection SerializableHasSerializationMethods
  */
 public final class DefaultConfiguration implements Configuration {
+
     private static final long serialVersionUID = 1157875385356127169L;
 
     /** The name of this configuration. */
@@ -143,8 +142,8 @@ public final class DefaultConfiguration implements Configuration {
      * @return unmodifiable map containing custom messages
      */
     @Override
-    public ImmutableMap<String, String> getMessages() {
-        return ImmutableMap.copyOf(messages);
+    public Map<String, String> getMessages() {
+        return new HashMap<>(messages);
     }
 
     /**
@@ -154,4 +153,5 @@ public final class DefaultConfiguration implements Configuration {
     public ThreadModeSettings getThreadModeSettings() {
         return threadModeSettings;
     }
+
 }

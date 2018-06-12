@@ -6,7 +6,8 @@
 
   <head>
     <title>Class Design</title>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"/>
+    <script type="text/javascript"
+            src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"/>
     <script type="text/javascript" src="js/anchors.js"/>
     <script type="text/javascript" src="js/google-analytics.js"/>
     <link rel="icon" href="images/favicon.png" type="image/x-icon" />
@@ -29,12 +30,12 @@
         </p>
         <p>
           Nothing wrong could be with founded classes.
-          This check makes sense only for library project (not an application projects)
+          This check makes sense only for library projects (not application projects)
           which care of ideal OOP-design to make sure that class works in all cases even misusage.
           Even in library projects this check most likely will find classes that are designed
-          for extension by somebody. User needs to use suppressions extensively to got a benefit from
-          this check, and keep in suppressions all confirmed/known classes that are deigned for
-          inheritance intentionally to let the check catch only new classes, and bring this to
+          for extension by somebody. User needs to use suppressions extensively to got a benefit
+          from this check, and keep in suppressions all confirmed/known classes that are deigned
+          for inheritance intentionally to let the check catch only new classes, and bring this to
           team/user attention.
         </p>
         <p>
@@ -52,7 +53,8 @@
          overridden in its subclass.
         </p>
          <p>
-          Problem is described at "Effective Java, 2nd Edition by Josh Bloch" book, chapter "Item 17: Design and document for inheritance or else prohibit it".
+          Problem is described at "Effective Java, 2nd Edition by Joshua Bloch" book, chapter
+          "Item 17: Design and document for inheritance or else prohibit it".
         </p>
         <p>
           Some quotes from book:
@@ -96,29 +98,29 @@ method will never affect the behavior of any other method.
         </p>
         <source>
 public abstract class Plant {
-    private String roots;
-    private String trunk;
+  private String roots;
+  private String trunk;
 
-    protected void validate() {
-      if (roots == null) throw new IllegalArgumentException("No roots!");
-      if (trunk == null) throw new IllegalArgumentException("No trunk!");
-    }
+  protected void validate() {
+    if (roots == null) throw new IllegalArgumentException("No roots!");
+    if (trunk == null) throw new IllegalArgumentException("No trunk!");
+  }
 
-    public abstract void grow();
+  public abstract void grow();
 }
 
 public class Tree extends Plant {
-    private List leaves;
+  private List leaves;
 
-    @Overrides
-    protected void validate() {
-      super.validate();
-      if (leaves == null) throw new IllegalArgumentException("No leaves!");
-    }
+  @Overrides
+  protected void validate() {
+    super.validate();
+    if (leaves == null) throw new IllegalArgumentException("No leaves!");
+  }
 
-    public void grow() {
-      validate();
-    }
+  public void grow() {
+    validate();
+  }
 }
         </source>
         <p>
@@ -126,18 +128,18 @@ public class Tree extends Plant {
         </p>
         <source>
 public abstract class Plant {
-    private String roots;
-    private String trunk;
+  private String roots;
+  private String trunk;
 
-    private void validate() {
-        if (roots == null) throw new IllegalArgumentException("No roots!");
-        if (trunk == null) throw new IllegalArgumentException("No trunk!");
-        validateEx();
-    }
+  private void validate() {
+    if (roots == null) throw new IllegalArgumentException("No roots!");
+    if (trunk == null) throw new IllegalArgumentException("No trunk!");
+    validateEx();
+  }
 
-    protected void validateEx() { }
+  protected void validateEx() { }
 
-    public abstract void grow();
+  public abstract void grow();
 }
         </source>
       </subsection>
@@ -157,7 +159,7 @@ public abstract class Plant {
                         Annotations which allow the check to skip the method from validation.
                     </td>
                     <td><a href="property_types.html#stringSet">String Set</a></td>
-                    <td><code>Test, Before, After, BeforeClass, AfterClass</code></td>
+                    <td><code>Before, BeforeClass, Test, After, AfterClass</code></td>
                     <td>7.2</td>
                 </tr>
             </table>
@@ -208,8 +210,8 @@ public class B {
 public class FooTest {
   @Test
   public void testFoo() {
-     final B b = new A();
-     assertEquals(2, b.foo());
+    final B b = new A();
+    assertEquals(2, b.foo());
   }
 
   public int foo4() {return 4;} // violation
@@ -338,14 +340,14 @@ public class FooTest {
         <source>
 public class StringUtils // not final to allow subclassing
 {
-    protected StringUtils() {
-        // prevents calls from subclass
-        throw new UnsupportedOperationException();
-    }
+  protected StringUtils() {
+    // prevents calls from subclass
+    throw new UnsupportedOperationException();
+  }
 
-    public static int count(char c, String s) {
-        // ...
-    }
+  public static int count(char c, String s) {
+    // ...
+  }
 }
         </source>
       </subsection>
@@ -462,9 +464,10 @@ public class StringUtils // not final to allow subclassing
         <p>
           According to Bloch, an interface should describe a <em>type</em>.
           It is therefore inappropriate to define an interface that does not
-          contain any methods but only constants. The Standard class <a
-          href="http://docs.oracle.com/javase/8/docs/api/javax/swing/SwingConstants.html">javax.swing.SwingConstants</a>
-          is an example of a class that would be flagged by this check.
+          contain any methods but only constants. The Standard interface <a
+          href="https://docs.oracle.com/javase/8/docs/api/javax/swing/SwingConstants.html">
+            javax.swing.SwingConstants</a>
+          is an example of an interface that would be flagged by this check.
         </p>
 
         <p>
@@ -648,7 +651,8 @@ public class StringUtils // not final to allow subclassing
           Checks that each top-level class, interface or
           enum resides in a source file of its own.
           Official description of a 'top-level' term:<a
-          href="http://docs.oracle.com/javase/specs/jls/se7/html/jls-7.html#jls-7.6">7.6. Top Level Type Declarations</a>.
+          href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-7.html#jls-7.6">
+            7.6. Top Level Type Declarations</a>.
           If file doesn't contains public class, enum or interface,
           top-level type is the first type in file.
         </p>
@@ -662,18 +666,19 @@ public class StringUtils // not final to allow subclassing
 &lt;module name="OneTopLevelClass"/&gt;
         </source>
         <p>
-          <b>ATTENTION:</b> This Check does not support customization of validated tokens, so do not use the "tokens" property.
+          <b>ATTENTION:</b> This Check does not support customization of validated tokens, so do
+          not use the "tokens" property.
         </p>
         <p>
           An example of code with violations:
         </p>
         <source>
 public class Foo{
-    //methods
+  //methods
 }
 
 class Foo2{
-    //methods
+  //methods
 }
         </source>
         <p>
@@ -681,11 +686,11 @@ class Foo2{
         </p>
         <source>
 class Foo{ // top-level class
-    //methods
+  //methods
 }
 
 class Foo2{
-    //methods
+  //methods
 }
         </source>
         <p>
@@ -693,7 +698,7 @@ class Foo2{
         </p>
         <source>
 public class Foo{
-    //methods
+  //methods
 }
         </source>
       </subsection>
@@ -800,7 +805,7 @@ public class Foo{
         </p>
         <source>
 &lt;module name=&quot;ThrowsCount&quot;&gt;
-    &lt;property name=&quot;max&quot; value=&quot;2&quot;/&gt;
+  &lt;property name=&quot;max&quot; value=&quot;2&quot;/&gt;
 &lt;/module&gt;
         </source>
 
@@ -809,7 +814,7 @@ public class Foo{
         </p>
         <source>
 &lt;module name=&quot;ThrowsCount&quot;&gt;
-    &lt;property name=&quot;ignorePrivateMethods&quot; value=&quot;false&quot;/&gt;
+  &lt;property name=&quot;ignorePrivateMethods&quot; value=&quot;false&quot;/&gt;
 &lt;/module&gt;
         </source>
       </subsection>
@@ -864,9 +869,9 @@ public class Foo{
         </p>
         <p>Note that
           Checkstyle 2 used to include <code>"^f[A-Z][a-zA-Z0-9]*$"</code> in the default
-          pattern to allow names used in container-managed persistence for Enterprise JavaBeans (EJB) 1.1 with the default settings.
-          With EJB 2.0 it is no longer necessary to have public access
-          for persistent fields, so the default has been changed.
+          pattern to allow names used in container-managed persistence for Enterprise JavaBeans
+          (EJB) 1.1 with the default settings. With EJB 2.0 it is no longer necessary to have
+          public access for persistent fields, so the default has been changed.
         </p>
 
         <p>
@@ -970,14 +975,15 @@ public class Foo{
             java.lang.Short, java.lang.Boolean, java.lang.Long, java.lang.Double, java.lang.Float,
             java.lang.StackTraceElement, java.math.BigInteger, java.math.BigDecimal, java.io.File,
             java.util.Locale, java.util.UUID, java.net.URL, java.net.URI,
-            java.net.Inet4Address, java.net.Inet6Address, java.net.InetSocketAddress,</td>
+            java.net.Inet4Address, java.net.Inet6Address, java.net.InetSocketAddress</td>
             <td>6.4.1</td>
           </tr>
           <tr>
             <td>ignoreAnnotationCanonicalNames</td>
             <td>ignore annotations canonical names</td>
             <td><a href="property_types.html#stringSet">String Set</a></td>
-            <td>org.junit.Rule, org.junit.ClassRule, com.google.common.annotations.VisibleForTesting</td>
+            <td>org.junit.Rule, org.junit.ClassRule,
+                com.google.common.annotations.VisibleForTesting</td>
             <td>6.5</td>
           </tr>
         </table>
@@ -996,7 +1002,7 @@ public class Foo{
         </p>
         <source>
 &lt;module name=&quot;VisibilityModifier&quot;&gt;
-    &lt;property name=&quot;packageAllowed&quot; value=&quot;true&quot;/&gt;
+  &lt;property name=&quot;packageAllowed&quot; value=&quot;true&quot;/&gt;
 &lt;/module&gt;
         </source>
 
@@ -1005,7 +1011,7 @@ public class Foo{
         </p>
         <source>
 &lt;module name=&quot;VisibilityModifier&quot;&gt;
-    &lt;property name=&quot;publicMemberPattern&quot; value=&quot;^$&quot;/&gt;
+  &lt;property name=&quot;publicMemberPattern&quot; value=&quot;^$&quot;/&gt;
 &lt;/module&gt;
         </source>
         <p>
@@ -1014,38 +1020,7 @@ public class Foo{
         </p>
         <source>
 &lt;module name=&quot;VisibilityModifier&quot;&gt;
-    &lt;property name=&quot;allowPublicImmutableFields&quot; value=&quot;true&quot;/&gt;
- &lt;/module&gt;
-        </source>
-        <p>
-          Example of allowed public immutable fields:
-        </p>
-        <source>
-public class ImmutableClass
-{
-    public final ImmutableSet&lt;String&gt; includes; // No warning
-    public final ImmutableSet&lt;String&gt; excludes; // No warning
-    public final java.lang.String notes; // No warning
-    public final BigDecimal value; // No warning
-
-    public ImmutableClass(Collection&lt;String&gt; includes, Collection&lt;String&gt; excludes,
-                 BigDecimal value, String notes)
-    {
-        this.includes = ImmutableSet.copyOf(includes);
-        this.excludes = ImmutableSet.copyOf(excludes);
-        this.value = value;
-        this.notes = notes;
-    }
-}
-        </source>
-        <p>
-          To configure the Check in order to allow user specified immutable class names:
-        </p>
-        <source>
-&lt;module name=&quot;VisibilityModifier&quot;&gt;
-    &lt;property name=&quot;allowPublicImmutableFields&quot; value=&quot;true&quot;/&gt;
-    &lt;property name=&quot;immutableClassCanonicalNames&quot; value=&quot;
-    com.google.common.collect.ImmutableSet&quot;/&gt;
+  &lt;property name=&quot;allowPublicImmutableFields&quot; value=&quot;true&quot;/&gt;
 &lt;/module&gt;
         </source>
         <p>
@@ -1054,21 +1029,52 @@ public class ImmutableClass
         <source>
 public class ImmutableClass
 {
-    public final ImmutableSet&lt;String&gt; includes; // No warning
-    public final ImmutableSet&lt;String&gt; excludes; // No warning
-    public final java.lang.String notes; // Warning here because
-                                         //'java.lang.String' wasn't specified as allowed class
-    public final int someValue; // No warning
+  public final ImmutableSet&lt;String&gt; includes; // No warning
+  public final ImmutableSet&lt;String&gt; excludes; // No warning
+  public final java.lang.String notes; // No warning
+  public final BigDecimal value; // No warning
 
-    public ImmutableClass(Collection&lt;String&gt; includes, Collection&lt;String&gt; excludes,
-                 String notes, int someValue)
-    {
-        this.includes = ImmutableSet.copyOf(includes);
-        this.excludes = ImmutableSet.copyOf(excludes);
-        this.value = value;
-        this.notes = notes;
-        this.someValue = someValue;
-    }
+  public ImmutableClass(Collection&lt;String&gt; includes, Collection&lt;String&gt; excludes,
+               BigDecimal value, String notes)
+  {
+    this.includes = ImmutableSet.copyOf(includes);
+    this.excludes = ImmutableSet.copyOf(excludes);
+    this.value = value;
+    this.notes = notes;
+  }
+}
+        </source>
+        <p>
+          To configure the Check in order to allow user specified immutable class names:
+        </p>
+        <source>
+&lt;module name=&quot;VisibilityModifier&quot;&gt;
+  &lt;property name=&quot;allowPublicImmutableFields&quot; value=&quot;true&quot;/&gt;
+  &lt;property name=&quot;immutableClassCanonicalNames&quot; value=&quot;
+  com.google.common.collect.ImmutableSet&quot;/&gt;
+&lt;/module&gt;
+        </source>
+        <p>
+          Example of allowed public immutable fields:
+        </p>
+        <source>
+public class ImmutableClass
+{
+  public final ImmutableSet&lt;String&gt; includes; // No warning
+  public final ImmutableSet&lt;String&gt; excludes; // No warning
+  public final java.lang.String notes; // Warning here because
+                                       //'java.lang.String' wasn't specified as allowed class
+  public final int someValue; // No warning
+
+  public ImmutableClass(Collection&lt;String&gt; includes, Collection&lt;String&gt; excludes,
+               String notes, int someValue)
+  {
+    this.includes = ImmutableSet.copyOf(includes);
+    this.excludes = ImmutableSet.copyOf(excludes);
+    this.value = value;
+    this.notes = notes;
+    this.someValue = someValue;
+  }
 }
         </source>
 
@@ -1080,8 +1086,9 @@ public class ImmutableClass
         <source>
 &lt;module name=&quot;VisibilityModifier&quot;&gt;
   &lt;property name=&quot;allowPublicImmutableFields&quot; value=&quot;true&quot;/&gt;
-  &lt;property name=&quot;immutableClassCanonicalNames&quot; value=&quot;
-  com.google.common.collect.ImmutableSet, com.google.common.collect.ImmutableMap,java.lang.String&quot;/&gt;
+  &lt;property name=&quot;immutableClassCanonicalNames&quot;
+    value=&quot;com.google.common.collect.ImmutableSet, com.google.common.collect.ImmutableMap,
+      java.lang.String&quot;/&gt;
 &lt;/module&gt;
         </source>
         <p>
@@ -1089,17 +1096,17 @@ public class ImmutableClass
         </p>
         <source>
 public final class Test {
-    public final String s;
-    public final ImmutableSet&lt;String&gt; names;
-    public final ImmutableSet&lt;Object&gt; objects; // violation (Object class is mutable)
-    public final ImmutableMap&lt;String, Object&gt; links; // violation (Object class is mutable)
+  public final String s;
+  public final ImmutableSet&lt;String&gt; names;
+  public final ImmutableSet&lt;Object&gt; objects; // violation (Object class is mutable)
+  public final ImmutableMap&lt;String, Object&gt; links; // violation (Object class is mutable)
 
-    public Test() {
-        s = "Hello!";
-        names = ImmutableSet.of();
-        objects = ImmutableSet.of();
-        links = ImmutableMap.of();
-    }
+  public Test() {
+    s = "Hello!";
+    names = ImmutableSet.of();
+    objects = ImmutableSet.of();
+    links = ImmutableMap.of();
+  }
 }
         </source>
         <p>
@@ -1117,16 +1124,16 @@ public final class Test {
         <source>
 class SomeClass
 {
-    @com.annotation.CustomAnnotation
-    String annotatedString; // no warning
-    @CustomAnnotation
-    String shortCustomAnnotated; // no warning
+  @com.annotation.CustomAnnotation
+  String annotatedString; // no warning
+  @CustomAnnotation
+  String shortCustomAnnotated; // no warning
 }
         </source>
 
         <p>
-          To configure the Check passing fields annotated with @org.junit.Rule, @org.junit.ClassRule and
-          @com.google.common.annotations.VisibleForTesting annotations:
+          To configure the Check passing fields annotated with @org.junit.Rule,
+          @org.junit.ClassRule and @com.google.common.annotations.VisibleForTesting annotations:
         </p>
         <source>
 &lt;module name=&quot;VisibilityModifier&quot;/&gt;
@@ -1137,12 +1144,12 @@ class SomeClass
         <source>
 class SomeClass
 {
-    @org.junit.Rule
-    public TemporaryFolder publicJUnitRule = new TemporaryFolder(); // no warning
-    @org.junit.ClassRule
-    public static TemporaryFolder publicJUnitClassRule = new TemporaryFolder(); // no warning
-    @com.google.common.annotations.VisibleForTesting
-    public String testString = ""; // no warning
+  @org.junit.Rule
+  public TemporaryFolder publicJUnitRule = new TemporaryFolder(); // no warning
+  @org.junit.ClassRule
+  public static TemporaryFolder publicJUnitClassRule = new TemporaryFolder(); // no warning
+  @com.google.common.annotations.VisibleForTesting
+  public String testString = ""; // no warning
 }
         </source>
 
@@ -1161,13 +1168,13 @@ class SomeClass
         <source>
 class SomeClass
 {
-    @CustomAnnotation
-    String customAnnotated; // no warning
-    @com.annotation.CustomAnnotation
-    String customAnnotated1; // no warning
-    @mypackage.annotation.CustomAnnotation
-    String customAnnotatedAnotherPackage; // another package but short name matches
-                                          // so no violation
+  @CustomAnnotation
+  String customAnnotated; // no warning
+  @com.annotation.CustomAnnotation
+  String customAnnotated1; // no warning
+  @mypackage.annotation.CustomAnnotation
+  String customAnnotatedAnotherPackage; // another package but short name matches
+                                        // so no violation
 }
         </source>
 

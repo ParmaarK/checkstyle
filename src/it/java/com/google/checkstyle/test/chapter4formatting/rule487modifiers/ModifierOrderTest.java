@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,26 +19,21 @@
 
 package com.google.checkstyle.test.chapter4formatting.rule487modifiers;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.junit.Test;
 
-import com.google.checkstyle.test.base.BaseCheckTestSupport;
+import com.google.checkstyle.test.base.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 import com.puppycrawl.tools.checkstyle.checks.modifier.ModifierOrderCheck;
 
-public class ModifierOrderTest extends BaseCheckTestSupport {
+public class ModifierOrderTest extends AbstractModuleTestSupport {
 
     @Override
-    protected String getPath(String fileName) throws IOException {
-        return super.getPath("chapter4formatting" + File.separator + "rule487modifiers"
-                + File.separator + fileName);
+    protected String getPackageLocation() {
+        return "com/google/checkstyle/test/chapter4formatting/rule487modifiers";
     }
 
     @Test
     public void testModifierOrder() throws Exception {
-
         final Class<ModifierOrderCheck> clazz = ModifierOrderCheck.class;
         final String msgMod = "mod.order";
         final String msgAnnotation = "annotation.order";
@@ -100,10 +95,11 @@ public class ModifierOrderTest extends BaseCheckTestSupport {
             "245:14: " + getCheckMessage(clazz, msgMod, "default"),
         };
 
-        final Configuration checkConfig = getCheckConfig("ModifierOrder");
+        final Configuration checkConfig = getModuleConfig("ModifierOrder");
         final String filePath = getPath("InputModifierOrder.java");
 
         final Integer[] warnList = getLinesWithWarn(filePath);
         verify(checkConfig, filePath, expected, warnList);
     }
+
 }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,13 +22,14 @@ package com.puppycrawl.tools.checkstyle.checks.annotation;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TextBlock;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocTagInfo;
-import com.puppycrawl.tools.checkstyle.utils.AnnotationUtility;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.AnnotationUtil;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * <p>
@@ -94,9 +95,10 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
  * </code>
  * </pre>
  *
- * @author Travis Schneeberger
  */
+@StatelessCheck
 public final class MissingDeprecatedCheck extends AbstractCheck {
+
     /**
      * A key is pointing to the warning message text in "messages.properties"
      * file.
@@ -125,15 +127,15 @@ public final class MissingDeprecatedCheck extends AbstractCheck {
 
     /** Compiled regexp to match Javadoc tag with no argument. */
     private static final Pattern MATCH_DEPRECATED =
-            CommonUtils.createPattern("@(deprecated)\\s+\\S");
+            CommonUtil.createPattern("@(deprecated)\\s+\\S");
 
     /** Compiled regexp to match first part of multilineJavadoc tags. */
     private static final Pattern MATCH_DEPRECATED_MULTILINE_START =
-            CommonUtils.createPattern("@(deprecated)\\s*$");
+            CommonUtil.createPattern("@(deprecated)\\s*$");
 
     /** Compiled regexp to look for a continuation of the comment. */
     private static final Pattern MATCH_DEPRECATED_MULTILINE_CONT =
-            CommonUtils.createPattern("(\\*/|@|[^\\s\\*])");
+            CommonUtil.createPattern("(\\*/|@|[^\\s\\*])");
 
     /** Multiline finished at end of comment. */
     private static final String END_JAVADOC = "*/";
@@ -153,11 +155,16 @@ public final class MissingDeprecatedCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return getAcceptableTokens();
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getAcceptableTokens() {
+        return getRequiredTokens();
+    }
+
+    @Override
+    public int[] getRequiredTokens() {
         return new int[] {
             TokenTypes.INTERFACE_DEF,
             TokenTypes.CLASS_DEF,
@@ -172,18 +179,13 @@ public final class MissingDeprecatedCheck extends AbstractCheck {
     }
 
     @Override
-    public int[] getRequiredTokens() {
-        return getAcceptableTokens();
-    }
-
-    @Override
     public void visitToken(final DetailAST ast) {
         final TextBlock javadoc =
             getFileContents().getJavadocBefore(ast.getLineNo());
 
         final boolean containsAnnotation =
-            AnnotationUtility.containsAnnotation(ast, DEPRECATED)
-            || AnnotationUtility.containsAnnotation(ast, FQ_DEPRECATED);
+            AnnotationUtil.containsAnnotation(ast, DEPRECATED)
+            || AnnotationUtil.containsAnnotation(ast, FQ_DEPRECATED);
 
         final boolean containsJavadocTag = containsJavadocTag(javadoc);
 
@@ -239,7 +241,6 @@ public final class MissingDeprecatedCheck extends AbstractCheck {
      */
     private boolean checkTagAtTheRestOfComment(String[] lines, boolean foundBefore,
             int currentLine, int index) {
-
         boolean found = false;
         int reindex = index + 1;
         while (reindex <= lines.length - 1) {
@@ -268,4 +269,5 @@ public final class MissingDeprecatedCheck extends AbstractCheck {
         }
         return found;
     }
+
 }

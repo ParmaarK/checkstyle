@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,8 +19,6 @@
 
 package com.puppycrawl.tools.checkstyle.grammars.comments;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -28,39 +26,35 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
+import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
-public class AllBlockCommentsTest extends BaseCheckTestSupport {
+public class AllBlockCommentsTest extends AbstractModuleTestSupport {
+
     private static final Set<String> ALL_COMMENTS = new LinkedHashSet<>();
 
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
     @Override
-    protected String getPath(String filename) throws IOException {
-        return super.getPath("grammars" + File.separator
-                + "comments" + File.separator + filename);
+    protected String getPackageLocation() {
+        return "com/puppycrawl/tools/checkstyle/grammars/comments";
     }
 
     @Test
     public void testAllBlockComments() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(BlockCommentListenerCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final DefaultConfiguration checkConfig =
+                createModuleConfig(BlockCommentListenerCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputFullOfBlockComments.java"), expected);
         Assert.assertTrue("All comments should be empty", ALL_COMMENTS.isEmpty());
     }
 
-    @Test
-    public void testAstTree() throws Exception {
-        verifyAst(getPath("InputFullOfBlockCommentsAst.txt"),
-                getPath("InputFullOfBlockComments.java"), true);
-    }
-
     private static class BlockCommentListenerCheck extends AbstractCheck {
+
         @Override
         public boolean isCommentNodesRequired() {
             return true;
@@ -101,5 +95,7 @@ public class AllBlockCommentsTest extends BaseCheckTestSupport {
                 Assert.fail("Unexpected comment: " + commentContent);
             }
         }
+
     }
+
 }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,9 +25,9 @@ import java.util.BitSet;
  * Encapsulates representation of notion of expected indentation levels.
  * Provide a way to have multiple acceptable levels.
  *
- * @author o_sukhodolsky
  */
 public class IndentLevel {
+
     /** Set of acceptable indentation levels. */
     private final BitSet levels = new BitSet();
 
@@ -116,17 +116,22 @@ public class IndentLevel {
 
     @Override
     public String toString() {
+        final String result;
         if (levels.cardinality() == 1) {
-            return String.valueOf(levels.nextSetBit(0));
+            result = String.valueOf(levels.nextSetBit(0));
         }
-        final StringBuilder sb = new StringBuilder();
-        for (int i = levels.nextSetBit(0); i >= 0;
-            i = levels.nextSetBit(i + 1)) {
-            if (sb.length() > 0) {
-                sb.append(", ");
+        else {
+            final StringBuilder sb = new StringBuilder(50);
+            for (int i = levels.nextSetBit(0); i >= 0;
+                 i = levels.nextSetBit(i + 1)) {
+                if (sb.length() > 0) {
+                    sb.append(", ");
+                }
+                sb.append(i);
             }
-            sb.append(i);
+            result = sb.toString();
         }
-        return sb.toString();
+        return result;
     }
+
 }

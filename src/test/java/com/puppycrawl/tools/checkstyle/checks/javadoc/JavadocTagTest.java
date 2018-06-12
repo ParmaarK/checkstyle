@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.puppycrawl.tools.checkstyle.utils.JavadocUtils;
+import com.puppycrawl.tools.checkstyle.utils.JavadocUtil;
 
 public class JavadocTagTest {
 
@@ -34,9 +34,9 @@ public class JavadocTagTest {
      */
     @Test
     public void testJavadocTagTypeValueOf() {
-        final JavadocUtils.JavadocTagType enumConst =
-            JavadocUtils.JavadocTagType.valueOf("ALL");
-        assertEquals(JavadocUtils.JavadocTagType.ALL, enumConst);
+        final JavadocUtil.JavadocTagType enumConst =
+            JavadocUtil.JavadocTagType.valueOf("ALL");
+        assertEquals("Invalid enum valueOf result", JavadocUtil.JavadocTagType.ALL, enumConst);
     }
 
     /* Additional test for jacoco, since values()
@@ -45,14 +45,14 @@ public class JavadocTagTest {
      */
     @Test
     public void testJavadocTagTypeValues() {
-        final JavadocUtils.JavadocTagType[] enumConstants =
-            JavadocUtils.JavadocTagType.values();
-        final JavadocUtils.JavadocTagType[] expected = {
-            JavadocUtils.JavadocTagType.BLOCK,
-            JavadocUtils.JavadocTagType.INLINE,
-            JavadocUtils.JavadocTagType.ALL,
+        final JavadocUtil.JavadocTagType[] enumConstants =
+            JavadocUtil.JavadocTagType.values();
+        final JavadocUtil.JavadocTagType[] expected = {
+            JavadocUtil.JavadocTagType.BLOCK,
+            JavadocUtil.JavadocTagType.INLINE,
+            JavadocUtil.JavadocTagType.ALL,
         };
-        assertArrayEquals(expected, enumConstants);
+        assertArrayEquals("Invalid enum constants", expected, enumConstants);
     }
 
     @Test
@@ -61,6 +61,8 @@ public class JavadocTagTest {
 
         final String result = javadocTag.toString();
 
-        assertEquals("JavadocTag[tag='author' lineNo=0, columnNo=1, firstArg='firstArg']", result);
+        assertEquals("Invalid toString result",
+                "JavadocTag[tag='author' lineNo=0, columnNo=1, firstArg='firstArg']", result);
     }
+
 }

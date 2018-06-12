@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,25 +22,55 @@ package com.puppycrawl.tools.checkstyle.checks.imports;
 import static com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck.MSG_KEY;
 import static org.junit.Assert.assertArrayEquals;
 
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableMap;
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class UnusedImportsCheckTest extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/imports/unusedimports";
     }
 
     @Test
+    public void testReferencedStateIsCleared() throws Exception {
+        final DefaultConfiguration checkConfig = createModuleConfig(UnusedImportsCheck.class);
+        final String inputWithoutWarnings = getPath("InputUnusedImportsWithoutWarnings.java");
+        final String inputWithWarnings = getPath("InputUnusedImportsCheckClearState.java");
+        final List<String> expectedFirstInput = Arrays.asList(CommonUtil.EMPTY_STRING_ARRAY);
+        final List<String> expectedSecondInput = Arrays.asList(
+                "3:8: " + getCheckMessage(MSG_KEY, "java.util.Arrays"),
+                "4:8: " + getCheckMessage(MSG_KEY, "java.util.List"),
+                "5:8: " + getCheckMessage(MSG_KEY, "java.util.Set")
+        );
+        final File[] inputsWithWarningsFirst =
+            {new File(inputWithWarnings), new File(inputWithoutWarnings)};
+        final File[] inputsWithoutWarningFirst =
+            {new File(inputWithoutWarnings), new File(inputWithWarnings)};
+
+        verify(createChecker(checkConfig), inputsWithWarningsFirst, ImmutableMap.of(
+                inputWithoutWarnings, expectedFirstInput,
+                inputWithWarnings, expectedSecondInput));
+        verify(createChecker(checkConfig), inputsWithoutWarningFirst, ImmutableMap.of(
+                inputWithoutWarnings, expectedFirstInput,
+                inputWithWarnings, expectedSecondInput));
+    }
+
+    @Test
     public void testWithoutProcessJavadoc() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(UnusedImportsCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(UnusedImportsCheck.class);
         checkConfig.addAttribute("processJavadoc", "false");
         final String[] expected = {
-            "8:45: " + getCheckMessage(MSG_KEY,
+            "8:16: " + getCheckMessage(MSG_KEY,
                 "com.puppycrawl.tools.checkstyle.checks."
                 + "imports.unusedimports.InputUnusedImportsBug"),
             "11:8: " + getCheckMessage(MSG_KEY, "java.lang.String"),
@@ -59,27 +89,26 @@ public class UnusedImportsCheckTest extends AbstractModuleTestSupport {
             "35:8: " + getCheckMessage(MSG_KEY, "java.util.BitSet"),
             "37:8: " + getCheckMessage(MSG_KEY, "com.puppycrawl.tools.checkstyle.Checker"),
             "38:8: " + getCheckMessage(MSG_KEY, "com.puppycrawl.tools.checkstyle.CheckerTest"),
-            "39:8: " + getCheckMessage(MSG_KEY,
-                "com.puppycrawl.tools.checkstyle.BaseFileSetCheckTestSupport"),
-            "40:8: " + getCheckMessage(MSG_KEY, "com.puppycrawl.tools.checkstyle.Definitions"),
+            "39:8: " + getCheckMessage(MSG_KEY, "com.puppycrawl.tools.checkstyle.Definitions"),
+            "40:8: " + getCheckMessage(MSG_KEY,
+                "com.puppycrawl.tools.checkstyle.checks.imports.unusedimports."
+                        + "InputUnusedImports15Extensions"),
             "41:8: " + getCheckMessage(MSG_KEY,
-                "com.puppycrawl.tools.checkstyle.checks.imports.unusedimports.Input15Extensions"),
-            "42:8: " + getCheckMessage(MSG_KEY,
                 "com.puppycrawl.tools.checkstyle.ConfigurationLoaderTest"),
-            "43:8: " + getCheckMessage(MSG_KEY,
+            "42:8: " + getCheckMessage(MSG_KEY,
                 "com.puppycrawl.tools.checkstyle.PackageNamesLoader"),
-            "44:8: " + getCheckMessage(MSG_KEY,
+            "43:8: " + getCheckMessage(MSG_KEY,
                 "com.puppycrawl.tools.checkstyle.DefaultConfiguration"),
-            "45:8: " + getCheckMessage(MSG_KEY, "com.puppycrawl.tools.checkstyle.DefaultLogger"),
+            "44:8: " + getCheckMessage(MSG_KEY, "com.puppycrawl.tools.checkstyle.DefaultLogger"),
         };
         verify(checkConfig, getPath("InputUnusedImports.java"), expected);
     }
 
     @Test
     public void testProcessJavadoc() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(UnusedImportsCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(UnusedImportsCheck.class);
         final String[] expected = {
-            "8:45: " + getCheckMessage(MSG_KEY,
+            "8:16: " + getCheckMessage(MSG_KEY,
                 "com.puppycrawl.tools.checkstyle.checks."
                         + "imports.unusedimports.InputUnusedImportsBug"),
             "11:8: " + getCheckMessage(MSG_KEY, "java.lang.String"),
@@ -91,43 +120,43 @@ public class UnusedImportsCheckTest extends AbstractModuleTestSupport {
             "27:15: " + getCheckMessage(MSG_KEY, "java.io.File.createTempFile"),
             //"29:8: Unused import - java.awt.Component.", // Should be detected
             "32:8: " + getCheckMessage(MSG_KEY, "java.awt.Label"),
-            "45:8: " + getCheckMessage(MSG_KEY, "com.puppycrawl.tools.checkstyle.DefaultLogger"),
+            "44:8: " + getCheckMessage(MSG_KEY, "com.puppycrawl.tools.checkstyle.DefaultLogger"),
         };
         verify(checkConfig, getPath("InputUnusedImports.java"), expected);
     }
 
     @Test
     public void testProcessJavadocWithLinkTag() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(UnusedImportsCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final DefaultConfiguration checkConfig = createModuleConfig(UnusedImportsCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputUnusedImportsWithValueTag.java"), expected);
     }
 
     @Test
     public void testProcessJavadocWithBlockTagContainingMethodParameters() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(UnusedImportsCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
-        verify(checkConfig, getPath("InputUnusedImportWithBlockMethodParameters.java"), expected);
+        final DefaultConfiguration checkConfig = createModuleConfig(UnusedImportsCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
+        verify(checkConfig, getPath("InputUnusedImportsWithBlockMethodParameters.java"), expected);
     }
 
     @Test
     public void testAnnotations() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(UnusedImportsCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final DefaultConfiguration checkConfig = createModuleConfig(UnusedImportsCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getNonCompilablePath("InputUnusedImportsAnnotations.java"), expected);
     }
 
     @Test
     public void testBug() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(UnusedImportsCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final DefaultConfiguration checkConfig = createModuleConfig(UnusedImportsCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputUnusedImportsBug.java"), expected);
     }
 
     @Test
     public void testNewlinesInsideTags() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(UnusedImportsCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final DefaultConfiguration checkConfig = createModuleConfig(UnusedImportsCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputUnusedImportsWithNewlinesInsideTags.java"), expected);
     }
 
@@ -183,7 +212,7 @@ public class UnusedImportsCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testFileInUnnamedPackage() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(UnusedImportsCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(UnusedImportsCheck.class);
         final String[] expected = {
             "5:8: " + getCheckMessage(MSG_KEY, "java.util.Arrays"),
             "6:8: " + getCheckMessage(MSG_KEY, "java.lang.String"),
@@ -194,7 +223,7 @@ public class UnusedImportsCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testImportsFromJavaLang() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(UnusedImportsCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(UnusedImportsCheck.class);
         final String[] expected = {
             "3:8: " + getCheckMessage(MSG_KEY, "java.lang.String"),
             "4:8: " + getCheckMessage(MSG_KEY, "java.lang.Math"),
@@ -210,4 +239,14 @@ public class UnusedImportsCheckTest extends AbstractModuleTestSupport {
         };
         verify(checkConfig, getPath("InputUnusedImportsFromJavaLang.java"), expected);
     }
+
+    @Test
+    public void testImportsJavadocQualifiedName() throws Exception {
+        final DefaultConfiguration checkConfig = createModuleConfig(UnusedImportsCheck.class);
+        final String[] expected = {
+            "4:8: " + getCheckMessage(MSG_KEY, "java.util.List"),
+        };
+        verify(checkConfig, getPath("InputUnusedImportsJavadocQualifiedName.java"), expected);
+    }
+
 }

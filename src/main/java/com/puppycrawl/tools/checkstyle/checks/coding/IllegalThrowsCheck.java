@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -24,12 +24,13 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FullIdent;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.AnnotationUtility;
-import com.puppycrawl.tools.checkstyle.utils.CheckUtils;
+import com.puppycrawl.tools.checkstyle.utils.AnnotationUtil;
+import com.puppycrawl.tools.checkstyle.utils.CheckUtil;
 
 /**
  * <p>
@@ -48,10 +49,8 @@ import com.puppycrawl.tools.checkstyle.utils.CheckUtils;
  *  or java.lang.Override annotation) default value is <b>true</b>.
  * </p>
  *
- * @author Oliver Burn
- * @author John Sirois
- * @author <a href="mailto:nesterenko-aleksey@list.ru">Aleksey Nesterenko</a>
  */
+@StatelessCheck
 public final class IllegalThrowsCheck extends AbstractCheck {
 
     /**
@@ -82,23 +81,22 @@ public final class IllegalThrowsCheck extends AbstractCheck {
     public void setIllegalClassNames(final String... classNames) {
         illegalClassNames.clear();
         illegalClassNames.addAll(
-                CheckUtils.parseClassNames(classNames));
-
+                CheckUtil.parseClassNames(classNames));
     }
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[] {TokenTypes.LITERAL_THROWS};
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getDefaultTokens();
+        return new int[] {TokenTypes.LITERAL_THROWS};
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {TokenTypes.LITERAL_THROWS};
+        return getRequiredTokens();
     }
 
     @Override
@@ -127,8 +125,8 @@ public final class IllegalThrowsCheck extends AbstractCheck {
     private boolean isIgnorableMethod(DetailAST methodDef) {
         return shouldIgnoreMethod(methodDef.findFirstToken(TokenTypes.IDENT).getText())
             || ignoreOverriddenMethods
-               && (AnnotationUtility.containsAnnotation(methodDef, "Override")
-                  || AnnotationUtility.containsAnnotation(methodDef, "java.lang.Override"));
+               && (AnnotationUtil.containsAnnotation(methodDef, "Override")
+                  || AnnotationUtil.containsAnnotation(methodDef, "java.lang.Override"));
     }
 
     /**
@@ -156,4 +154,5 @@ public final class IllegalThrowsCheck extends AbstractCheck {
     public void setIgnoreOverriddenMethods(boolean ignoreOverriddenMethods) {
         this.ignoreOverriddenMethods = ignoreOverriddenMethods;
     }
+
 }

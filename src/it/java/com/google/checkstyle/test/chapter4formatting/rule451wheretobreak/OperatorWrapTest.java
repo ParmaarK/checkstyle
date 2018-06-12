@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,26 +19,21 @@
 
 package com.google.checkstyle.test.chapter4formatting.rule451wheretobreak;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.junit.Test;
 
-import com.google.checkstyle.test.base.BaseCheckTestSupport;
+import com.google.checkstyle.test.base.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 import com.puppycrawl.tools.checkstyle.checks.whitespace.OperatorWrapCheck;
 
-public class OperatorWrapTest extends BaseCheckTestSupport {
+public class OperatorWrapTest extends AbstractModuleTestSupport {
 
     @Override
-    protected String getPath(String fileName) throws IOException {
-        return super.getPath("chapter4formatting" + File.separator + "rule451wheretobreak"
-                + File.separator + fileName);
+    protected String getPackageLocation() {
+        return "com/google/checkstyle/test/chapter4formatting/rule451wheretobreak";
     }
 
     @Test
     public void testOperatorWrap() throws Exception {
-
         final Class<OperatorWrapCheck> clazz = OperatorWrapCheck.class;
         final String messageKey = "line.new";
 
@@ -64,7 +59,7 @@ public class OperatorWrapTest extends BaseCheckTestSupport {
             "194:38: " + getCheckMessage(clazz, messageKey, "?"),
         };
 
-        final Configuration checkConfig = getCheckConfig("OperatorWrap");
+        final Configuration checkConfig = getModuleConfig("OperatorWrap");
         final String filePath = getPath("InputOperatorWrap.java");
 
         final Integer[] warnList = getLinesWithWarn(filePath);

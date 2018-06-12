@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,41 +19,36 @@
 
 package com.puppycrawl.tools.checkstyle.checks.regexp;
 
-import static com.puppycrawl.tools.checkstyle.checks.regexp.MultilineDetector.MSG_REGEXP_EXCEEDED;
-import static com.puppycrawl.tools.checkstyle.checks.regexp.MultilineDetector.MSG_REGEXP_MINIMUM;
+import static com.puppycrawl.tools.checkstyle.checks.regexp.SinglelineDetector.MSG_REGEXP_EXCEEDED;
+import static com.puppycrawl.tools.checkstyle.checks.regexp.SinglelineDetector.MSG_REGEXP_MINIMUM;
 
 import java.io.File;
-import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
-import org.junit.Before;
+import org.junit.Assert;
 import org.junit.Test;
 
-import com.puppycrawl.tools.checkstyle.BaseFileSetCheckTestSupport;
+import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.api.FileText;
+import com.puppycrawl.tools.checkstyle.internal.testmodules.TestLoggingReporter;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
-public class RegexpSinglelineCheckTest extends BaseFileSetCheckTestSupport {
-    private DefaultConfiguration checkConfig;
+public class RegexpSinglelineCheckTest extends AbstractModuleTestSupport {
 
-    @Before
-    public void setUp() {
-        checkConfig = createCheckConfig(RegexpSinglelineCheck.class);
-    }
+    private static final String[] EMPTY = {};
 
     @Override
-    protected String getPath(String filename) throws IOException {
-        return super.getPath("checks" + File.separator
-                + "regexp" + File.separator
-                + "regexpsingleline" + File.separator
-                + filename);
+    protected String getPackageLocation() {
+        return "com/puppycrawl/tools/checkstyle/checks/regexp/regexpsingleline";
     }
 
     @Test
     public void testIt() throws Exception {
-        final String illegal = "System\\.(out)|(err)\\.print(ln)?\\(";
-        checkConfig.addAttribute("format", illegal);
+        final DefaultConfiguration checkConfig = createModuleConfig(RegexpSinglelineCheck.class);
+        checkConfig.addAttribute("format", "System\\.(out)|(err)\\.print(ln)?\\(");
         final String[] expected = {
-            "69: " + getCheckMessage(MSG_REGEXP_EXCEEDED, illegal),
+            "69: " + getCheckMessage(MSG_REGEXP_EXCEEDED, "System\\.(out)|(err)\\.print(ln)?\\("),
         };
         verify(checkConfig, getPath("InputRegexpSinglelineSemantic.java"), expected);
     }
@@ -61,45 +56,44 @@ public class RegexpSinglelineCheckTest extends BaseFileSetCheckTestSupport {
     @Test
     public void testMessageProperty()
             throws Exception {
-        final String illegal = "System\\.(out)|(err)\\.print(ln)?\\(";
-        checkConfig.addAttribute("format", illegal);
-        final String message = "Bad line :(";
-        checkConfig.addAttribute("message", message);
+        final DefaultConfiguration checkConfig = createModuleConfig(RegexpSinglelineCheck.class);
+        checkConfig.addAttribute("format", "System\\.(out)|(err)\\.print(ln)?\\(");
+        checkConfig.addAttribute("message", "Bad line :(");
         final String[] expected = {
-            "69: " + message,
+            "69: Bad line :(",
         };
         verify(checkConfig, getPath("InputRegexpSinglelineSemantic.java"), expected);
     }
 
     @Test
     public void testIgnoreCaseTrue() throws Exception {
-        final String illegal = "SYSTEM\\.(OUT)|(ERR)\\.PRINT(LN)?\\(";
-        checkConfig.addAttribute("format", illegal);
+        final DefaultConfiguration checkConfig = createModuleConfig(RegexpSinglelineCheck.class);
+        checkConfig.addAttribute("format", "SYSTEM\\.(OUT)|(ERR)\\.PRINT(LN)?\\(");
         checkConfig.addAttribute("ignoreCase", "true");
         checkConfig.addAttribute("maximum", "0");
 
         final String[] expected = {
-            "69: " + getCheckMessage(MSG_REGEXP_EXCEEDED, illegal),
+            "69: " + getCheckMessage(MSG_REGEXP_EXCEEDED, "SYSTEM\\.(OUT)|(ERR)\\.PRINT(LN)?\\("),
         };
         verify(checkConfig, getPath("InputRegexpSinglelineSemantic.java"), expected);
     }
 
     @Test
     public void testIgnoreCaseFalse() throws Exception {
-        final String illegal = "SYSTEM\\.(OUT)|(ERR)\\.PRINT(LN)?\\(";
-        checkConfig.addAttribute("format", illegal);
+        final DefaultConfiguration checkConfig = createModuleConfig(RegexpSinglelineCheck.class);
+        checkConfig.addAttribute("format", "SYSTEM\\.(OUT)|(ERR)\\.PRINT(LN)?\\(");
         checkConfig.addAttribute("ignoreCase", "false");
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputRegexpSinglelineSemantic.java"), expected);
     }
 
     @Test
     public void testMinimum() throws Exception {
-        final String illegal = "\\r";
-        checkConfig.addAttribute("format", illegal);
+        final DefaultConfiguration checkConfig = createModuleConfig(RegexpSinglelineCheck.class);
+        checkConfig.addAttribute("format", "\\r");
         checkConfig.addAttribute("minimum", "500");
         final String[] expected = {
-            "0: " + getCheckMessage(MSG_REGEXP_MINIMUM, "500", illegal),
+            "0: " + getCheckMessage(MSG_REGEXP_MINIMUM, "500", "\\r"),
         };
 
         verify(checkConfig, getPath("InputRegexpSinglelineSemantic.java"), expected);
@@ -107,8 +101,8 @@ public class RegexpSinglelineCheckTest extends BaseFileSetCheckTestSupport {
 
     @Test
     public void testSetMessage() throws Exception {
-        final String illegal = "\\r";
-        checkConfig.addAttribute("format", illegal);
+        final DefaultConfiguration checkConfig = createModuleConfig(RegexpSinglelineCheck.class);
+        checkConfig.addAttribute("format", "\\r");
         checkConfig.addAttribute("minimum", "500");
         checkConfig.addAttribute("message", "someMessage");
         final String[] expected = {
@@ -117,4 +111,37 @@ public class RegexpSinglelineCheckTest extends BaseFileSetCheckTestSupport {
 
         verify(checkConfig, getPath("InputRegexpSinglelineSemantic.java"), expected);
     }
+
+    @Test
+    public void testMaximum() throws Exception {
+        final DefaultConfiguration checkConfig = createModuleConfig(RegexpSinglelineCheck.class);
+        checkConfig.addAttribute("format", "System\\.(out)|(err)\\.print(ln)?\\(");
+        checkConfig.addAttribute("maximum", "1");
+        verify(checkConfig, getPath("InputRegexpSinglelineSemantic.java"), EMPTY);
+    }
+
+    /**
+     * Done as a UT cause new instance of Detector is created each time 'verify' executed.
+     * @throws Exception some Exception
+     */
+    @Test
+    public void testStateIsBeingReset() throws Exception {
+        final String illegal = "System\\.(out)|(err)\\.print(ln)?\\(";
+        final TestLoggingReporter reporter = new TestLoggingReporter();
+        final DetectorOptions detectorOptions = DetectorOptions.newBuilder()
+                .reporter(reporter)
+                .format(illegal)
+                .maximum(1)
+                .build();
+
+        final SinglelineDetector detector =
+                new SinglelineDetector(detectorOptions);
+        final File file = new File(getPath("InputRegexpSinglelineSemantic.java"));
+
+        detector.processLines(new FileText(file, StandardCharsets.UTF_8.name()));
+        detector.processLines(new FileText(file, StandardCharsets.UTF_8.name()));
+        Assert.assertEquals("Logged unexpected amount of issues",
+                0, reporter.getLogCount());
+    }
+
 }

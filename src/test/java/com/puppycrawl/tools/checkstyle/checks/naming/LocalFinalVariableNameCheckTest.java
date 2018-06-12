@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -27,10 +27,11 @@ import org.junit.Test;
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class LocalFinalVariableNameCheckTest
     extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/naming/localfinalvariablename";
@@ -41,15 +42,15 @@ public class LocalFinalVariableNameCheckTest
         final LocalFinalVariableNameCheck checkObj =
             new LocalFinalVariableNameCheck();
         assertArrayEquals(
-            "LocalFinalVariableNameCheck#getRequiredTockens should return empty array by default",
-            CommonUtils.EMPTY_INT_ARRAY, checkObj.getRequiredTokens());
+            "LocalFinalVariableNameCheck#getRequiredTokens should return empty array by default",
+            CommonUtil.EMPTY_INT_ARRAY, checkObj.getRequiredTokens());
     }
 
     @Test
     public void testDefault()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(LocalFinalVariableNameCheck.class);
+            createModuleConfig(LocalFinalVariableNameCheck.class);
 
         final String pattern = "^[a-z][a-zA-Z0-9]*$";
 
@@ -63,7 +64,7 @@ public class LocalFinalVariableNameCheckTest
     public void testSet()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(LocalFinalVariableNameCheck.class);
+            createModuleConfig(LocalFinalVariableNameCheck.class);
         checkConfig.addAttribute("format", "[A-Z]+");
 
         final String pattern = "[A-Z]+";
@@ -78,8 +79,8 @@ public class LocalFinalVariableNameCheckTest
     public void testInnerClass()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(LocalFinalVariableNameCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+            createModuleConfig(LocalFinalVariableNameCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputLocalFinalVariableNameInnerClass.java"), expected);
     }
 
@@ -99,7 +100,7 @@ public class LocalFinalVariableNameCheckTest
     @Test
     public void testTryWithResources() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(LocalFinalVariableNameCheck.class);
+            createModuleConfig(LocalFinalVariableNameCheck.class);
         checkConfig.addAttribute("format", "[A-Z]+");
 
         final String pattern = "[A-Z]+";
@@ -113,4 +114,5 @@ public class LocalFinalVariableNameCheckTest
         };
         verify(checkConfig, getPath("InputLocalFinalVariableNameTryResources.java"), expected);
     }
+
 }

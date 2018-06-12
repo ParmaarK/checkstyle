@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,27 +19,22 @@
 
 package com.google.checkstyle.test.chapter4formatting.rule413emptyblocks;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.junit.Test;
 
-import com.google.checkstyle.test.base.BaseCheckTestSupport;
+import com.google.checkstyle.test.base.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 import com.puppycrawl.tools.checkstyle.checks.blocks.EmptyCatchBlockCheck;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
-public class EmptyCatchBlockTest extends BaseCheckTestSupport {
+public class EmptyCatchBlockTest extends AbstractModuleTestSupport {
 
     @Override
-    protected String getPath(String fileName) throws IOException {
-        return super.getPath("chapter4formatting" + File.separator + "rule413emptyblocks"
-                + File.separator + fileName);
+    protected String getPackageLocation() {
+        return "com/google/checkstyle/test/chapter4formatting/rule413emptyblocks";
     }
 
     @Test
     public void testEmptyBlockCatch() throws Exception {
-
         final String[] expected = {
             "28: " + getCheckMessage(EmptyCatchBlockCheck.class, "catch.block.empty"),
             "49: " + getCheckMessage(EmptyCatchBlockCheck.class, "catch.block.empty"),
@@ -48,7 +43,7 @@ public class EmptyCatchBlockTest extends BaseCheckTestSupport {
             "83: " + getCheckMessage(EmptyCatchBlockCheck.class, "catch.block.empty"),
         };
 
-        final Configuration checkConfig = getCheckConfig("EmptyCatchBlock");
+        final Configuration checkConfig = getModuleConfig("EmptyCatchBlock");
         final String filePath = getPath("InputEmptyBlockCatch.java");
 
         final Integer[] warnList = getLinesWithWarn(filePath);
@@ -57,10 +52,9 @@ public class EmptyCatchBlockTest extends BaseCheckTestSupport {
 
     @Test
     public void testNoViolations() throws Exception {
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
-
-        final Configuration checkConfig = getCheckConfig("EmptyCatchBlock");
+        final Configuration checkConfig = getModuleConfig("EmptyCatchBlock");
         final String filePath = getPath("InputEmptyCatchBlockNoViolations.java");
 
         final Integer[] warnList = getLinesWithWarn(filePath);
@@ -69,13 +63,12 @@ public class EmptyCatchBlockTest extends BaseCheckTestSupport {
 
     @Test
     public void testViolationsByComment() throws Exception {
-
         final String[] expected = {
             "19: " + getCheckMessage(EmptyCatchBlockCheck.class, "catch.block.empty"),
             "27: " + getCheckMessage(EmptyCatchBlockCheck.class, "catch.block.empty"),
         };
 
-        final Configuration checkConfig = getCheckConfig("EmptyCatchBlock");
+        final Configuration checkConfig = getModuleConfig("EmptyCatchBlock");
         final String filePath = getPath("InputEmptyCatchBlockViolationsByComment.java");
 
         final Integer[] warnList = getLinesWithWarn(filePath);
@@ -91,10 +84,11 @@ public class EmptyCatchBlockTest extends BaseCheckTestSupport {
             "58: " + getCheckMessage(EmptyCatchBlockCheck.class, "catch.block.empty"),
         };
 
-        final Configuration checkConfig = getCheckConfig("EmptyCatchBlock");
+        final Configuration checkConfig = getModuleConfig("EmptyCatchBlock");
         final String filePath = getPath("InputEmptyCatchBlockViolationsByVariableName.java");
 
         final Integer[] warnList = getLinesWithWarn(filePath);
         verify(checkConfig, filePath, expected, warnList);
     }
+
 }

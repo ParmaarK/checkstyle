@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,13 +22,14 @@ package com.puppycrawl.tools.checkstyle.checks.javadoc;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.SeverityLevel;
 import com.puppycrawl.tools.checkstyle.api.TextBlock;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * <p>
@@ -61,8 +62,8 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
  * &lt;/module&gt;
  * </pre>
  *
- * @author Daniel Grenner
  */
+@StatelessCheck
 public class WriteTagCheck
     extends AbstractCheck {
 
@@ -100,7 +101,7 @@ public class WriteTagCheck
      */
     public void setTag(String tag) {
         this.tag = tag;
-        tagRegExp = CommonUtils.createPattern(tag + "\\s*(.*$)");
+        tagRegExp = CommonUtil.createPattern(tag + "\\s*(.*$)");
     }
 
     /**
@@ -145,7 +146,7 @@ public class WriteTagCheck
 
     @Override
     public int[] getRequiredTokens() {
-        return CommonUtils.EMPTY_INT_ARRAY;
+        return CommonUtil.EMPTY_INT_ARRAY;
     }
 
     @Override
@@ -200,7 +201,7 @@ public class WriteTagCheck
      *
      * @see java.text.MessageFormat
      */
-    protected final void logTag(int line, String tagName, String tagValue) {
+    private void logTag(int line, String tagName, String tagValue) {
         final String originalSeverity = getSeverity();
         setSeverity(tagSeverity.getName());
 
@@ -208,4 +209,5 @@ public class WriteTagCheck
 
         setSeverity(originalSeverity);
     }
+
 }

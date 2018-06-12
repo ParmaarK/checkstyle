@@ -1,14 +1,16 @@
 [![][travis img]][travis]
 [![][appveyor img]][appveyor]
 [![][teamcity img]][teamcity]
-[![][codeship img]][codeship]
 [![][circleci img]][circleci]
 [![][wercker img]][wercker]
 [![][shippable img]][shippable]
 [![][coverage img]][coverage]
+[![][snyk img]][snyk]
+
+[![][codeship img]][codeship]
+[![][buddy img]][buddy]
 
 [![][mavenbadge img]][mavenbadge]
-[![][versioneye img]][versioneye]
 [![][sonar img]][sonar]
 
 Members chat: [![][gitter_mem img]][gitter_mem]
@@ -16,19 +18,22 @@ Contributors chat: [![][gitter_con img]][gitter_con]
 
 ![](https://raw.githubusercontent.com/checkstyle/resources/master/img/checkstyle-logos/checkstyle-logo-260x99.png)
 
-Checkstyle is a tool for
-checking Java source code for adherence to a Code Standard or set of validation rules (best practices).
+Checkstyle is a tool for checking Java source code for adherence to a Code Standard
+or set of validation rules (best practices).
 
-The latest release version can be found at [SourceForge downloads](https://sourceforge.net/projects/checkstyle/files/checkstyle/) or at [Maven repo](http://repo1.maven.org/maven2/com/puppycrawl/tools/checkstyle/).
+The latest release version can be found at
+[SourceForge downloads](https://sourceforge.net/projects/checkstyle/files/checkstyle/)
+or at [Maven repo](http://repo1.maven.org/maven2/com/puppycrawl/tools/checkstyle/).
 
-Each-commit builds of maven artifacts can be found at [Maven Snapshot repository](https://oss.sonatype.org/content/repositories/snapshots/com/puppycrawl/tools/checkstyle/).
+Each-commit builds of maven artifacts can be found at
+[Maven Snapshot repository](https://oss.sonatype.org/content/repositories/snapshots/com/puppycrawl/tools/checkstyle/) .
 
 Documentation is available in HTML format, see http://checkstyle.sourceforge.net/checks.html.
 
 Continuous integration and Quality reports
 ======================
 Travis (Linux & MacOS build): [![][travis img]][travis]
-Appveyor (Windows build): [![][appveyor img]][appveyor]
+AppVeyor (Windows build): [![][appveyor img]][appveyor]
 [Distelli CI](https://www.distelli.com/checkstyle/builds)
 
 Quality reports: http://checkstyle.sourceforge.net/project-reports.html
@@ -42,7 +47,7 @@ Please send any feedback to https://groups.google.com/forum/?hl=en#!forum/checks
 
 Questions and Answers from community: [![][stackoverflow img]][stackoverflow]
 
-Bugs and Feature requests (not a questions): https://github.com/checkstyle/checkstyle/issues
+Bugs and Feature requests (not the questions): https://github.com/checkstyle/checkstyle/issues
 
 Licensing
 =========
@@ -64,7 +69,7 @@ of these packages are in the file named "LICENSE.apache20" in this
 directory.
 
 The software uses the Google Guava Libraries
-(https://code.google.com/p/guava-libraries/). The license terms of
+(https://github.com/google/guava/). The license terms of
 these packages are in the file named "LICENSE.apache20" in this
 directory.
 
@@ -74,8 +79,8 @@ directory.
 [appveyor]:https://ci.appveyor.com/project/checkstyle/checkstyle/history
 [appveyor img]:https://ci.appveyor.com/api/projects/status/rw6bw3dl9kph6ucc?svg=true
 
-[sonar]:https://sonarqube.com/dashboard?id=com.puppycrawl.tools%3Acheckstyle
-[sonar img]:https://sonarqube.com/api/badges/measure?key=com.puppycrawl.tools:checkstyle&metric=sqale_debt_ratio
+[sonar]:https://sonarcloud.io/dashboard?id=com.puppycrawl.tools%3Acheckstyle
+[sonar img]:https://sonarcloud.io/api/project_badges/measure?project=com.puppycrawl.tools%3Acheckstyle&metric=sqale_index
 
 [codacy]:https://www.codacy.com/app/checkstyle/checkstyle
 [codacy img]:https://api.codacy.com/project/badge/3adf12d434314ba8b38277ea46d3c44b
@@ -88,9 +93,6 @@ directory.
 
 [mavenbadge]:https://search.maven.org/#search|gav|1|g%3A%22com.puppycrawl.tools%22%20AND%20a%3A%22checkstyle%22
 [mavenbadge img]:https://maven-badges.herokuapp.com/maven-central/com.puppycrawl.tools/checkstyle/badge.svg
-
-[versioneye]:https://www.versioneye.com/user/projects/5504ca834a1064774400049a
-[versioneye img]:https://www.versioneye.com/user/projects/5504ca834a1064774400049a/badge.svg
 
 [gitter_mem]:https://gitter.im/checkstyle
 [gitter_mem img]:https://img.shields.io/badge/gitter-JOIN%20CHAT-blue.svg
@@ -116,3 +118,11 @@ directory.
 [shippable]: https://app.shippable.com/projects/577032be3be4f4faa56adb38
 [shippable img]: https://img.shields.io/shippable/577032be3be4f4faa56adb38/master.svg?label=shippable
 
+[buddy]: https://app.buddy.works/ivanovjr/checkstyle/pipelines/pipeline/135806
+[buddy img]: https://app.buddy.works/ivanovjr/checkstyle/pipelines/pipeline/135806/badge.svg?token=240176b1ce495d0a03a141f3f2f77971f43fe892a98de31cbc0e392ce5341f76 "buddy pipeline"
+
+[snyk]: https://snyk.io/test/github/checkstyle/checkstyle:pom.xml?targetFile=pom.xml
+[snyk img]: https://snyk.io/test/github/checkstyle/checkstyle/badge.svg
+
+
+              

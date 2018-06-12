@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,10 +25,11 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CheckUtils;
+import com.puppycrawl.tools.checkstyle.utils.CheckUtil;
 
 /**
  * <p>
@@ -42,8 +43,8 @@ import com.puppycrawl.tools.checkstyle.utils.CheckUtils;
  * ensure that parameters are never assigned would give
  * the best of both worlds.
  * </p>
- * @author <a href="mailto:simon@redhillconsulting.com.au">Simon Harris</a>
  */
+@FileStatefulCheck
 public final class ParameterAssignmentCheck extends AbstractCheck {
 
     /**
@@ -59,35 +60,11 @@ public final class ParameterAssignmentCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[] {
-            TokenTypes.CTOR_DEF,
-            TokenTypes.METHOD_DEF,
-            TokenTypes.ASSIGN,
-            TokenTypes.PLUS_ASSIGN,
-            TokenTypes.MINUS_ASSIGN,
-            TokenTypes.STAR_ASSIGN,
-            TokenTypes.DIV_ASSIGN,
-            TokenTypes.MOD_ASSIGN,
-            TokenTypes.SR_ASSIGN,
-            TokenTypes.BSR_ASSIGN,
-            TokenTypes.SL_ASSIGN,
-            TokenTypes.BAND_ASSIGN,
-            TokenTypes.BXOR_ASSIGN,
-            TokenTypes.BOR_ASSIGN,
-            TokenTypes.INC,
-            TokenTypes.POST_INC,
-            TokenTypes.DEC,
-            TokenTypes.POST_DEC,
-        };
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getDefaultTokens();
-    }
-
-    @Override
-    public int[] getAcceptableTokens() {
         return new int[] {
             TokenTypes.CTOR_DEF,
             TokenTypes.METHOD_DEF,
@@ -108,6 +85,11 @@ public final class ParameterAssignmentCheck extends AbstractCheck {
             TokenTypes.DEC,
             TokenTypes.POST_DEC,
         };
+    }
+
+    @Override
+    public int[] getAcceptableTokens() {
+        return getRequiredTokens();
     }
 
     @Override
@@ -206,8 +188,7 @@ public final class ParameterAssignmentCheck extends AbstractCheck {
             if (identAST != null
                 && identAST.getType() == TokenTypes.IDENT
                 && parameterNames.contains(identAST.getText())) {
-                log(ast.getLineNo(), ast.getColumnNo(),
-                    MSG_KEY, identAST.getText());
+                log(ast, MSG_KEY, identAST.getText());
             }
         }
     }
@@ -238,7 +219,7 @@ public final class ParameterAssignmentCheck extends AbstractCheck {
 
         while (parameterDefAST != null) {
             if (parameterDefAST.getType() == TokenTypes.PARAMETER_DEF
-                    && !CheckUtils.isReceiverParameter(parameterDefAST)) {
+                    && !CheckUtil.isReceiverParameter(parameterDefAST)) {
                 final DetailAST param =
                     parameterDefAST.findFirstToken(TokenTypes.IDENT);
                 parameterNames.add(param.getText());
@@ -246,4 +227,5 @@ public final class ParameterAssignmentCheck extends AbstractCheck {
             parameterDefAST = parameterDefAST.getNextSibling();
         }
     }
+
 }

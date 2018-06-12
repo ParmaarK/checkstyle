@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -33,20 +33,21 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FullIdent;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CheckUtils;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CheckUtil;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * Base class for coupling calculation.
  *
- * @author <a href="mailto:simon@redhillconsulting.com.au">Simon Harris</a>
- * @author o_sukhodolsky
  */
+@FileStatefulCheck
 public abstract class AbstractClassCouplingCheck extends AbstractCheck {
+
     /** A package separator - "." */
     private static final String DOT = ".";
 
@@ -96,7 +97,7 @@ public abstract class AbstractClassCouplingCheck extends AbstractCheck {
      */
     protected AbstractClassCouplingCheck(int defaultMax) {
         max = defaultMax;
-        excludeClassesRegexps.add(CommonUtils.createPattern("^$"));
+        excludeClassesRegexps.add(CommonUtil.createPattern("^$"));
     }
 
     /**
@@ -108,14 +109,6 @@ public abstract class AbstractClassCouplingCheck extends AbstractCheck {
     @Override
     public final int[] getDefaultTokens() {
         return getRequiredTokens();
-    }
-
-    /**
-     * Returns allowed complexity.
-     * @return allowed complexity.
-     */
-    public final int getMax() {
-        return max;
     }
 
     /**
@@ -140,20 +133,19 @@ public abstract class AbstractClassCouplingCheck extends AbstractCheck {
      * @param from array representing regular expressions of classes to ignore.
      */
     public void setExcludeClassesRegexps(String... from) {
-        excludeClassesRegexps.clear();
         excludeClassesRegexps.addAll(Arrays.stream(from.clone())
-                .map(CommonUtils::createPattern)
+                .map(CommonUtil::createPattern)
                 .collect(Collectors.toSet()));
     }
 
     /**
-     * Sets user-excluded pakcages to ignore. All exlcuded packages should end with a period,
+     * Sets user-excluded packages to ignore. All excluded packages should end with a period,
      * so it also appends a dot to a package name.
      * @param excludedPackages the list of packages to ignore.
      */
     public final void setExcludedPackages(String... excludedPackages) {
         final List<String> invalidIdentifiers = Arrays.stream(excludedPackages)
-            .filter(x -> !CommonUtils.isName(x))
+            .filter(packageName -> !CommonUtil.isName(packageName))
             .collect(Collectors.toList());
         if (!invalidIdentifiers.isEmpty()) {
             throw new IllegalArgumentException(
@@ -238,8 +230,10 @@ public abstract class AbstractClassCouplingCheck extends AbstractCheck {
 
     /**
      * Encapsulates information about classes coupling inside single file.
+     * @noinspection ThisEscapedInObjectConstruction
      */
     private class FileContext {
+
         /** A map of (imported class name -> class name with package) pairs. */
         private final Map<String, String> importedClassPackage = new HashMap<>();
 
@@ -332,15 +326,15 @@ public abstract class AbstractClassCouplingCheck extends AbstractCheck {
         public void visitLiteralThrows(DetailAST ast) {
             classContext.visitLiteralThrows(ast);
         }
+
     }
 
     /**
      * Encapsulates information about class coupling.
      *
-     * @author <a href="mailto:simon@redhillconsulting.com.au">Simon Harris</a>
-     * @author o_sukhodolsky
      */
     private class ClassContext {
+
         /** Parent file context. */
         private final FileContext parentContext;
         /**
@@ -389,7 +383,7 @@ public abstract class AbstractClassCouplingCheck extends AbstractCheck {
          * @param ast type to process.
          */
         public void visitType(DetailAST ast) {
-            final String fullTypeName = CheckUtils.createFullType(ast).getText();
+            final String fullTypeName = CheckUtil.createFullType(ast).getText();
             addReferencedClassName(fullTypeName);
         }
 
@@ -427,7 +421,7 @@ public abstract class AbstractClassCouplingCheck extends AbstractCheck {
 
             if (referencedClassNames.size() > max) {
                 log(lineNo, columnNo, getLogMessageId(),
-                        referencedClassNames.size(), getMax(),
+                        referencedClassNames.size(), max,
                         referencedClassNames.toString());
             }
         }
@@ -471,5 +465,7 @@ public abstract class AbstractClassCouplingCheck extends AbstractCheck {
             }
             return isFromExcludedPackage;
         }
+
     }
+
 }

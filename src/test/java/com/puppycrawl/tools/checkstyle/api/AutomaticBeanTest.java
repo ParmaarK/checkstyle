@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -42,12 +42,13 @@ public class AutomaticBeanTest {
     public void testConfigureNoSuchAttribute() {
         final TestBean testBean = new TestBean();
         final DefaultConfiguration conf = new DefaultConfiguration("testConf");
-        conf.addAttribute("NonExisting", "doesn't matter");
+        conf.addAttribute("NonExistent", "doesn't matter");
         try {
             testBean.configure(conf);
+            fail("Exception is expected");
         }
         catch (CheckstyleException ex) {
-            final String expected = "Property 'NonExisting' in module ";
+            final String expected = "Property 'NonExistent' in module ";
             assertNull("Exceptions cause should be null", ex.getCause());
             assertTrue("Invalid exception message, should start with: " + expected,
                     ex.getMessage().startsWith(expected));
@@ -61,6 +62,7 @@ public class AutomaticBeanTest {
         conf.addAttribute("privateField", "doesn't matter");
         try {
             testBean.configure(conf);
+            fail("Exception is expected");
         }
         catch (CheckstyleException ex) {
             final String expected = "Property 'privateField' in module ";
@@ -149,6 +151,7 @@ public class AutomaticBeanTest {
         final TestBean testBean = new TestBean();
         testBean.setVal(0);
         testBean.setWrong("wrongVal");
+        testBean.assignPrivateFieldSecretly(null);
         try {
             testBean.setExceptionalMethod("someValue");
             fail("exception expected");
@@ -180,6 +183,7 @@ public class AutomaticBeanTest {
         public int getRegisterCount() {
             return registerCount;
         }
+
     }
 
     private static class TestBean extends AutomaticBean {
@@ -198,13 +202,19 @@ public class AutomaticBeanTest {
             this.val = val;
         }
 
+        public void assignPrivateFieldSecretly(String input) {
+            privateField = input;
+        }
+
         public void setExceptionalMethod(String value) {
             throw new IllegalStateException(privateField + "," + wrong + "," + val + "," + value);
         }
 
-        public void doSmth() {
-            privateField = "some value, just for fun";
+        @Override
+        protected void finishLocalSetup() {
+            // No code by default
         }
 
     }
+
 }

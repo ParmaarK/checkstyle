@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -27,11 +27,9 @@ import org.junit.Test;
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 
-/**
- * NoCloneCheck test.
- */
 public class NoCloneCheckTest
     extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/coding/noclone";
@@ -41,7 +39,7 @@ public class NoCloneCheckTest
     public void testHasClone()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(NoCloneCheck.class);
+            createModuleConfig(NoCloneCheck.class);
         final String[] expected = {
             "10: " + getCheckMessage(MSG_KEY),
             "27: " + getCheckMessage(MSG_KEY),
@@ -57,8 +55,9 @@ public class NoCloneCheckTest
     @Test
     public void testTokensNotNull() {
         final NoCloneCheck check = new NoCloneCheck();
-        Assert.assertNotNull(check.getAcceptableTokens());
-        Assert.assertNotNull(check.getDefaultTokens());
-        Assert.assertNotNull(check.getRequiredTokens());
+        Assert.assertNotNull("Acceptable tokens should not be null", check.getAcceptableTokens());
+        Assert.assertNotNull("Default tokens should not be null", check.getDefaultTokens());
+        Assert.assertNotNull("Required tokens should not be null", check.getRequiredTokens());
     }
+
 }

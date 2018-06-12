@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,21 +23,21 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import com.google.common.collect.ImmutableMap;
 import com.puppycrawl.tools.checkstyle.grammars.CommentListener;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * Represents the contents of a file.
  *
- * @author Oliver Burn
  */
 public final class FileContents implements CommentListener {
+
     /**
      * The pattern to match a single line comment containing only the comment
      * itself -- no code.
@@ -122,7 +122,7 @@ public final class FileContents implements CommentListener {
      * @param endLineNo the ending line number
      * @param endColNo the ending column number
      **/
-    public void reportBlockComment(int startLineNo, int startColNo,
+    private void reportBlockComment(int startLineNo, int startColNo,
             int endLineNo, int endColNo) {
         final String[] cComment = extractBlockComment(startLineNo, startColNo,
                 endLineNo, endColNo);
@@ -165,7 +165,7 @@ public final class FileContents implements CommentListener {
      * @deprecated Use {@link #getSingleLineComments()} instead.
      */
     @Deprecated
-    public ImmutableMap<Integer, TextBlock> getCppComments() {
+    public Map<Integer, TextBlock> getCppComments() {
         return getSingleLineComments();
     }
 
@@ -174,8 +174,8 @@ public final class FileContents implements CommentListener {
      * the value is the comment {@link TextBlock} at the line.
      * @return the Map of comments
      */
-    public ImmutableMap<Integer, TextBlock> getSingleLineComments() {
-        return ImmutableMap.copyOf(cppComments);
+    public Map<Integer, TextBlock> getSingleLineComments() {
+        return Collections.unmodifiableMap(cppComments);
     }
 
     /**
@@ -202,7 +202,7 @@ public final class FileContents implements CommentListener {
      */
     // -@cs[AbbreviationAsWordInName] Can't change yet since class is API.
     @Deprecated
-    public ImmutableMap<Integer, List<TextBlock>> getCComments() {
+    public Map<Integer, List<TextBlock>> getCComments() {
         return getBlockComments();
     }
 
@@ -212,8 +212,8 @@ public final class FileContents implements CommentListener {
      * that start at that line.
      * @return the map of comments
      */
-    public ImmutableMap<Integer, List<TextBlock>> getBlockComments() {
-        return ImmutableMap.copyOf(clangComments);
+    public Map<Integer, List<TextBlock>> getBlockComments() {
+        return Collections.unmodifiableMap(clangComments);
     }
 
     /**
@@ -313,7 +313,7 @@ public final class FileContents implements CommentListener {
      * @return if the specified line consists only of tabs and spaces.
      **/
     public boolean lineIsBlank(int lineNo) {
-        return CommonUtils.isBlank(line(lineNo));
+        return CommonUtil.isBlank(line(lineNo));
     }
 
     /**
@@ -399,4 +399,5 @@ public final class FileContents implements CommentListener {
         }
         return hasIntersection;
     }
+
 }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -26,10 +26,11 @@ import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class HiddenFieldCheckTest
     extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/coding/hiddenfield";
@@ -38,16 +39,16 @@ public class HiddenFieldCheckTest
     @Test
     public void testStaticVisibilityFromLambdas() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(HiddenFieldCheck.class);
+            createModuleConfig(HiddenFieldCheck.class);
         final String[] expected = {
             "19:34: " + getCheckMessage(MSG_KEY, "value"),
             "51:31: " + getCheckMessage(MSG_KEY, "languageCode"),
             "60:35: " + getCheckMessage(MSG_KEY, "number"),
             "73:35: " + getCheckMessage(MSG_KEY, "id"),
             "101:33: " + getCheckMessage(MSG_KEY, "note"),
-            "126:57: " + getCheckMessage(MSG_KEY, "stringValue"),
-            "126:78: " + getCheckMessage(MSG_KEY, "intValue"),
-            "137:74: " + getCheckMessage(MSG_KEY, "doubleValue"),
+            "126:48: " + getCheckMessage(MSG_KEY, "stringValue"),
+            "126:69: " + getCheckMessage(MSG_KEY, "intValue"),
+            "137:69: " + getCheckMessage(MSG_KEY, "doubleValue"),
             "149:51: " + getCheckMessage(MSG_KEY, "firstString"),
             "149:64: " + getCheckMessage(MSG_KEY, "secondString"),
             "165:49: " + getCheckMessage(MSG_KEY, "first"),
@@ -63,12 +64,12 @@ public class HiddenFieldCheckTest
     @Test
     public void testStaticVisibilityFromAnonymousClasses() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(HiddenFieldCheck.class);
+            createModuleConfig(HiddenFieldCheck.class);
         final String[] expected = {
-            "10:97: " + getCheckMessage(MSG_KEY, "other"),
-            "16:94: " + getCheckMessage(MSG_KEY, "other"),
-            "24:101: " + getCheckMessage(MSG_KEY, "other"),
-            "34:105: " + getCheckMessage(MSG_KEY, "other"),
+            "10:45: " + getCheckMessage(MSG_KEY, "other"),
+            "16:42: " + getCheckMessage(MSG_KEY, "other"),
+            "24:49: " + getCheckMessage(MSG_KEY, "other"),
+            "34:53: " + getCheckMessage(MSG_KEY, "other"),
             "46:26: " + getCheckMessage(MSG_KEY, "someField"),
         };
         verify(checkConfig, getPath("InputHiddenFieldStaticVisibility.java"), expected);
@@ -78,7 +79,7 @@ public class HiddenFieldCheckTest
     public void testNoParameters()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(HiddenFieldCheck.class);
+            createModuleConfig(HiddenFieldCheck.class);
         checkConfig.addAttribute("tokens", "VARIABLE_DEF");
         final String[] expected = {
             "18:13: " + getCheckMessage(MSG_KEY, "hidden"),
@@ -107,7 +108,7 @@ public class HiddenFieldCheckTest
     public void testDefault()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(HiddenFieldCheck.class);
+            createModuleConfig(HiddenFieldCheck.class);
         final String[] expected = {
             "18:13: " + getCheckMessage(MSG_KEY, "hidden"),
             "21:33: " + getCheckMessage(MSG_KEY, "hidden"),
@@ -153,9 +154,10 @@ public class HiddenFieldCheckTest
     public void testIgnoreFormat()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(HiddenFieldCheck.class);
+            createModuleConfig(HiddenFieldCheck.class);
         checkConfig.addAttribute("ignoreFormat", "^i.*$");
-        Assert.assertNotNull(checkConfig.getAttribute("ignoreFormat"));
+        Assert.assertNotNull("Ignore format should not be null",
+                checkConfig.getAttribute("ignoreFormat"));
         final String[] expected = {
             "18:13: " + getCheckMessage(MSG_KEY, "hidden"),
             "21:33: " + getCheckMessage(MSG_KEY, "hidden"),
@@ -194,7 +196,7 @@ public class HiddenFieldCheckTest
     public void testIgnoreSetter()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(HiddenFieldCheck.class);
+            createModuleConfig(HiddenFieldCheck.class);
         checkConfig.addAttribute("ignoreSetter", "true");
         final String[] expected = {
             "18:13: " + getCheckMessage(MSG_KEY, "hidden"),
@@ -237,7 +239,7 @@ public class HiddenFieldCheckTest
     public void testIgnoreChainSetter()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(HiddenFieldCheck.class);
+            createModuleConfig(HiddenFieldCheck.class);
         checkConfig.addAttribute("ignoreSetter", "true");
         checkConfig.addAttribute("setterCanReturnItsClass", "true");
         final String[] expected = {
@@ -279,7 +281,7 @@ public class HiddenFieldCheckTest
     public void testIgnoreConstructorParameter()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(HiddenFieldCheck.class);
+            createModuleConfig(HiddenFieldCheck.class);
         checkConfig.addAttribute("ignoreConstructorParameter", "true");
         final String[] expected = {
             "18:13: " + getCheckMessage(MSG_KEY, "hidden"),
@@ -323,7 +325,7 @@ public class HiddenFieldCheckTest
     public void testReordered()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(HiddenFieldCheck.class);
+            createModuleConfig(HiddenFieldCheck.class);
         final String[] expected = {
             "18:13: " + getCheckMessage(MSG_KEY, "hidden"),
             "21:40: " + getCheckMessage(MSG_KEY, "hidden"),
@@ -352,7 +354,7 @@ public class HiddenFieldCheckTest
     @Test
     public void testIgnoreAbstractMethods() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(HiddenFieldCheck.class);
+            createModuleConfig(HiddenFieldCheck.class);
         checkConfig.addAttribute("ignoreAbstractMethods", "true");
 
         final String[] expected = {
@@ -396,8 +398,9 @@ public class HiddenFieldCheckTest
 
     @Test
     public void testReceiverParameter() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(HiddenFieldCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final DefaultConfiguration checkConfig = createModuleConfig(HiddenFieldCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputHiddenFieldReceiver.java"), expected);
     }
+
 }

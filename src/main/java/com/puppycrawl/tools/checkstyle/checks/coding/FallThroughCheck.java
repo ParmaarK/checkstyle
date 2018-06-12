@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,10 +22,11 @@ package com.puppycrawl.tools.checkstyle.checks.coding;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * Checks for fall through in switch statements
@@ -66,8 +67,8 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
  * &lt;/module&gt;
  * </pre>
  *
- * @author o_sukhodolsky
  */
+@StatelessCheck
 public class FallThroughCheck extends AbstractCheck {
 
     /**
@@ -90,17 +91,17 @@ public class FallThroughCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[] {TokenTypes.CASE_GROUP};
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getDefaultTokens();
+        return new int[] {TokenTypes.CASE_GROUP};
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {TokenTypes.CASE_GROUP};
+        return getRequiredTokens();
     }
 
     /**
@@ -179,6 +180,9 @@ public class FallThroughCheck extends AbstractCheck {
                 break;
             case TokenTypes.LITERAL_SWITCH:
                 terminated = checkSwitch(ast, useContinue);
+                break;
+            case TokenTypes.LITERAL_SYNCHRONIZED:
+                terminated = checkSynchronized(ast, useBreak, useContinue);
                 break;
             default:
                 terminated = false;
@@ -310,6 +314,20 @@ public class FallThroughCheck extends AbstractCheck {
     }
 
     /**
+     * Checks if a given synchronized block terminated by return, throw or,
+     * if allowed break, continue.
+     * @param synchronizedAst synchronized block to check.
+     * @param useBreak should we consider break as terminator.
+     * @param useContinue should we consider continue as terminator.
+     * @return true if synchronized block is terminated.
+     */
+    private boolean checkSynchronized(final DetailAST synchronizedAst, boolean useBreak,
+                                      boolean useContinue) {
+        return isTerminated(
+            synchronizedAst.findFirstToken(TokenTypes.SLIST), useBreak, useContinue);
+    }
+
+    /**
      * Determines if the fall through case between {@code currentCase} and
      * {@code nextCase} is relieved by a appropriate comment.
      *
@@ -354,7 +372,7 @@ public class FallThroughCheck extends AbstractCheck {
             //    }
             final int startLineNo = currentCase.getLineNo();
             for (int i = endLineNo - 2; i > startLineNo - 1; i--) {
-                if (!CommonUtils.isBlank(lines[i])) {
+                if (!CommonUtil.isBlank(lines[i])) {
                     allThroughComment = matchesComment(reliefPattern, lines[i], i + 1);
                     break;
                 }
@@ -371,19 +389,15 @@ public class FallThroughCheck extends AbstractCheck {
      * @param lineNo The line number in the file.
      * @return True if a match was found inside a comment.
      */
-    private boolean matchesComment(Pattern pattern, String line, int lineNo
-    ) {
+    private boolean matchesComment(Pattern pattern, String line, int lineNo) {
         final Matcher matcher = pattern.matcher(line);
+        boolean matches = false;
 
-        final boolean hit = matcher.find();
-
-        if (hit) {
-            final int startMatch = matcher.start();
-            // -1 because it returns the char position beyond the match
-            final int endMatch = matcher.end() - 1;
-            return getFileContents().hasIntersectionWithComment(lineNo,
-                    startMatch, lineNo, endMatch);
+        if (matcher.find()) {
+            matches = getFileContents().hasIntersectionWithComment(lineNo, matcher.start(),
+                    lineNo, matcher.end());
         }
-        return false;
+        return matches;
     }
+
 }

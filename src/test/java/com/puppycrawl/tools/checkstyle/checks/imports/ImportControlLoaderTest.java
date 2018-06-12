@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -52,6 +52,7 @@ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ImportControlLoader.class, URI.class})
 public class ImportControlLoaderTest {
+
     private static String getPath(String filename) {
         return "src/test/resources/com/puppycrawl/tools/"
                 + "checkstyle/checks/imports/importcontrolloader/" + filename;
@@ -59,10 +60,10 @@ public class ImportControlLoaderTest {
 
     @Test
     public void testLoad() throws CheckstyleException {
-        final ImportControl root =
+        final AbstractImportControl root =
                 ImportControlLoader.load(
                 new File(getPath("InputImportControlLoaderComplete.xml")).toURI());
-        assertNotNull(root);
+        assertNotNull("Import root should not be null", root);
     }
 
     @Test
@@ -73,17 +74,19 @@ public class ImportControlLoaderTest {
             fail("exception expected");
         }
         catch (CheckstyleException ex) {
-            assertSame(MalformedURLException.class, ex.getCause().getClass());
-            assertEquals("unknown protocol: aaa", ex.getCause().getMessage());
+            assertSame("Invalid exception class",
+                    MalformedURLException.class, ex.getCause().getClass());
+            assertEquals("Invalid exception message",
+                    "unknown protocol: aaa", ex.getCause().getMessage());
         }
     }
 
     @Test
     public void testExtraElementInConfig() throws Exception {
-        final ImportControl root =
+        final AbstractImportControl root =
                 ImportControlLoader.load(
                     new File(getPath("InputImportControlLoaderWithNewElement.xml")).toURI());
-        assertNotNull(root);
+        assertNotNull("Import root should not be null", root);
     }
 
     @Test
@@ -104,8 +107,9 @@ public class ImportControlLoaderTest {
             fail("exception expected");
         }
         catch (InvocationTargetException ex) {
-            assertSame(SAXException.class, ex.getCause().getClass());
-            assertEquals("missing attribute you_cannot_find_me", ex.getCause().getMessage());
+            assertSame("Invalid exception class", SAXException.class, ex.getCause().getClass());
+            assertEquals("Invalid exception message",
+                    "missing attribute you_cannot_find_me", ex.getCause().getMessage());
         }
     }
 
@@ -125,8 +129,10 @@ public class ImportControlLoaderTest {
             fail("exception expected");
         }
         catch (InvocationTargetException ex) {
-            assertSame(CheckstyleException.class, ex.getCause().getClass());
-            assertTrue(ex.getCause().getMessage().startsWith("unable to read"));
+            assertSame("Invalid exception class",
+                    CheckstyleException.class, ex.getCause().getClass());
+            assertTrue("Invalid exception message: " + ex.getCause().getMessage(),
+                    ex.getCause().getMessage().startsWith("unable to read"));
         }
     }
 
@@ -148,7 +154,9 @@ public class ImportControlLoaderTest {
             fail("exception expected " + available);
         }
         catch (CheckstyleException ex) {
-            assertSame(IOException.class, ex.getCause().getClass());
+            final Throwable[] suppressed = ex.getSuppressed();
+            assertEquals("Expected one suppressed exception", 1, suppressed.length);
+            assertSame("Invalid exception class", IOException.class, suppressed[0].getClass());
         }
         Mockito.verify(inputStream).close();
     }
@@ -170,7 +178,9 @@ public class ImportControlLoaderTest {
             fail("exception expected " + available);
         }
         catch (CheckstyleException ex) {
-            assertSame(SAXParseException.class, ex.getCause().getClass());
+            assertSame("Invalid exception class",
+                    SAXParseException.class, ex.getCause().getClass());
         }
     }
+
 }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,10 +19,6 @@
 
 package com.puppycrawl.tools.checkstyle.filters;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URL;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
@@ -33,19 +29,18 @@ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.ExternalResourceHolder;
 import com.puppycrawl.tools.checkstyle.api.Filter;
 import com.puppycrawl.tools.checkstyle.api.FilterSet;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.FilterUtil;
 
 /**
  * <p>
  * This filter accepts AuditEvents according to file, check, line, and
  * column, as specified in a suppression file.
  * </p>
- * @author Rick Giles
- * @author <a href="mailto:piotr.listkiewicz@gmail.com">liscju</a>
+ * @noinspection NonFinalFieldReferenceInEquals, NonFinalFieldReferencedInHashCode
  */
 public class SuppressionFilter extends AutomaticBean implements Filter, ExternalResourceHolder {
 
-    /** Filename of supression file. */
+    /** Filename of suppression file. */
     private String file;
     /** Tells whether config file existence is optional. */
     private boolean optional;
@@ -53,7 +48,7 @@ public class SuppressionFilter extends AutomaticBean implements Filter, External
     private FilterSet filters = new FilterSet();
 
     /**
-     * Sets name of the supression file.
+     * Sets name of the suppression file.
      * @param fileName name of the suppressions file.
      */
     public void setFile(String fileName) {
@@ -94,7 +89,7 @@ public class SuppressionFilter extends AutomaticBean implements Filter, External
     protected void finishLocalSetup() throws CheckstyleException {
         if (file != null) {
             if (optional) {
-                if (suppressionSourceExists(file)) {
+                if (FilterUtil.isFileExists(file)) {
                     filters = SuppressionsLoader.loadSuppressions(file);
                 }
                 else {
@@ -112,32 +107,4 @@ public class SuppressionFilter extends AutomaticBean implements Filter, External
         return Collections.singleton(file);
     }
 
-    /**
-     * Checks if suppression source with given fileName exists.
-     * @param fileName name of the suppressions file.
-     * @return true if suppression file exists, otherwise false
-     */
-    private static boolean suppressionSourceExists(String fileName) {
-        boolean suppressionSourceExists = true;
-        InputStream sourceInput = null;
-        try {
-            final URI uriByFilename = CommonUtils.getUriByFilename(fileName);
-            final URL url = uriByFilename.toURL();
-            sourceInput = url.openStream();
-        }
-        catch (CheckstyleException | IOException ignored) {
-            suppressionSourceExists = false;
-        }
-        finally {
-            if (sourceInput != null) {
-                try {
-                    sourceInput.close();
-                }
-                catch (IOException ignored) {
-                    suppressionSourceExists = false;
-                }
-            }
-        }
-        return suppressionSourceExists;
-    }
 }

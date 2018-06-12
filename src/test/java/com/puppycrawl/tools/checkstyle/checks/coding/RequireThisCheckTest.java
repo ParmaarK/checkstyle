@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,7 @@ package com.puppycrawl.tools.checkstyle.checks.coding;
 import static com.puppycrawl.tools.checkstyle.checks.coding.RequireThisCheck.MSG_METHOD;
 import static com.puppycrawl.tools.checkstyle.checks.coding.RequireThisCheck.MSG_VARIABLE;
 
+import java.lang.reflect.Constructor;
 import java.util.SortedSet;
 
 import org.junit.Assert;
@@ -33,9 +34,11 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.LocalizedMessage;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.internal.utils.TestUtil;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class RequireThisCheckTest extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/coding/requirethis";
@@ -44,7 +47,7 @@ public class RequireThisCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testIt() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(RequireThisCheck.class);
+            createModuleConfig(RequireThisCheck.class);
         checkConfig.addAttribute("validateOnlyOverlapping", "false");
         final String[] expected = {
             "11:9: " + getCheckMessage(MSG_VARIABLE, "i", ""),
@@ -58,6 +61,11 @@ public class RequireThisCheckTest extends AbstractModuleTestSupport {
             "121:13: " + getCheckMessage(MSG_METHOD, "instanceMethod", "Issue2240."),
             "122:13: " + getCheckMessage(MSG_VARIABLE, "i", "Issue2240."),
             "134:9: " + getCheckMessage(MSG_METHOD, "foo", ""),
+            "142:9: " + getCheckMessage(MSG_VARIABLE, "s", ""),
+            "168:16: " + getCheckMessage(MSG_VARIABLE, "a", ""),
+            "168:20: " + getCheckMessage(MSG_VARIABLE, "a", ""),
+            "174:16: " + getCheckMessage(MSG_VARIABLE, "b", ""),
+            "174:20: " + getCheckMessage(MSG_VARIABLE, "b", ""),
         };
         verify(checkConfig,
                getPath("InputRequireThisEnumInnerClassesAndBugs.java"),
@@ -67,7 +75,7 @@ public class RequireThisCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testMethodsOnly() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(RequireThisCheck.class);
+            createModuleConfig(RequireThisCheck.class);
         checkConfig.addAttribute("checkFields", "false");
         checkConfig.addAttribute("validateOnlyOverlapping", "false");
         final String[] expected = {
@@ -84,7 +92,7 @@ public class RequireThisCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testFieldsOnly() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(RequireThisCheck.class);
+            createModuleConfig(RequireThisCheck.class);
         checkConfig.addAttribute("checkMethods", "false");
         checkConfig.addAttribute("validateOnlyOverlapping", "false");
         final String[] expected = {
@@ -95,6 +103,11 @@ public class RequireThisCheckTest extends AbstractModuleTestSupport {
             "113:9: " + getCheckMessage(MSG_VARIABLE, "i", ""),
             "114:9: " + getCheckMessage(MSG_VARIABLE, "i", ""),
             "122:13: " + getCheckMessage(MSG_VARIABLE, "i", "Issue2240."),
+            "142:9: " + getCheckMessage(MSG_VARIABLE, "s", ""),
+            "168:16: " + getCheckMessage(MSG_VARIABLE, "a", ""),
+            "168:20: " + getCheckMessage(MSG_VARIABLE, "a", ""),
+            "174:16: " + getCheckMessage(MSG_VARIABLE, "b", ""),
+            "174:20: " + getCheckMessage(MSG_VARIABLE, "b", ""),
         };
         verify(checkConfig,
                getPath("InputRequireThisEnumInnerClassesAndBugs.java"),
@@ -104,16 +117,16 @@ public class RequireThisCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testGenerics() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(RequireThisCheck.class);
+            createModuleConfig(RequireThisCheck.class);
         checkConfig.addAttribute("validateOnlyOverlapping", "false");
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputRequireThis15Extensions.java"), expected);
     }
 
     @Test
     public void testGithubIssue41() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(RequireThisCheck.class);
+                createModuleConfig(RequireThisCheck.class);
         checkConfig.addAttribute("validateOnlyOverlapping", "false");
         final String[] expected = {
             "7:19: " + getCheckMessage(MSG_VARIABLE, "number", ""),
@@ -127,14 +140,14 @@ public class RequireThisCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testTokensNotNull() {
         final RequireThisCheck check = new RequireThisCheck();
-        Assert.assertNotNull(check.getAcceptableTokens());
-        Assert.assertNotNull(check.getDefaultTokens());
-        Assert.assertNotNull(check.getRequiredTokens());
+        Assert.assertNotNull("Acceptable tokens should not be null", check.getAcceptableTokens());
+        Assert.assertNotNull("Acceptable tokens should not be null", check.getDefaultTokens());
+        Assert.assertNotNull("Acceptable tokens should not be null", check.getRequiredTokens());
     }
 
     @Test
     public void testWithAnonymousClass() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(RequireThisCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(RequireThisCheck.class);
         checkConfig.addAttribute("validateOnlyOverlapping", "false");
         final String[] expected = {
             "19:25: " + getCheckMessage(MSG_METHOD, "doSideEffect", ""),
@@ -161,7 +174,7 @@ public class RequireThisCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testValidateOnlyOverlappingFalse() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(RequireThisCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(RequireThisCheck.class);
         checkConfig.addAttribute("validateOnlyOverlapping", "false");
         final String[] expected = {
             "20:9: " + getCheckMessage(MSG_VARIABLE, "field1", ""),
@@ -199,12 +212,12 @@ public class RequireThisCheckTest extends AbstractModuleTestSupport {
             "238:9: " + getCheckMessage(MSG_VARIABLE, "field1", ""),
             "253:9: " + getCheckMessage(MSG_VARIABLE, "booleanField", ""),
             "262:9: " + getCheckMessage(MSG_VARIABLE, "field1", ""),
-            "270:18: " + getCheckMessage(MSG_METHOD, "addSuffixToField", ""),
+            "270:18: " + getCheckMessage(MSG_METHOD, "addSuf2F", ""),
             "275:9: " + getCheckMessage(MSG_VARIABLE, "field1", ""),
-            "275:18: " + getCheckMessage(MSG_METHOD, "addSuffixToField", ""),
+            "275:18: " + getCheckMessage(MSG_METHOD, "addSuf2F", ""),
             "301:9: " + getCheckMessage(MSG_VARIABLE, "field1", ""),
             "340:9: " + getCheckMessage(MSG_VARIABLE, "field1", ""),
-            "374:40: " + getCheckMessage(MSG_METHOD, "getServletRelativeAction", ""),
+            "374:25: " + getCheckMessage(MSG_METHOD, "getAction", ""),
             "376:20: " + getCheckMessage(MSG_METHOD, "processAction", ""),
             "384:16: " + getCheckMessage(MSG_METHOD, "processAction", ""),
         };
@@ -213,7 +226,7 @@ public class RequireThisCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testValidateOnlyOverlappingTrue() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(RequireThisCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(RequireThisCheck.class);
         final String[] expected = {
             "20:9: " + getCheckMessage(MSG_VARIABLE, "field1", ""),
             "43:9: " + getCheckMessage(MSG_VARIABLE, "field1", ""),
@@ -233,39 +246,39 @@ public class RequireThisCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testReceiverParameter() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(RequireThisCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final DefaultConfiguration checkConfig = createModuleConfig(RequireThisCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputRequireThisReceiver.java"), expected);
     }
 
     @Test
     public void testBraceAlone() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(RequireThisCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(RequireThisCheck.class);
         checkConfig.addAttribute("validateOnlyOverlapping", "false");
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputRequireThisBraceAlone.java"), expected);
     }
 
     @Test
     public void testStatic() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(RequireThisCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(RequireThisCheck.class);
         checkConfig.addAttribute("validateOnlyOverlapping", "false");
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputRequireThisStatic.java"), expected);
     }
 
     @Test
     public void testMethodReferences() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(RequireThisCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(RequireThisCheck.class);
         final String[] expected = {
             "15:9: " + getCheckMessage(MSG_VARIABLE, "tags", ""),
         };
-        verify(checkConfig, getPath("InputRequireThisMetodReferences.java"), expected);
+        verify(checkConfig, getPath("InputRequireThisMethodReferences.java"), expected);
     }
 
     @Test
     public void testAllowLocalVars() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(RequireThisCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(RequireThisCheck.class);
         checkConfig.addAttribute("validateOnlyOverlapping", "false");
         checkConfig.addAttribute("checkMethods", "false");
         final String[] expected = {
@@ -281,7 +294,7 @@ public class RequireThisCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testAllowLambdaParameters() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(RequireThisCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(RequireThisCheck.class);
         checkConfig.addAttribute("validateOnlyOverlapping", "false");
         checkConfig.addAttribute("checkMethods", "false");
         final String[] expected = {
@@ -292,4 +305,73 @@ public class RequireThisCheckTest extends AbstractModuleTestSupport {
         };
         verify(checkConfig, getPath("InputRequireThisAllowLambdaParameters.java"), expected);
     }
+
+    @Test
+    public void testCatchVariables() throws Exception {
+        final DefaultConfiguration checkConfig = createModuleConfig(RequireThisCheck.class);
+        checkConfig.addAttribute("validateOnlyOverlapping", "false");
+        final String[] expected = {
+            "29:21: " + getCheckMessage(MSG_VARIABLE, "ex", ""),
+        };
+        verify(checkConfig, getPath("InputRequireThisCatchVariables.java"), expected);
+    }
+
+    @Test
+    public void testEnumConstant() throws Exception {
+        final DefaultConfiguration checkConfig = createModuleConfig(RequireThisCheck.class);
+        checkConfig.addAttribute("validateOnlyOverlapping", "false");
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
+        verify(checkConfig, getPath("InputRequireThisEnumConstant.java"), expected);
+    }
+
+    @Test
+    public void testAnnotationInterface() throws Exception {
+        final DefaultConfiguration checkConfig = createModuleConfig(RequireThisCheck.class);
+        checkConfig.addAttribute("validateOnlyOverlapping", "false");
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
+        verify(checkConfig, getPath("InputRequireThisAnnotationInterface.java"), expected);
+    }
+
+    @Test
+    public void testFor() throws Exception {
+        final DefaultConfiguration checkConfig = createModuleConfig(RequireThisCheck.class);
+        checkConfig.addAttribute("validateOnlyOverlapping", "false");
+        final String[] expected = {
+            "13:13: " + getCheckMessage(MSG_VARIABLE, "bottom", ""),
+            "21:34: " + getCheckMessage(MSG_VARIABLE, "name", ""),
+        };
+        verify(checkConfig, getPath("InputRequireThisFor.java"), expected);
+    }
+
+    @Test
+    public void test() throws Exception {
+        final DefaultConfiguration checkConfig = createModuleConfig(RequireThisCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
+        verify(checkConfig, getPath("InputRequireThisCaseGroup.java"), expected);
+    }
+
+    @Test
+    public void testExtendedMethod() throws Exception {
+        final DefaultConfiguration checkConfig = createModuleConfig(RequireThisCheck.class);
+        checkConfig.addAttribute("validateOnlyOverlapping", "false");
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
+        verify(checkConfig, getPath("InputRequireThisExtendedMethod.java"), expected);
+    }
+
+    @Test
+    public void testUnusedMethod() throws Exception {
+        final DetailAST ident = new DetailAST();
+        ident.setText("testName");
+
+        final Class<?> cls = Class.forName(RequireThisCheck.class.getName() + "$CatchFrame");
+        final Constructor<?> constructor = cls.getDeclaredConstructors()[0];
+        constructor.setAccessible(true);
+        final Object o = constructor.newInstance(null, ident);
+
+        Assert.assertEquals("expected ident token", ident,
+                TestUtil.getClassDeclaredMethod(cls, "getFrameNameIdent").invoke(o));
+        Assert.assertEquals("expected catch frame type", "CATCH_FRAME",
+                TestUtil.getClassDeclaredMethod(cls, "getType").invoke(o).toString());
+    }
+
 }

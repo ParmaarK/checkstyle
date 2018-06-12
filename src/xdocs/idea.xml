@@ -6,7 +6,8 @@
 
   <head>
     <title>Importing and debugging in IntelliJ IDE</title>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"/>
+    <script type="text/javascript"
+            src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"/>
     <script type="text/javascript" src="js/anchors.js"/>
     <script type="text/javascript" src="js/google-analytics.js"/>
     <link rel="icon" href="images/favicon.png" type="image/x-icon" />
@@ -33,7 +34,8 @@
       </p>
       <p>
         Generate sources that a required by checkstyle
-        by right click over pom.xml file and click on menu "Maven / Generate Sources and Update Folders"
+        by right click over pom.xml file and click on menu "Maven / Generate Sources and Update
+        Folders"
         <img alt="screenshot" src="images/gui_screenshot_idea_generate_sources.png"/>
         <br/><br/>
       </p>
@@ -60,11 +62,13 @@
     <section name="Organize Imports">
       <p>
         One of the Checkstyle checks we run on our own code require certain order of import
-        statements. Few changes in IDE settings are required to help your IDE do it automatically.<br/>
+        statements. Few changes in IDE settings are required to help your IDE do it
+        automatically.<br/>
         To change formatter settings please go to File->Settings in menu.<br/>
         Then in the tree go to: Editor->Code Style->Java, open Import tab (follow numbers on a
         picture) and apply settings highlighted:<br/><br/>
-        <img alt="Organize Imports settings in IDEA" src="images/gui_screenshot_organize_imports_idea.jpg"/>
+        <img alt="Organize Imports settings in IDEA"
+          src="images/gui_screenshot_organize_imports_idea.jpg"/>
         <br/>
       </p>
     </section>
@@ -76,12 +80,14 @@
         <code>config/intellij-idea-inspections.xml</code>.<br/><br/>
         <img alt="Inspections in IntelliJ IDEA" src="images/gui_screenshot_inspections_idea.png"/>
         <br/><br/>
-        Not all files in repository should be analyzed. For example test input files contain numerous
-        violations on purpose. Our shared inspection scope can be used to exclude such files.<br/>
+        Not all files in repository should be analyzed. For example test input files contain
+        numerous violations on purpose. Our shared inspection scope can be used to exclude such
+        files.<br/>
         To add custom scope copy file <code>config/intellij-idea-inspection-scope.xml</code>
         to <code>.idea/scopes</code> directory.
         Command from root of repo is
-        <code>mkdir -p .idea/scopes; cp config/intellij-idea-inspection-scope.xml .idea/scopes/</code><br/>
+        <code>mkdir -p .idea/scopes; cp config/intellij-idea-inspection-scope.xml
+        .idea/scopes/</code><br/>
         Now it should be ready to use in inspect code window:<br/><br/>
         <img alt="Scope for inspections" src="images/gui_screenshot_scope_idea.png"/>
       </p>
@@ -94,7 +100,8 @@
         checkstyle files. A simple solution to this problem is by using the key combinations
         <code>Ctrl + Shift + Alt + V</code> or <code>Edit | Paste Simple</code>. However it is
         recommended that this settings be changed by default as shown below
-        <img alt="Disable Auto Indent on Paste" src="images/gui_screenshot_disable_indent_paste_idea.png"/>
+        <img alt="Disable Auto Indent on Paste"
+          src="images/gui_screenshot_disable_indent_paste_idea.png"/>
       </p>
     </section>
 

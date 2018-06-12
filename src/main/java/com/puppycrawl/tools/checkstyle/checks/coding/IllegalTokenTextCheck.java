@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,10 +21,11 @@ package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import java.util.regex.Pattern;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * <p>
@@ -49,8 +50,8 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
  *     &lt;property name="ignoreCase" value="true"/&gt;
  * &lt;/module&gt;
  * </pre>
- * @author Rick Giles
  */
+@StatelessCheck
 public class IllegalTokenTextCheck
     extends AbstractCheck {
 
@@ -67,17 +68,17 @@ public class IllegalTokenTextCheck
     private String message = "";
 
     /** The format string of the regexp. */
-    private String format = "$^";
+    private String formatString = "$^";
 
     /** The regexp to match against. */
-    private Pattern regexp = Pattern.compile(format);
+    private Pattern format = Pattern.compile(formatString);
 
-    /** The flags to use with the regexp. */
-    private int compileFlags;
+    /** {@code true} if the casing should be ignored. */
+    private boolean ignoreCase;
 
     @Override
     public int[] getDefaultTokens() {
-        return CommonUtils.EMPTY_INT_ARRAY;
+        return CommonUtil.EMPTY_INT_ARRAY;
     }
 
     @Override
@@ -96,7 +97,7 @@ public class IllegalTokenTextCheck
 
     @Override
     public int[] getRequiredTokens() {
-        return CommonUtils.EMPTY_INT_ARRAY;
+        return CommonUtil.EMPTY_INT_ARRAY;
     }
 
     @Override
@@ -107,16 +108,15 @@ public class IllegalTokenTextCheck
     @Override
     public void visitToken(DetailAST ast) {
         final String text = ast.getText();
-        if (regexp.matcher(text).find()) {
+        if (format.matcher(text).find()) {
             String customMessage = message;
             if (customMessage.isEmpty()) {
                 customMessage = MSG_KEY;
             }
             log(
-                ast.getLineNo(),
-                ast.getColumnNo(),
+                ast,
                 customMessage,
-                format);
+                formatString);
         }
     }
 
@@ -140,30 +140,33 @@ public class IllegalTokenTextCheck
      * @throws org.apache.commons.beanutils.ConversionException unable to parse format
      */
     public void setFormat(String format) {
-        this.format = format;
+        formatString = format;
         updateRegexp();
     }
 
     /**
      * Set whether or not the match is case sensitive.
      * @param caseInsensitive true if the match is case insensitive.
+     * @noinspection BooleanParameter
      */
     public void setIgnoreCase(boolean caseInsensitive) {
-        if (caseInsensitive) {
+        ignoreCase = caseInsensitive;
+        updateRegexp();
+    }
+
+    /**
+     * Updates the {@link #format} based on the values from {@link #formatString} and
+     * {@link #ignoreCase}.
+     */
+    private void updateRegexp() {
+        final int compileFlags;
+        if (ignoreCase) {
             compileFlags = Pattern.CASE_INSENSITIVE;
         }
         else {
             compileFlags = 0;
         }
-
-        updateRegexp();
+        format = CommonUtil.createPattern(formatString, compileFlags);
     }
 
-    /**
-     * Updates the {@link #regexp} based on the values from {@link #format} and
-     * {@link #compileFlags}.
-     */
-    private void updateRegexp() {
-        regexp = CommonUtils.createPattern(format, compileFlags);
-    }
 }

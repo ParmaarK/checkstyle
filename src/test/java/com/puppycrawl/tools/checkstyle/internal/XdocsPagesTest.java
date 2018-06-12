@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,13 +25,17 @@ import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -61,13 +65,29 @@ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 import com.puppycrawl.tools.checkstyle.api.Scope;
 import com.puppycrawl.tools.checkstyle.api.SeverityLevel;
+import com.puppycrawl.tools.checkstyle.checks.LineSeparatorOption;
+import com.puppycrawl.tools.checkstyle.checks.annotation.AnnotationUseStyleCheck.ClosingParens;
+import com.puppycrawl.tools.checkstyle.checks.annotation.AnnotationUseStyleCheck.ElementStyle;
+import com.puppycrawl.tools.checkstyle.checks.annotation.AnnotationUseStyleCheck.TrailingArrayComma;
+import com.puppycrawl.tools.checkstyle.checks.blocks.BlockOption;
+import com.puppycrawl.tools.checkstyle.checks.blocks.LeftCurlyOption;
+import com.puppycrawl.tools.checkstyle.checks.blocks.RightCurlyOption;
+import com.puppycrawl.tools.checkstyle.checks.imports.ImportOrderOption;
 import com.puppycrawl.tools.checkstyle.checks.javadoc.AbstractJavadocCheck;
 import com.puppycrawl.tools.checkstyle.checks.naming.AccessModifier;
+import com.puppycrawl.tools.checkstyle.checks.whitespace.PadOption;
+import com.puppycrawl.tools.checkstyle.checks.whitespace.WrapOption;
+import com.puppycrawl.tools.checkstyle.internal.utils.CheckUtil;
+import com.puppycrawl.tools.checkstyle.internal.utils.TestUtil;
+import com.puppycrawl.tools.checkstyle.internal.utils.XdocUtil;
+import com.puppycrawl.tools.checkstyle.internal.utils.XmlUtil;
+import com.puppycrawl.tools.checkstyle.utils.TokenUtil;
 
 public class XdocsPagesTest {
+
     private static final Path AVAILABLE_CHECKS_PATH = Paths.get("src/xdocs/checks.xml");
     private static final String LINK_TEMPLATE =
-            "(?s).*<a href=\"config_\\w+\\.html#%1$s\">%1$s</a>.*";
+            "(?s).*<a href=\"config_\\w+\\.html#%1$s\">(\\s)*%1$s</a>.*";
 
     private static final Pattern VERSION = Pattern.compile("\\d+\\.\\d+(\\.\\d+)?");
 
@@ -80,6 +100,7 @@ public class XdocsPagesTest {
             "name=\"Header\"",
             "name=\"Translation\"",
             "name=\"SeverityMatchFilter\"",
+            "name=\"SuppressWithPlainTextCommentFilter\"",
             "name=\"SuppressionFilter\"",
             "name=\"SuppressWarningsFilter\"",
             "name=\"BeforeExecutionExclusionFileFilter\"",
@@ -110,6 +131,14 @@ public class XdocsPagesTest {
             "TreeWalker.upChild",
             "SuppressWithNearbyCommentFilter.fileContents",
             "SuppressionCommentFilter.fileContents"
+    );
+
+    private static final List<String> PROPERTIES_ALLOWED_GET_TYPES_FROM_METHOD = Arrays.asList(
+            // static field (all upper case)
+            "SuppressWarningsHolder.aliasList",
+            // loads string into memory similar to file
+            "Header.header",
+            "RegexpHeader.header"
     );
 
     private static final Set<String> SUN_MODULES = Collections.unmodifiableSet(
@@ -160,7 +189,8 @@ public class XdocsPagesTest {
                 XmlUtil.getRawXml(fileName, code, unserializedSource);
 
                 // can't test ant structure, or old and outdated checks
-                Assert.assertTrue(fileName.startsWith("anttask")
+                Assert.assertTrue("Xml is invalid, old or has outdated structure",
+                        fileName.startsWith("anttask")
                         || fileName.startsWith("releasenotes")
                         || isValidCheckstyleXml(fileName, code, unserializedSource));
             }
@@ -185,8 +215,8 @@ public class XdocsPagesTest {
                     .getCanonicalPath();
 
             code = "<?xml version=\"1.0\"?>\n<!DOCTYPE module PUBLIC "
-                    + "\"-//Puppy Crawl//DTD Check Configuration 1.3//EN\" \"" + dtdPath + "\">\n"
-                    + code;
+                    + "\"-//Checkstyle//DTD Checkstyle Configuration 1.3//EN\" \"" + dtdPath
+                    + "\">\n" + code;
         }
         return code;
     }
@@ -210,6 +240,7 @@ public class XdocsPagesTest {
         // can't process non-existent examples, or out of context snippets
         if (!code.contains("com.mycompany") && !code.contains("checkstyle-packages")
                 && !code.contains("MethodLimit") && !code.contains("<suppress ")
+                && !code.contains("<suppress-xpath ")
                 && !code.contains("<import-control ")
                 && !unserializedSource.startsWith("<property ")
                 && !unserializedSource.startsWith("<taskdef ")) {
@@ -244,7 +275,7 @@ public class XdocsPagesTest {
 
     @Test
     public void testAllCheckSections() throws Exception {
-        final ModuleFactory moduleFactory = TestUtils.getPackageObjectFactory();
+        final ModuleFactory moduleFactory = TestUtil.getPackageObjectFactory();
 
         for (Path path : XdocUtil.getXdocsConfigFilePaths(XdocUtil.getXdocsFilePaths())) {
             final String fileName = path.getFileName().toString();
@@ -287,12 +318,12 @@ public class XdocsPagesTest {
     }
 
     /**
-     * Test contains asserts in callstack, but idea does not see them
+     * Test contains asserts in callstack, but idea does not see them.
      * @noinspection JUnitTestMethodWithNoAssertions
      */
     @Test
     public void testAllCheckSectionsEx() throws Exception {
-        final ModuleFactory moduleFactory = TestUtils.getPackageObjectFactory();
+        final ModuleFactory moduleFactory = TestUtil.getPackageObjectFactory();
 
         final Path path = Paths.get(XdocUtil.DIRECTORY_PATH + "/config.xml");
         final String fileName = path.getFileName().toString();
@@ -327,6 +358,11 @@ public class XdocsPagesTest {
 
         int subSectionPos = 0;
         for (Node subSection : XmlUtil.getChildrenElements(section)) {
+            if (subSectionPos == 0 && "p".equals(subSection.getNodeName())) {
+                validateSinceDescriptionSection(fileName, sectionName, subSection);
+                continue;
+            }
+
             final String subSectionName = subSection.getAttributes().getNamedItem("name")
                     .getNodeValue();
 
@@ -352,7 +388,6 @@ public class XdocsPagesTest {
 
             switch (subSectionPos) {
                 case 0:
-                    validateSinceDescriptionSection(fileName, sectionName, subSection);
                     break;
                 case 1:
                     validatePropertySection(fileName, sectionName, subSection, instance);
@@ -445,6 +480,9 @@ public class XdocsPagesTest {
         if (hasParentModule(sectionName)) {
             if (AbstractJavadocCheck.class.isAssignableFrom(clss)) {
                 properties.removeAll(JAVADOC_CHECK_PROPERTIES);
+
+                // override
+                properties.add("violateExecutionOnNonTightHtml");
             }
             else if (AbstractCheck.class.isAssignableFrom(clss)) {
                 properties.removeAll(CHECK_PROPERTIES);
@@ -576,28 +614,26 @@ public class XdocsPagesTest {
         Assert.assertFalse(fileName + " section '" + sectionName + "' should have a type for "
                 + propertyName, actualTypeName.isEmpty());
 
-        final PropertyDescriptor descriptor = PropertyUtils.getPropertyDescriptor(instance,
-                propertyName);
-        final Class<?> clss = descriptor.getPropertyType();
-        final String expectedTypeName = getModulePropertyExpectedTypeName(clss, instance,
+        final Field field = getField(instance.getClass(), propertyName);
+        final Class<?> fieldClss = getFieldClass(fileName, sectionName, instance, field,
                 propertyName);
 
-        if (expectedTypeName != null) {
-            final String expectedValue = getModulePropertyExpectedValue(clss, instance,
-                    propertyName);
+        final String expectedTypeName = getModulePropertyExpectedTypeName(sectionName, fieldClss,
+                instance, propertyName);
+        final String expectedValue = getModulePropertyExpectedValue(sectionName, propertyName,
+                field, fieldClss, instance);
+
+        Assert.assertEquals(fileName + " section '" + sectionName
+                + "' should have the type for " + propertyName, expectedTypeName,
+                actualTypeName);
+
+        if (expectedValue != null) {
+            final String actualValue = columns.get(3).getTextContent().replace("\n", "")
+                    .replace("\r", "").replaceAll(" +", " ").trim();
 
             Assert.assertEquals(fileName + " section '" + sectionName
-                    + "' should have the type for " + propertyName, expectedTypeName,
-                    actualTypeName);
-
-            if (expectedValue != null) {
-                final String actualValue = columns.get(3).getTextContent().replace("\n", "")
-                        .replace("\r", "").replaceAll(" +", " ").trim();
-
-                Assert.assertEquals(fileName + " section '" + sectionName
-                        + "' should have the value for " + propertyName, expectedValue,
-                        actualValue);
-            }
+                    + "' should have the value for " + propertyName, expectedValue,
+                    actualValue);
         }
     }
 
@@ -638,25 +674,66 @@ public class XdocsPagesTest {
                         .replaceAll("\\s+", " ").trim());
     }
 
-    /** @noinspection IfStatementWithTooManyBranches */
-    private static String getModulePropertyExpectedTypeName(Class<?> clss, Object instance,
-            String propertyName) {
+    /**
+     * Get's the name of the bean property's type for the class.
+     * @param sectionName The name of the section/module being worked on.
+     * @param fieldClass The bean property's type.
+     * @param instance The class instance to work with.
+     * @param propertyName The property name to work with.
+     * @return String form of property's type.
+     * @noinspection IfStatementWithTooManyBranches, OverlyComplexBooleanExpression
+     */
+    private static String getModulePropertyExpectedTypeName(String sectionName, Class<?> fieldClass,
+            Object instance, String propertyName) {
         final String instanceName = instance.getClass().getSimpleName();
         String result = null;
 
-        if (clss == boolean.class) {
+        if (("SuppressionCommentFilter".equals(sectionName)
+                || "SuppressWithNearbyCommentFilter".equals(sectionName)
+                || "SuppressWithPlainTextCommentFilter".equals(sectionName))
+                    && ("checkFormat".equals(propertyName)
+                        || "messageFormat".equals(propertyName)
+                        || "influenceFormat".equals(propertyName))
+                || ("RegexpMultiline".equals(sectionName)
+                    || "RegexpSingleline".equals(sectionName)
+                    || "RegexpSinglelineJava".equals(sectionName))
+                    && "format".equals(propertyName)) {
+            // dynamic custom expression
+            result = "Regular Expression";
+        }
+        else if ("CustomImportOrder".equals(sectionName)
+                && "customImportOrderRules".equals(propertyName)) {
+            // specially separated list
+            result = "String";
+        }
+        else if (fieldClass == boolean.class) {
             result = "Boolean";
         }
-        else if (clss == int.class) {
+        else if (fieldClass == int.class) {
             result = "Integer";
         }
-        else if (clss == int[].class) {
-            result = "Integer Set";
+        else if (fieldClass == int[].class) {
+            if (isPropertyTokenType(sectionName, propertyName)) {
+                result = "subset of tokens TokenTypes";
+            }
+            else {
+                result = "Integer Set";
+            }
         }
-        else if (clss == double[].class) {
+        else if (fieldClass == double[].class) {
             result = "Number Set";
         }
-        else if (clss == String[].class) {
+        else if (fieldClass == String.class) {
+            result = "String";
+
+            if ("Checker".equals(sectionName) && "localeCountry".equals(propertyName)) {
+                result += " (either the empty string or an uppercase ISO 3166 2-letter code)";
+            }
+            else if ("Checker".equals(sectionName) && "localeLanguage".equals(propertyName)) {
+                result += " (either the empty string or a lowercase ISO 639 code)";
+            }
+        }
+        else if (fieldClass == String[].class) {
             if (propertyName.endsWith("Tokens") || propertyName.endsWith("Token")
                     || "AtclauseOrderCheck".equals(instanceName) && "target".equals(propertyName)
                     || "MultipleStringLiteralsCheck".equals(instanceName)
@@ -667,23 +744,59 @@ public class XdocsPagesTest {
                 result = "String Set";
             }
         }
-        else if (clss == URI.class) {
+        else if (fieldClass == URI.class) {
             result = "URI";
         }
-        else if (clss == Pattern.class) {
+        else if (fieldClass == Pattern.class) {
             result = "Regular Expression";
         }
-        else if (clss == SeverityLevel.class) {
+        else if (fieldClass == Pattern[].class) {
+            result = "Regular Expressions";
+        }
+        else if (fieldClass == SeverityLevel.class) {
             result = "Severity";
         }
-        else if (clss == Scope.class) {
+        else if (fieldClass == Scope.class) {
             result = "Scope";
         }
-        else if (clss == AccessModifier[].class) {
+        else if (fieldClass == ElementStyle.class) {
+            result = "Element Style";
+        }
+        else if (fieldClass == ClosingParens.class) {
+            result = "Closing Parens";
+        }
+        else if (fieldClass == TrailingArrayComma.class) {
+            result = "Trailing Comma";
+        }
+        else if (fieldClass == PadOption.class) {
+            result = "Pad Policy";
+        }
+        else if (fieldClass == WrapOption.class) {
+            result = "Wrap Operator Policy";
+        }
+        else if (fieldClass == BlockOption.class) {
+            result = "Block Policy";
+        }
+        else if (fieldClass == LeftCurlyOption.class) {
+            result = "Left Curly Brace Policy";
+        }
+        else if (fieldClass == RightCurlyOption.class) {
+            result = "Right Curly Brace Policy";
+        }
+        else if (fieldClass == LineSeparatorOption.class) {
+            result = "Line Separator Policy";
+        }
+        else if (fieldClass == ImportOrderOption.class) {
+            result = "Import Order Policy";
+        }
+        else if (fieldClass == AccessModifier[].class) {
             result = "Access Modifier Set";
         }
-        else if (clss != String.class) {
-            Assert.fail("Unknown property type: " + clss.getSimpleName());
+        else if ("PropertyCacheFile".equals(fieldClass.getSimpleName())) {
+            result = "File";
+        }
+        else {
+            Assert.fail("Unknown property type: " + fieldClass.getSimpleName());
         }
 
         if ("SuppressWarningsHolder".equals(instanceName)) {
@@ -694,18 +807,43 @@ public class XdocsPagesTest {
         return result;
     }
 
-    private static String getModulePropertyExpectedValue(Class<?> clss, Object instance,
-            String propertyName) throws Exception {
-        final Field field = getField(instance.getClass(), propertyName);
+    /**
+     * Get's the name of the bean property's default value for the class.
+     * @param sectionName The name of the section/module being worked on.
+     * @param propertyName The property name to work with.
+     * @param field The bean property's field.
+     * @param fieldClass The bean property's type.
+     * @param instance The class instance to work with.
+     * @return String form of property's default value.
+     * @noinspection ReuseOfLocalVariable, OverlyNestedMethod
+     */
+    private static String getModulePropertyExpectedValue(String sectionName, String propertyName,
+            Field field, Class<?> fieldClass, Object instance) throws Exception {
         String result = null;
 
         if (field != null) {
-            final Object value = field.get(instance);
+            Object value = field.get(instance);
 
-            if (clss == boolean.class) {
+            // noinspection IfStatementWithTooManyBranches
+            if ("Checker".equals(sectionName) && "localeCountry".equals(propertyName)) {
+                result = "default locale country for the Java Virtual Machine";
+            }
+            else if ("Checker".equals(sectionName) && "localeLanguage".equals(propertyName)) {
+                result = "default locale language for the Java Virtual Machine";
+            }
+            else if ("Checker".equals(sectionName) && "charset".equals(propertyName)) {
+                result = "System property \"file.encoding\"";
+            }
+            else if ("charset".equals(propertyName)) {
+                result = "the charset property of the parent Checker module";
+            }
+            else if ("PropertyCacheFile".equals(fieldClass.getSimpleName())) {
+                result = "null (no cache file)";
+            }
+            else if (fieldClass == boolean.class) {
                 result = value.toString();
             }
-            else if (clss == int.class) {
+            else if (fieldClass == int.class) {
                 if (value.equals(Integer.MAX_VALUE)) {
                     result = "java.lang.Integer.MAX_VALUE";
                 }
@@ -713,47 +851,204 @@ public class XdocsPagesTest {
                     result = value.toString();
                 }
             }
-            else if (clss == int[].class) {
-                result = Arrays.toString((int[]) value).replace("[", "").replace("]", "");
-                if (result.isEmpty()) {
-                    result = "{}";
+            else if (fieldClass == int[].class) {
+                if (value instanceof Collection) {
+                    final Collection<?> collection = (Collection<?>) value;
+                    final int[] newArray = new int[collection.size()];
+                    final Iterator<?> iterator = collection.iterator();
+                    int index = 0;
+
+                    while (iterator.hasNext()) {
+                        newArray[index] = (Integer) iterator.next();
+                        index++;
+                    }
+
+                    value = newArray;
+                }
+
+                if (isPropertyTokenType(sectionName, propertyName)) {
+                    result = "";
+                    boolean first = true;
+
+                    if (value instanceof BitSet) {
+                        final BitSet list = (BitSet) value;
+                        final StringBuilder sb = new StringBuilder(20);
+
+                        for (int i = 0; i < list.size(); i++) {
+                            if (list.get(i)) {
+                                if (first) {
+                                    first = false;
+                                }
+                                else {
+                                    sb.append(", ");
+                                }
+
+                                sb.append(TokenUtil.getTokenName(i));
+                            }
+                        }
+
+                        result = sb.toString();
+                    }
+                    else if (value != null) {
+                        final StringBuilder sb = new StringBuilder(20);
+
+                        for (int i = 0; i < Array.getLength(value); i++) {
+                            if (first) {
+                                first = false;
+                            }
+                            else {
+                                sb.append(", ");
+                            }
+
+                            sb.append(TokenUtil.getTokenName((int) Array.get(value, i)));
+                        }
+
+                        result = sb.toString();
+                    }
+                }
+                else {
+                    result = Arrays.toString((int[]) value).replace("[", "").replace("]", "");
+
+                    if (result.isEmpty()) {
+                        result = "{}";
+                    }
                 }
             }
-            else if (clss == double[].class) {
+            else if (fieldClass == double[].class) {
                 result = Arrays.toString((double[]) value).replace("[", "").replace("]", "")
                         .replace(".0", "");
                 if (result.isEmpty()) {
                     result = "{}";
                 }
             }
-            else if (clss == URI.class) {
+            else if (fieldClass == String[].class) {
+                if (value instanceof Collection) {
+                    final Collection<?> collection = (Collection<?>) value;
+                    final String[] newArray = new String[collection.size()];
+                    final Iterator<?> iterator = collection.iterator();
+                    int index = 0;
+
+                    while (iterator.hasNext()) {
+                        final Object next = iterator.next();
+                        newArray[index] = (String) next;
+                        index++;
+                    }
+
+                    value = newArray;
+                }
+
+                if (value != null && Array.getLength(value) > 0) {
+                    if (Array.get(value, 0) instanceof Number) {
+                        final String[] newArray = new String[Array.getLength(value)];
+
+                        for (int i = 0; i < newArray.length; i++) {
+                            newArray[i] = TokenUtil.getTokenName(((Number) Array.get(value, i))
+                                    .intValue());
+                        }
+
+                        value = newArray;
+                    }
+
+                    result = Arrays.toString((Object[]) value).replace("[", "")
+                            .replace("]", "");
+                }
+                else {
+                    result = "";
+                }
+
+                if (result.isEmpty()) {
+                    if ("fileExtensions".equals(propertyName)) {
+                        result = "all files";
+                    }
+                    else {
+                        result = "{}";
+                    }
+                }
+            }
+            else if (fieldClass == URI.class || fieldClass == String.class) {
                 if (value != null) {
                     result = '"' + value.toString() + '"';
                 }
             }
-            else if (clss == Pattern.class) {
+            else if (fieldClass == Pattern.class) {
                 if (value != null) {
                     result = '"' + value.toString().replace("\n", "\\n").replace("\t", "\\t")
                             .replace("\r", "\\r").replace("\f", "\\f") + '"';
+
+                    if ("\"$^\"".equals(result)) {
+                        result += " (empty)";
+                    }
+                }
+            }
+            else if (fieldClass == Pattern[].class) {
+                if (value instanceof Collection) {
+                    final Collection<?> collection = (Collection<?>) value;
+                    final Pattern[] newArray = new Pattern[collection.size()];
+                    final Iterator<?> iterator = collection.iterator();
+                    int index = 0;
+
+                    while (iterator.hasNext()) {
+                        final Object next = iterator.next();
+                        newArray[index] = (Pattern) next;
+                        index++;
+                    }
+
+                    value = newArray;
                 }
 
-                if ("\"$^\"".equals(result)) {
-                    result += " (empty)";
+                if (value != null && Array.getLength(value) > 0) {
+                    final String[] newArray = new String[Array.getLength(value)];
+
+                    for (int i = 0; i < newArray.length; i++) {
+                        newArray[i] = ((Pattern) Array.get(value, i)).pattern();
+                    }
+
+                    result = Arrays.toString(newArray).replace("[", "")
+                            .replace("]", "");
+                }
+                else {
+                    result = "";
+                }
+
+                if (result.isEmpty()) {
+                    result = "{}";
                 }
             }
-            else if (value != null && (clss == SeverityLevel.class || clss == Scope.class)) {
-                result = value.toString().toLowerCase(Locale.ENGLISH);
+            else if (fieldClass.isEnum()) {
+                if (value != null) {
+                    result = value.toString().toLowerCase(Locale.ENGLISH);
+                }
             }
-            else if (value != null && clss == AccessModifier[].class) {
+            else if (fieldClass == AccessModifier[].class) {
                 result = Arrays.toString((Object[]) value).replace("[", "").replace("]", "");
             }
+            else {
+                Assert.fail("Unknown property type: " + fieldClass.getSimpleName());
+            }
 
-            if (clss != String.class && clss != String[].class && result == null) {
+            if (result == null) {
                 result = "null";
             }
         }
 
         return result;
+    }
+
+    /**
+     * Checks if the given property is takes token names as a type.
+     * @param sectionName The name of the section/module being worked on.
+     * @param propertyName The property name to work with.
+     * @return {@code true} if the property is takes token names as a type.
+     * @noinspection OverlyComplexBooleanExpression
+     */
+    private static boolean isPropertyTokenType(String sectionName, String propertyName) {
+        return "AtclauseOrder".equals(sectionName) && "target".equals(propertyName)
+            || "IllegalType".equals(sectionName) && "memberModifiers".equals(propertyName)
+            || "MagicNumber".equals(sectionName)
+                    && "constantWaiverParentToken".equals(propertyName)
+            || "MultipleStringLiterals".equals(sectionName)
+                    && "ignoreOccurrenceContext".equals(propertyName)
+            || "DescendantToken".equals(sectionName) && "limitedTokens".equals(propertyName);
     }
 
     private static Field getField(Class<?> clss, String propertyName) {
@@ -767,6 +1062,48 @@ public class XdocsPagesTest {
             catch (NoSuchFieldException ignored) {
                 result = getField(clss.getSuperclass(), propertyName);
             }
+        }
+
+        return result;
+    }
+
+    private static Class<?> getFieldClass(String fileName, String sectionName, Object instance,
+            Field field, String propertyName) throws Exception {
+        Class<?> result = null;
+
+        if (field != null) {
+            result = field.getType();
+        }
+        if (result == null) {
+            Assert.assertTrue(
+                    fileName + " section '" + sectionName + "' could not find field "
+                            + propertyName,
+                    PROPERTIES_ALLOWED_GET_TYPES_FROM_METHOD.contains(sectionName + "."
+                            + propertyName));
+
+            final PropertyDescriptor descriptor = PropertyUtils.getPropertyDescriptor(instance,
+                    propertyName);
+            result = descriptor.getPropertyType();
+        }
+        if (result == List.class || result == Set.class) {
+            final ParameterizedType type = (ParameterizedType) field.getGenericType();
+            final Class<?> parameterClass = (Class<?>) type.getActualTypeArguments()[0];
+
+            if (parameterClass == Integer.class) {
+                result = int[].class;
+            }
+            else if (parameterClass == String.class) {
+                result = String[].class;
+            }
+            else if (parameterClass == Pattern.class) {
+                result = Pattern[].class;
+            }
+            else {
+                Assert.fail("Unknown parameterized type: " + parameterClass.getSimpleName());
+            }
+        }
+        else if (result == BitSet.class) {
+            result = int[].class;
         }
 
         return result;
@@ -1096,4 +1433,5 @@ public class XdocsPagesTest {
         Assert.assertFalse(fileName + " rule '" + ruleName + "' has too many configs",
                 itrConfigs.hasNext());
     }
+
 }

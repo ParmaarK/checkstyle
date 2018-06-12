@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -27,10 +27,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 
+import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.ScopeUtils;
+import com.puppycrawl.tools.checkstyle.utils.ScopeUtil;
 
 /**
  * <p>
@@ -47,7 +48,7 @@ import com.puppycrawl.tools.checkstyle.utils.ScopeUtils;
  * </pre>
  * <p>
  * By default, this Check skip final validation on
- *  <a href = "http://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.14.2">
+ *  <a href = "https://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.14.2">
  * Enhanced For-Loop</a>
  * </p>
  * <p>
@@ -71,9 +72,8 @@ import com.puppycrawl.tools.checkstyle.utils.ScopeUtils;
  * }
  * }
  * </p>
- * @author k_gibbs, r_auckenthaler
- * @author Vladislav Lisetskiy
  */
+@FileStatefulCheck
 public class FinalLocalVariableCheck extends AbstractCheck {
 
     /**
@@ -201,16 +201,18 @@ public class FinalLocalVariableCheck extends AbstractCheck {
                 break;
             case TokenTypes.PARAMETER_DEF:
                 if (!isInLambda(ast)
-                        && !ast.branchContains(TokenTypes.FINAL)
+                        && ast.findFirstToken(TokenTypes.MODIFIERS)
+                            .findFirstToken(TokenTypes.FINAL) == null
                         && !isInAbstractOrNativeMethod(ast)
-                        && !ScopeUtils.isInInterfaceBlock(ast)
+                        && !ScopeUtil.isInInterfaceBlock(ast)
                         && !isMultipleTypeCatch(ast)) {
                     insertParameter(ast);
                 }
                 break;
             case TokenTypes.VARIABLE_DEF:
                 if (ast.getParent().getType() != TokenTypes.OBJBLOCK
-                        && !ast.branchContains(TokenTypes.FINAL)
+                        && ast.findFirstToken(TokenTypes.MODIFIERS)
+                            .findFirstToken(TokenTypes.FINAL) == null
                         && !isVariableInForInit(ast)
                         && shouldCheckEnhancedForLoopVariable(ast)) {
                     insertVariable(ast);
@@ -247,7 +249,7 @@ public class FinalLocalVariableCheck extends AbstractCheck {
             case TokenTypes.SLIST:
                 // -@cs[MoveVariableInsideIf] assignment value is modified later so it can't be
                 // moved
-                final Deque<DetailAST> prevScopeUnitializedVariableData =
+                final Deque<DetailAST> prevScopeUninitializedVariableData =
                     prevScopeUninitializedVariables.peek();
                 boolean containsBreak = false;
                 if (ast.getParent().getType() != TokenTypes.CASE_GROUP
@@ -259,7 +261,7 @@ public class FinalLocalVariableCheck extends AbstractCheck {
                 }
                 final DetailAST parent = ast.getParent();
                 if (containsBreak || shouldUpdateUninitializedVariables(parent)) {
-                    updateAllUninitializedVariables(prevScopeUnitializedVariableData);
+                    updateAllUninitializedVariables(prevScopeUninitializedVariableData);
                 }
                 updateCurrentScopeAssignedVariables();
                 break;
@@ -269,7 +271,7 @@ public class FinalLocalVariableCheck extends AbstractCheck {
         if (scope != null) {
             for (FinalVariableCandidate candidate : scope.values()) {
                 final DetailAST ident = candidate.variableIdent;
-                log(ident.getLineNo(), ident.getColumnNo(), MSG_KEY, ident.getText());
+                log(ident, MSG_KEY, ident.getText());
             }
         }
     }
@@ -344,35 +346,35 @@ public class FinalLocalVariableCheck extends AbstractCheck {
      */
     private void storePrevScopeUninitializedVariableData() {
         final ScopeData scopeData = scopeStack.peek();
-        final Deque<DetailAST> prevScopeUnitializedVariableData =
+        final Deque<DetailAST> prevScopeUninitializedVariableData =
                 new ArrayDeque<>();
-        scopeData.uninitializedVariables.forEach(prevScopeUnitializedVariableData::push);
-        prevScopeUninitializedVariables.push(prevScopeUnitializedVariableData);
+        scopeData.uninitializedVariables.forEach(prevScopeUninitializedVariableData::push);
+        prevScopeUninitializedVariables.push(prevScopeUninitializedVariableData);
     }
 
     /**
      * Update current scope data uninitialized variable according to the whole scope data.
-     * @param prevScopeUnitializedVariableData variable for previous stack of uninitialized
+     * @param prevScopeUninitializedVariableData variable for previous stack of uninitialized
      *     variables
+     * @noinspection MethodParameterNamingConvention
      */
-    // -@cs[CyclomaticComplexity] Breaking apart will damage encapsulation.
     private void updateAllUninitializedVariables(
-            Deque<DetailAST> prevScopeUnitializedVariableData) {
+            Deque<DetailAST> prevScopeUninitializedVariableData) {
         // Check for only previous scope
-        updateUninitializedVariables(prevScopeUnitializedVariableData);
+        updateUninitializedVariables(prevScopeUninitializedVariableData);
         // Check for rest of the scope
         prevScopeUninitializedVariables.forEach(this::updateUninitializedVariables);
     }
 
     /**
      * Update current scope data uninitialized variable according to the specific scope data.
-     * @param scopeUnitializedVariableData variable for specific stack of uninitialized variables
+     * @param scopeUninitializedVariableData variable for specific stack of uninitialized variables
      */
-    private void updateUninitializedVariables(Deque<DetailAST> scopeUnitializedVariableData) {
+    private void updateUninitializedVariables(Deque<DetailAST> scopeUninitializedVariableData) {
         final Iterator<DetailAST> iterator = currentScopeAssignedVariables.peek().iterator();
         while (iterator.hasNext()) {
             final DetailAST assignedVariable = iterator.next();
-            for (DetailAST variable : scopeUnitializedVariableData) {
+            for (DetailAST variable : scopeUninitializedVariableData) {
                 for (ScopeData scopeData : scopeStack) {
                     final FinalVariableCandidate candidate =
                         scopeData.scope.get(variable.getText());
@@ -435,7 +437,8 @@ public class FinalLocalVariableCheck extends AbstractCheck {
         DetailAST returnValue = null;
         for (DetailAST astIterator = ast.getFirstChild(); astIterator != null;
                 astIterator = astIterator.getNextSibling()) {
-            if (astIterator.getType() == childType && astIterator.branchContains(containType)) {
+            if (astIterator.getType() == childType
+                    && astIterator.findFirstToken(containType) != null) {
                 returnValue = astIterator;
             }
         }
@@ -611,8 +614,8 @@ public class FinalLocalVariableCheck extends AbstractCheck {
             if (parent.getType() == TokenTypes.METHOD_DEF) {
                 final DetailAST modifiers =
                     parent.findFirstToken(TokenTypes.MODIFIERS);
-                abstractOrNative = modifiers.branchContains(TokenTypes.ABSTRACT)
-                        || modifiers.branchContains(TokenTypes.LITERAL_NATIVE);
+                abstractOrNative = modifiers.findFirstToken(TokenTypes.ABSTRACT) != null
+                        || modifiers.findFirstToken(TokenTypes.LITERAL_NATIVE) != null;
             }
             parent = parent.getParent();
         }
@@ -639,7 +642,7 @@ public class FinalLocalVariableCheck extends AbstractCheck {
                 && astTraverse.getType() != TokenTypes.CLASS_DEF
                 && astTraverse.getType() != TokenTypes.ENUM_DEF
                 && astTraverse.getType() != TokenTypes.CTOR_DEF
-                && !ScopeUtils.isClassFieldDef(astTraverse)) {
+                && !ScopeUtil.isClassFieldDef(astTraverse)) {
             astTraverse = astTraverse.getParent();
         }
         return astTraverse;
@@ -690,6 +693,7 @@ public class FinalLocalVariableCheck extends AbstractCheck {
      * Holder for the scope data.
      */
     private static class ScopeData {
+
         /** Contains variable definitions. */
         private final Map<String, FinalVariableCandidate> scope = new HashMap<>();
 
@@ -717,10 +721,12 @@ public class FinalLocalVariableCheck extends AbstractCheck {
             }
             return result;
         }
+
     }
 
     /**Represents information about final local variable candidate. */
     private static class FinalVariableCandidate {
+
         /** Identifier token. */
         private final DetailAST variableIdent;
         /** Whether the variable is assigned. */
@@ -735,5 +741,7 @@ public class FinalLocalVariableCheck extends AbstractCheck {
         FinalVariableCandidate(DetailAST variableIdent) {
             this.variableIdent = variableIdent;
         }
+
     }
+
 }

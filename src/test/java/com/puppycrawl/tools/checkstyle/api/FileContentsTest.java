@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -34,12 +34,9 @@ import java.util.Map;
 import org.junit.Test;
 import org.powermock.reflect.Whitebox;
 
-import com.google.common.collect.ImmutableMap;
-
 public class FileContentsTest {
 
     @Test
-    @SuppressWarnings("deprecation")
     public void testDeprecatedAbbreviatedMethod() {
         // just to make UT coverage 100%
         final FileContents fileContents = new FileContents("filename", "123", "456");
@@ -60,7 +57,8 @@ public class FileContentsTest {
         final FileContents fileContents = new FileContents(
                 new FileText(new File("filename"), Collections.singletonList("  //  ")));
         fileContents.reportSingleLineComment(1, 2);
-        assertFalse(fileContents.hasIntersectionWithComment(1, 0, 1, 1));
+        assertFalse("Should return false when there is no intersection",
+                fileContents.hasIntersectionWithComment(1, 0, 1, 1));
     }
 
     @Test
@@ -69,7 +67,8 @@ public class FileContentsTest {
         final FileContents fileContents = new FileContents(
                 new FileText(new File("filename"), Collections.singletonList("  //   ")));
         fileContents.reportSingleLineComment(1, 2);
-        assertTrue(fileContents.hasIntersectionWithComment(1, 5, 1, 6));
+        assertTrue("Should return true when comments intersect",
+                fileContents.hasIntersectionWithComment(1, 5, 1, 6));
     }
 
     @Test
@@ -79,7 +78,8 @@ public class FileContentsTest {
         fileContents.reportCppComment(1, 2);
         final Map<Integer, TextBlock> cppComments = fileContents.getCppComments();
 
-        assertEquals(new Comment(new String[] {" //  "}, 2, 1, 6).toString(),
+        assertEquals("Invalid comment",
+                new Comment(new String[] {" //  "}, 2, 1, 6).toString(),
                 cppComments.get(1).toString());
     }
 
@@ -90,7 +90,8 @@ public class FileContentsTest {
                         "  //test   ", "  //test   ")));
         fileContents.reportCppComment(4, 4);
 
-        assertTrue(fileContents.hasIntersectionWithComment(1, 3, 4, 6));
+        assertTrue("Should return true when comments intersect",
+                fileContents.hasIntersectionWithComment(1, 3, 4, 6));
     }
 
     @Test
@@ -98,9 +99,10 @@ public class FileContentsTest {
         final FileContents fileContents = new FileContents(
                 new FileText(new File("filename"), Collections.singletonList("  //   ")));
         fileContents.reportCComment(1, 2, 1, 2);
-        final ImmutableMap<Integer, List<TextBlock>> comments = fileContents.getCComments();
+        final Map<Integer, List<TextBlock>> comments = fileContents.getCComments();
 
-        assertEquals(new Comment(new String[] {"/"}, 2, 1, 2).toString(),
+        assertEquals("Invalid comment",
+                new Comment(new String[] {"/"}, 2, 1, 2).toString(),
                 comments.get(1).get(0).toString());
     }
 
@@ -111,7 +113,8 @@ public class FileContentsTest {
         fileContents.reportCComment(1, 2, 1, 5);
         fileContents.reportCComment(3, 2, 4, 2);
 
-        assertTrue(fileContents.hasIntersectionWithComment(2, 2, 3, 6));
+        assertTrue("Should return true when comments intersect",
+                fileContents.hasIntersectionWithComment(2, 2, 3, 6));
     }
 
     @Test
@@ -120,7 +123,8 @@ public class FileContentsTest {
                 new FileText(new File("filename"), Arrays.asList("  /* */    ", "    ", " ")));
         fileContents.reportCComment(1, 2, 1, 5);
 
-        assertFalse(fileContents.hasIntersectionWithComment(2, 2, 3, 6));
+        assertFalse("Should return false when there is no intersection",
+                fileContents.hasIntersectionWithComment(2, 2, 3, 6));
     }
 
     @Test
@@ -129,7 +133,7 @@ public class FileContentsTest {
                 new File("filename.package-info.java"),
                 Collections.singletonList("  //   ")));
 
-        assertTrue(fileContents.inPackageInfo());
+        assertTrue("Should return true when in package info", fileContents.inPackageInfo());
     }
 
     @Test
@@ -141,7 +145,8 @@ public class FileContentsTest {
         Whitebox.setInternalState(fileContents, "javadocComments", javadoc);
         final TextBlock javadocBefore = fileContents.getJavadocBefore(2);
 
-        assertEquals(new Comment(new String[] {"// "}, 2, 1, 2).toString(),
+        assertEquals("Invalid before javadoc",
+                new Comment(new String[] {"// "}, 2, 1, 2).toString(),
                 javadocBefore.toString());
     }
 
@@ -151,10 +156,11 @@ public class FileContentsTest {
                 new FileText(new File("filename"), Arrays.asList("   ", "    ", "  /* test   ",
                         "  */  ", "   ")));
         fileContents.reportCComment(3, 2, 4, 2);
-        final ImmutableMap<Integer, List<TextBlock>> blockComments =
+        final Map<Integer, List<TextBlock>> blockComments =
             fileContents.getBlockComments();
         final String[] text = blockComments.get(3).get(0).getText();
 
-        assertArrayEquals(new String[] {"/* test   ", "  *"}, text);
+        assertArrayEquals("Invalid comment text", new String[] {"/* test   ", "  *"}, text);
     }
+
 }

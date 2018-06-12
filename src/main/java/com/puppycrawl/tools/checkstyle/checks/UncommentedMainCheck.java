@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,7 @@ package com.puppycrawl.tools.checkstyle.checks;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FullIdent;
@@ -36,9 +37,8 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * &lt;module name=&quot;UncommentedMain&quot;/&gt;
  * </pre>
  *
- * @author Michael Yui
- * @author o_sukhodolsky
  */
+@FileStatefulCheck
 public class UncommentedMainCheck
     extends AbstractCheck {
 
@@ -67,21 +67,21 @@ public class UncommentedMainCheck
 
     @Override
     public int[] getAcceptableTokens() {
+        return getRequiredTokens();
+    }
+
+    @Override
+    public int[] getDefaultTokens() {
+        return getRequiredTokens();
+    }
+
+    @Override
+    public int[] getRequiredTokens() {
         return new int[] {
             TokenTypes.METHOD_DEF,
             TokenTypes.CLASS_DEF,
             TokenTypes.PACKAGE_DEF,
         };
-    }
-
-    @Override
-    public int[] getDefaultTokens() {
-        return getAcceptableTokens();
-    }
-
-    @Override
-    public int[] getRequiredTokens() {
-        return getAcceptableTokens();
     }
 
     @Override
@@ -94,16 +94,12 @@ public class UncommentedMainCheck
     @Override
     public void leaveToken(DetailAST ast) {
         if (ast.getType() == TokenTypes.CLASS_DEF) {
-            if (classDepth == 1) {
-                currentClass = null;
-            }
             classDepth--;
         }
     }
 
     @Override
     public void visitToken(DetailAST ast) {
-
         switch (ast.getType()) {
             case TokenTypes.PACKAGE_DEF:
                 visitPackageDef(ast);
@@ -186,8 +182,8 @@ public class UncommentedMainCheck
         final DetailAST modifiers =
             method.findFirstToken(TokenTypes.MODIFIERS);
 
-        return modifiers.branchContains(TokenTypes.LITERAL_PUBLIC)
-            && modifiers.branchContains(TokenTypes.LITERAL_STATIC);
+        return modifiers.findFirstToken(TokenTypes.LITERAL_PUBLIC) != null
+            && modifiers.findFirstToken(TokenTypes.LITERAL_STATIC) != null;
     }
 
     /**
@@ -237,4 +233,5 @@ public class UncommentedMainCheck
         return "String".equals(type.getText())
             || "java.lang.String".equals(type.getText());
     }
+
 }

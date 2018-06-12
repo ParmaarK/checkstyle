@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -28,55 +28,62 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import com.puppycrawl.tools.checkstyle.internal.CheckUtil;
+import com.puppycrawl.tools.checkstyle.internal.utils.CheckUtil;
 
 public class ThreadModeSettingsTest {
+
     @Test
-    public void testProperties() throws Exception {
+    public void testProperties() {
         final ThreadModeSettings config = new ThreadModeSettings(1, 2);
-        assertEquals(1, config.getCheckerThreadsNumber());
-        assertEquals(2, config.getTreeWalkerThreadsNumber());
+        assertEquals("Invalid checker threads number", 1, config.getCheckerThreadsNumber());
+        assertEquals("Invalid treewalker threads number", 2, config.getTreeWalkerThreadsNumber());
     }
 
     @Test
-    public void testResolveCheckerInMultiThreadMode() throws Exception {
+    public void testResolveCheckerInMultiThreadMode() {
         final ThreadModeSettings configuration = new ThreadModeSettings(2, 2);
 
         try {
-            configuration.resolveName("Checker");
+            configuration.resolveName(ThreadModeSettings.CHECKER_MODULE_NAME);
             fail("An exception is expected");
         }
         catch (IllegalArgumentException ex) {
-            assertEquals("Multi thread mode for Checker module is not implemented",
+            assertEquals("Invalid exception message",
+                    "Multi thread mode for Checker module is not implemented",
                     ex.getMessage());
         }
     }
 
     @Test
-    public void testResolveCheckerInSingleThreadMode() throws Exception {
+    public void testResolveCheckerInSingleThreadMode() {
         final ThreadModeSettings singleThreadMode = ThreadModeSettings.SINGLE_THREAD_MODE_INSTANCE;
 
-        assertEquals("Checker", singleThreadMode.resolveName("Checker"));
+        assertEquals("Invalid name resolved", ThreadModeSettings.CHECKER_MODULE_NAME,
+                singleThreadMode.resolveName(ThreadModeSettings.CHECKER_MODULE_NAME));
     }
 
     @Test
-    public void testResolveTreeWalker() throws Exception {
+    public void testResolveTreeWalker() {
         final ThreadModeSettings configuration = new ThreadModeSettings(2, 2);
 
         try {
-            configuration.resolveName("TreeWalker");
+            configuration.resolveName(ThreadModeSettings.TREE_WALKER_MODULE_NAME);
+            fail("Exception is expected");
         }
         catch (IllegalArgumentException ex) {
-            assertEquals("Multi thread mode for TreeWalker module is not implemented",
+            assertEquals("Invalid exception message",
+                    "Multi thread mode for TreeWalker module is not implemented",
                     ex.getMessage());
         }
     }
 
     @Test
-    public void testResolveTreeWalkerInSingleThreadMode() throws Exception {
+    public void testResolveTreeWalkerInSingleThreadMode() {
         final ThreadModeSettings singleThreadMode = ThreadModeSettings.SINGLE_THREAD_MODE_INSTANCE;
-
-        assertThat(singleThreadMode.resolveName("TreeWalker"), is("TreeWalker"));
+        final String actual =
+                singleThreadMode.resolveName(ThreadModeSettings.TREE_WALKER_MODULE_NAME);
+        assertThat("Invalid name resolved: " + actual,
+                actual, is(ThreadModeSettings.TREE_WALKER_MODULE_NAME));
     }
 
     @Test
@@ -94,8 +101,11 @@ public class ThreadModeSettingsTest {
             }
 
             final String moduleName = module.getSimpleName();
-            assertThat(singleThreadModeSettings.resolveName(moduleName), is(moduleName));
-            assertThat(multiThreadModeSettings.resolveName(moduleName), is(moduleName));
+            assertThat("Invalid name resolved",
+                    singleThreadModeSettings.resolveName(moduleName), is(moduleName));
+            assertThat("Invalid name resolved",
+                    multiThreadModeSettings.resolveName(moduleName), is(moduleName));
         }
     }
+
 }

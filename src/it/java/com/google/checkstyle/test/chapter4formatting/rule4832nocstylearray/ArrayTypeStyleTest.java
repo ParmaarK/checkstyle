@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,26 +21,21 @@ package com.google.checkstyle.test.chapter4formatting.rule4832nocstylearray;
 
 import static com.puppycrawl.tools.checkstyle.checks.ArrayTypeStyleCheck.MSG_KEY;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.junit.Test;
 
-import com.google.checkstyle.test.base.BaseCheckTestSupport;
+import com.google.checkstyle.test.base.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 import com.puppycrawl.tools.checkstyle.checks.ArrayTypeStyleCheck;
 
-public class ArrayTypeStyleTest extends BaseCheckTestSupport {
+public class ArrayTypeStyleTest extends AbstractModuleTestSupport {
 
     @Override
-    protected String getPath(String fileName) throws IOException {
-        return super.getPath("chapter4formatting" + File.separator + "rule4832nocstylearray"
-                + File.separator + fileName);
+    protected String getPackageLocation() {
+        return "com/google/checkstyle/test/chapter4formatting/rule4832nocstylearray";
     }
 
     @Test
     public void testArrayTypeStyle() throws Exception {
-
         final String[] expected = {
             "9:23: " + getCheckMessage(ArrayTypeStyleCheck.class, MSG_KEY),
             "15:44: " + getCheckMessage(ArrayTypeStyleCheck.class, MSG_KEY),
@@ -50,10 +45,11 @@ public class ArrayTypeStyleTest extends BaseCheckTestSupport {
             "42:19: " + getCheckMessage(ArrayTypeStyleCheck.class, MSG_KEY),
         };
 
-        final Configuration checkConfig = getCheckConfig("ArrayTypeStyle");
+        final Configuration checkConfig = getModuleConfig("ArrayTypeStyle");
         final String filePath = getPath("InputArrayTypeStyle.java");
 
         final Integer[] warnList = getLinesWithWarn(filePath);
         verify(checkConfig, filePath, expected, warnList);
     }
+
 }

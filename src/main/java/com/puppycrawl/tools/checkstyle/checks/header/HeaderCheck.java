@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,7 @@ package com.puppycrawl.tools.checkstyle.checks.header;
 import java.io.File;
 import java.util.Arrays;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.FileText;
 
 /**
@@ -30,8 +31,8 @@ import com.puppycrawl.tools.checkstyle.api.FileText;
  * the default value of header is set to null
  * and the check does not rise any violations.
  *
- * @author Lars Kühne
  */
+@StatelessCheck
 public class HeaderCheck extends AbstractHeaderCheck {
 
     /**
@@ -67,7 +68,7 @@ public class HeaderCheck extends AbstractHeaderCheck {
      * @param line the line contents
      * @return true if and only if the line matches the required header line
      */
-    protected boolean isMatch(int lineNumber, String line) {
+    private boolean isMatch(int lineNumber, String line) {
         // skip lines we are meant to ignore
         return isIgnoreLine(lineNumber + 1)
             || getHeaderLines().get(lineNumber).equals(line);
@@ -107,4 +108,5 @@ public class HeaderCheck extends AbstractHeaderCheck {
     protected void postProcessHeaderLines() {
         // no code
     }
+
 }

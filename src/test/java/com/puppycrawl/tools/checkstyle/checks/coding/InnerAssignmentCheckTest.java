@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -26,10 +26,11 @@ import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class InnerAssignmentCheckTest
     extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/coding/innerassignment";
@@ -38,7 +39,7 @@ public class InnerAssignmentCheckTest
     @Test
     public void testIt() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(InnerAssignmentCheck.class);
+            createModuleConfig(InnerAssignmentCheck.class);
         final String[] expected = {
             "16:15: " + getCheckMessage(MSG_KEY),
             "16:19: " + getCheckMessage(MSG_KEY),
@@ -64,8 +65,8 @@ public class InnerAssignmentCheckTest
     @Test
     public void testLambdaExpression() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(InnerAssignmentCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+            createModuleConfig(InnerAssignmentCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputInnerAssignmentLambdaExpressions.java"),
             expected);
     }
@@ -73,8 +74,9 @@ public class InnerAssignmentCheckTest
     @Test
     public void testTokensNotNull() {
         final InnerAssignmentCheck check = new InnerAssignmentCheck();
-        Assert.assertNotNull(check.getAcceptableTokens());
-        Assert.assertNotNull(check.getDefaultTokens());
-        Assert.assertNotNull(check.getRequiredTokens());
+        Assert.assertNotNull("Unexpected acceptable tokenks", check.getAcceptableTokens());
+        Assert.assertNotNull("Unexpected default tokens", check.getDefaultTokens());
+        Assert.assertNotNull("Unexpected required tokens", check.getRequiredTokens());
     }
+
 }

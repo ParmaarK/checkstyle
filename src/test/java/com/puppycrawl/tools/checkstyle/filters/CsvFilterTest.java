@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,6 +19,7 @@
 
 package com.puppycrawl.tools.checkstyle.filters;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -26,8 +27,8 @@ import org.junit.Test;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 
-/** Tests CsvFilter. */
 public class CsvFilterTest {
+
     @Test
     public void testDecideSingle() {
         final IntFilter filter = new CsvFilter("0");
@@ -77,7 +78,40 @@ public class CsvFilterTest {
     }
 
     @Test
+    public void testEmptyChain() {
+        final CsvFilter filter = new CsvFilter("");
+        assertFalse("0", filter.accept(0));
+    }
+
+    @Test
+    public void testOneFilter() {
+        final CsvFilter filter = new CsvFilter("");
+        filter.addFilter(new IntMatchFilter(0));
+        assertTrue("0", filter.accept(0));
+        assertFalse("1", filter.accept(1));
+    }
+
+    @Test
+    public void testMultipleFilter() {
+        final CsvFilter filter = new CsvFilter("");
+        filter.addFilter(new IntMatchFilter(0));
+        filter.addFilter(new IntRangeFilter(0, 2));
+        assertTrue("0", filter.accept(0));
+        assertTrue("1", filter.accept(1));
+        filter.addFilter(new IntRangeFilter(3, 4));
+        assertTrue("0 is in [3,4]", filter.accept(0));
+    }
+
+    @Test
+    public void testGetFilters() {
+        final CsvFilter filter = new CsvFilter("");
+        filter.addFilter(new IntMatchFilter(0));
+        assertEquals("size is the same", 1, filter.getFilters().size());
+    }
+
+    @Test
     public void testEqualsAndHashCode() {
         EqualsVerifier.forClass(CsvFilter.class).usingGetClass().verify();
     }
+
 }

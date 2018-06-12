@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,14 +20,16 @@
 package com.puppycrawl.tools.checkstyle.checks.whitespace;
 
 import static com.puppycrawl.tools.checkstyle.checks.whitespace.SingleSpaceSeparatorCheck.MSG_KEY;
+import static org.junit.Assert.assertArrayEquals;
 
 import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class SingleSpaceSeparatorCheckTest extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/whitespace/singlespaceseparator";
@@ -35,21 +37,31 @@ public class SingleSpaceSeparatorCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testNoSpaceErrors() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(SingleSpaceSeparatorCheck.class);
+        final DefaultConfiguration checkConfig =
+                createModuleConfig(SingleSpaceSeparatorCheck.class);
         verify(checkConfig, getPath("InputSingleSpaceSeparatorNoErrors.java"),
-                CommonUtils.EMPTY_STRING_ARRAY);
+                CommonUtil.EMPTY_STRING_ARRAY);
+    }
+
+    @Test
+    public void testGetAcceptableTokens() {
+        final SingleSpaceSeparatorCheck check = new SingleSpaceSeparatorCheck();
+
+        assertArrayEquals("Invalid acceptable tokens",
+            CommonUtil.EMPTY_INT_ARRAY, check.getAcceptableTokens());
     }
 
     @Test
     public void testSpaceErrors() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(SingleSpaceSeparatorCheck.class);
-        checkConfig.addAttribute("validateComments", String.valueOf(true));
+        final DefaultConfiguration checkConfig =
+                createModuleConfig(SingleSpaceSeparatorCheck.class);
+        checkConfig.addAttribute("validateComments", "true");
         final String[] expected = {
             "1:9: " + getCheckMessage(MSG_KEY),
             "1:27: " + getCheckMessage(MSG_KEY),
             "4:8: " + getCheckMessage(MSG_KEY),
             "6:18: " + getCheckMessage(MSG_KEY),
-            "6:42: " + getCheckMessage(MSG_KEY),
+            "6:51: " + getCheckMessage(MSG_KEY),
             "7:20: " + getCheckMessage(MSG_KEY),
             "8:11: " + getCheckMessage(MSG_KEY),
             "8:15: " + getCheckMessage(MSG_KEY),
@@ -79,13 +91,14 @@ public class SingleSpaceSeparatorCheckTest extends AbstractModuleTestSupport {
             "31:7: " + getCheckMessage(MSG_KEY),
         };
 
-        verify(checkConfig, getPath("InputSingleSpaceErrors.java"), expected);
+        verify(checkConfig, getPath("InputSingleSpaceSeparatorErrors.java"), expected);
     }
 
     @Test
     public void testSpaceErrorsAroundComments() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(SingleSpaceSeparatorCheck.class);
-        checkConfig.addAttribute("validateComments", String.valueOf(true));
+        final DefaultConfiguration checkConfig =
+                createModuleConfig(SingleSpaceSeparatorCheck.class);
+        checkConfig.addAttribute("validateComments", "true");
         final String[] expected = {
             "5:10: " + getCheckMessage(MSG_KEY),
             "5:42: " + getCheckMessage(MSG_KEY),
@@ -99,12 +112,48 @@ public class SingleSpaceSeparatorCheckTest extends AbstractModuleTestSupport {
     }
 
     @Test
+    public void testSpaceErrorsInChildNodes() throws Exception {
+        final DefaultConfiguration checkConfig =
+            createModuleConfig(SingleSpaceSeparatorCheck.class);
+        final String[] expected = {
+            "5:15: " + getCheckMessage(MSG_KEY),
+        };
+
+        verify(checkConfig, getPath("InputSingleSpaceSeparatorChildNodes.java"), expected);
+    }
+
+    @Test
+    public void testMinColumnNo() throws Exception {
+        final DefaultConfiguration checkConfig =
+            createModuleConfig(SingleSpaceSeparatorCheck.class);
+        checkConfig.addAttribute("validateComments", "true");
+        final String[] expected = {
+            "5:3: " + getCheckMessage(MSG_KEY),
+        };
+
+        verify(checkConfig, getPath("InputSingleSpaceSeparatorMinColumnNo.java"), expected);
+    }
+
+    @Test
+    public void testWhitespaceInStartOfTheLine() throws Exception {
+        final DefaultConfiguration checkConfig =
+            createModuleConfig(SingleSpaceSeparatorCheck.class);
+        final String[] expected = {
+            "5:6: " + getCheckMessage(MSG_KEY),
+        };
+
+        verify(checkConfig, getPath("InputSingleSpaceSeparatorStartOfTheLine.java"), expected);
+    }
+
+    @Test
     public void testSpaceErrorsIfCommentsIgnored() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(SingleSpaceSeparatorCheck.class);
+        final DefaultConfiguration checkConfig =
+                createModuleConfig(SingleSpaceSeparatorCheck.class);
         final String[] expected = {
             "13:13: " + getCheckMessage(MSG_KEY),
         };
 
         verify(checkConfig, getPath("InputSingleSpaceSeparatorComments.java"), expected);
     }
+
 }

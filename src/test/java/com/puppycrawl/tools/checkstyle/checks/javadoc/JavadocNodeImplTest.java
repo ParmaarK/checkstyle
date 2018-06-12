@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -36,7 +36,8 @@ public class JavadocNodeImplTest {
 
         final String result = javadocNode.toString();
 
-        assertEquals("JavadocNodeImpl[index=0, type=CODE_LITERAL, text='null', lineNumber=1,"
+        assertEquals("Invalid toString result",
+                "JavadocNodeImpl[index=0, type=CODE_LITERAL, text='null', lineNumber=1,"
                 + " columnNumber=2, children=0, parent=null]", result);
     }
 
@@ -47,6 +48,7 @@ public class JavadocNodeImplTest {
 
         final int result = javadocNode.getColumnNumber();
 
-        assertEquals(1, result);
+        assertEquals("Invalid column number", 1, result);
     }
+
 }

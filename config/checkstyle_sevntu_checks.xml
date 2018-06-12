@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
 
 <!DOCTYPE module PUBLIC
-        "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
-        "http://checkstyle.sourceforge.net/dtds/configuration_1_2.dtd">
+        "-//Checkstyle//DTD Checkstyle Configuration 1.2//EN"
+        "https://checkstyle.org/dtds/configuration_1_2.dtd">
 
 <module name="Checker">
     <!-- All checks are from https://github.com/sevntu-checkstyle/sevntu.checkstyle project -->
@@ -21,7 +21,6 @@
             <property name="checkFormat" value="$1"/>
             <property name="influenceFormat" value="3"/>
         </module>
-        <module name="FileContentsHolder"/>
         <module name="StaticMethodCandidate"/>
         <module name="UselessSingleCatchCheck"/>
         <module name="NestedSwitchCheck"/>
@@ -67,7 +66,9 @@
             <property name="ignoreMethods" value="true"/>
         </module>
         <module name="ChildBlockLength">
-            <property name="blockTypes" value="LITERAL_IF,LITERAL_ELSE,LITERAL_WHILE,LITERAL_DO,LITERAL_FOR,LITERAL_SWITCH,LITERAL_TRY,LITERAL_CATCH"/>
+            <property name="blockTypes"
+                      value="LITERAL_IF,LITERAL_ELSE,LITERAL_WHILE,LITERAL_DO,
+                             LITERAL_FOR,LITERAL_SWITCH,LITERAL_TRY,LITERAL_CATCH"/>
         </module>
         <module name="MapIterationInForEachLoop">
             <property name="proposeKeySetUsage" value="true"/>
@@ -77,7 +78,9 @@
         <!--Might cause problems related to issue:
         https://github.com/sevntu-checkstyle/sevntu.checkstyle/issues/352-->
         <module name="AvoidConstantAsFirstOperandInConditionCheck">
-            <property name="targetConstantTypes" value="LITERAL_NULL,LITERAL_TRUE,LITERAL_FALSE,NUM_INT,NUM_DOUBLE,NUM_LONG,NUM_FLOAT"/>
+            <property name="targetConstantTypes"
+                      value="LITERAL_NULL,LITERAL_TRUE,LITERAL_FALSE,
+                             NUM_INT,NUM_DOUBLE,NUM_LONG,NUM_FLOAT"/>
         </module>
         <module name="EitherLogOrThrowCheck"/>
         <module name="IllegalCatchExtended">
@@ -119,23 +122,13 @@
             <property name="forbiddenImportsExcludesRegexp" value=""/>
         </module>
         <module name="ForbidCertainImports">
-            <property name="packageNameRegexp" value=".+\.checkstyle\.api.*|.+\.checkstyle\.utils.*"/>
+            <property name="packageNameRegexp"
+                      value=".+\.checkstyle\.api.*|.+\.checkstyle\.utils.*"/>
             <property name="forbiddenImportsRegexp" value=".+\.checks\..+"/>
             <!-- AccessModifier is in util package (should be moved to api package) to disallow
             its usage by API clients till https://github.com/checkstyle/checkstyle/issues/3511-->
             <property name="forbiddenImportsExcludesRegexp"
                       value="^com.puppycrawl.tools.checkstyle.checks.naming.AccessModifier$"/>
-        </module>
-        <module name="ForbidCertainImports">
-            <property name="packageNameRegexp" value=".+"/>
-            <property name="id" value="ForbidInterfacesImportFromJavaUtilStream"/>
-            <!--Disallowed till https://github.com/mojohaus/cobertura-maven-plugin/issues/29-->
-            <property name="forbiddenImportsRegexp" value="java\.util\.stream\.Stream|
-            java\.util\.stream\.Stream\.Builder|java\.util\.stream\.DoubleStream|
-            java\.util\.stream\.DoubleStream\.Builder|java\.util\.stream\.IntStream|
-            java\.util\.stream\.IntStream\.Builder|java\.util\.stream\.LongStream|
-            java\.util\.stream\.LongStream\.Builder|java\.util\.stream\.BaseStream|
-            java\.util\.stream\.Collector"/>
         </module>
         <module name="LineLengthExtended">
             <property name="max" value="100"/>
@@ -162,8 +155,8 @@
                       ### Field(static .*)
                       ### Field(private static final)
                       ### Field(private static .*)
-                      ### DeclareAnnonClassField(public static final)
-                      ### DeclareAnnonClassField((private|protected) static final)
+                      ### DeclareAnonClassField(public static final)
+                      ### DeclareAnonClassField((private|protected) static final)
                       ### Field(@Autowired.* public)
                       ### Field(@Inject.* public)
                       ### Field(public.*)
@@ -190,17 +183,29 @@
         <module name="NumericLiteralNeedsUnderscoreCheck"/>
         <module name="UniformEnumConstantNameCheck" />
         <module name="ForbidAnnotationElementValueCheck" />
-        <module name="com.github.sevntu.checkstyle.checks.design.HideUtilityClassConstructorCheck" />
+        <module name="com.github.sevntu.checkstyle.checks.design.HideUtilityClassConstructorCheck"/>
         <module name="AvoidModifiersForTypesCheck">
           <property name="forbiddenClassesRegexpProtected" value="Logger"/>
           <property name="forbiddenClassesRegexpPublic" value="Logger"/>
           <property name="forbiddenClassesRegexpPackagePrivate" value="Logger"/>
+          <property name="forbiddenClassesRegexpStatic" value="Logger"/>
         </module>
         <module name="ConstructorWithoutParamsCheck">
           <property name="classNameFormat" value=".*Exception$"/>
           <property name="ignoredClassNameFormat" value="UnsupportedOperationException"/>
         </module>
-        <module name="ReturnCountExtendedCheck" />
+        <module name="ReturnCountExtendedCheck">
+          <property name="maxReturnCount" value="1"/>
+          <property name="topLinesToIgnoreCount" value="5"/>
+          <property name="ignoreMethodLinesCount" value="0"/>
+          <property name="ignoreEmptyReturns" value="false"/>
+        </module>
         <module name="MoveVariableInsideIfCheck" />
+        <module name="RequireFailForTryCatchInJunit" />
+        <module name="CheckstyleTestMakeupCheck" />
+        <module name="com.github.sevntu.checkstyle.checks.coding.ForbidCertainMethodCheck">
+          <property name="methodName" value="assert(True|False)"/>
+          <property name="argumentCount" value="1"/>
+        </module>
     </module>
 </module>

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,16 +25,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.doNothing;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -53,24 +48,21 @@ import org.apache.tools.ant.types.Reference;
 import org.apache.tools.ant.types.resources.FileResource;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.internal.util.reflection.Whitebox;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
 
-import com.google.common.io.Closeables;
 import com.puppycrawl.tools.checkstyle.AbstractPathTestSupport;
-import com.puppycrawl.tools.checkstyle.CheckerStub;
 import com.puppycrawl.tools.checkstyle.DefaultLogger;
 import com.puppycrawl.tools.checkstyle.Definitions;
-import com.puppycrawl.tools.checkstyle.PackageNamesLoader;
-import com.puppycrawl.tools.checkstyle.TestRootModuleChecker;
 import com.puppycrawl.tools.checkstyle.XMLLogger;
-import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.LocalizedMessage;
+import com.puppycrawl.tools.checkstyle.internal.testmodules.CheckerStub;
+import com.puppycrawl.tools.checkstyle.internal.testmodules.TestRootModuleChecker;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({CheckstyleAntTask.class, Closeables.class})
+@PrepareForTest(CheckstyleAntTask.class)
 public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
 
     private static final String FLAWLESS_INPUT =
@@ -201,8 +193,8 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
         assertThat("There more files to check then expected",
                 filesToCheck.size(), is(9));
         assertThat("The path of file differs from expected",
-                filesToCheck.get(5).getAbsolutePath(), is(getPath(FLAWLESS_INPUT)));
-        assertEquals("Amount of logged messages in unxexpected",
+                filesToCheck.get(6).getAbsolutePath(), is(getPath(FLAWLESS_INPUT)));
+        assertEquals("Amount of logged messages in unexpected",
                 9, antTask.getLoggedMessages().size());
     }
 
@@ -252,7 +244,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
     }
 
     @Test
-    public final void testNonExistingConfig() throws IOException {
+    public final void testNonExistentConfig() throws IOException {
         final CheckstyleAntTask antTask = new CheckstyleAntTask();
         antTask.setConfig(getPath(NOT_EXISTING_FILE));
         antTask.setProject(new Project());
@@ -473,11 +465,6 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
 
     @Test
     public final void testSetPropertiesFile() throws IOException {
-        //check if input stream finally closed
-        mockStatic(Closeables.class);
-        doNothing().when(Closeables.class);
-        Closeables.closeQuietly(any(InputStream.class));
-
         TestRootModuleChecker.reset();
 
         final CheckstyleAntTask antTask = getCheckstyleAntTask(CUSTOM_ROOT_CONFIG_FILE);
@@ -488,12 +475,10 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
 
         assertEquals("Property is not set",
                 "ignore", TestRootModuleChecker.getProperty());
-        verifyStatic(times(1));
-        Closeables.closeQuietly(any(InputStream.class));
     }
 
     @Test
-    public final void testSetPropertiesNonExistingFile() throws IOException {
+    public final void testSetPropertiesNonExistentFile() throws IOException {
         final CheckstyleAntTask antTask = getCheckstyleAntTask();
         antTask.setFile(new File(getPath(FLAWLESS_INPUT)));
         antTask.setProperties(new File(getPath(NOT_EXISTING_FILE)));
@@ -522,7 +507,8 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
         antTask.execute();
 
         final List<String> expected = FileUtils.readLines(
-                new File(getPath("InputCheckstyleAntTaskXmlOutput.xml")), StandardCharsets.UTF_8);
+                new File(getPath("ExpectedCheckstyleAntTaskXmlOutput.xml")),
+                        StandardCharsets.UTF_8);
         final List<String> actual = FileUtils.readLines(outputFile, StandardCharsets.UTF_8);
         for (int i = 0; i < expected.size(); i++) {
             final String line = expected.get(i);
@@ -654,7 +640,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
 
         assertNotNull("Classpath should not be null",
                 Whitebox.getInternalState(antTask, "classpath"));
-        final Path classpath = (Path) Whitebox.getInternalState(antTask, "classpath");
+        final Path classpath = Whitebox.getInternalState(antTask, "classpath");
         assertTrue("Classpath contain provided path", classpath.toString().contains(path1));
         assertTrue("Classpath contain provided path", classpath.toString().contains(path2));
     }
@@ -668,7 +654,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
             Whitebox.getInternalState(antTask, "classpath"));
     }
 
-    /** This test is created to satisfy pitest, it is hard to emulate Referece by Id */
+    /** This test is created to satisfy pitest, it is hard to emulate Reference by Id. */
     @Test
     public void testSetClasspathRef1() {
         final CheckstyleAntTask antTask = new CheckstyleAntTask();
@@ -679,7 +665,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
         try {
             assertNotNull("Classpath should not be null",
                     Whitebox.getInternalState(antTask, "classpath"));
-            final Path classpath = (Path) Whitebox.getInternalState(antTask, "classpath");
+            final Path classpath = Whitebox.getInternalState(antTask, "classpath");
             classpath.list();
             fail("Exception is expected");
         }
@@ -806,21 +792,15 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
             assertEquals("Log messages were expected",
                     expected.getLevel(), actual.getLevel());
         }
-
     }
 
-    @Test
-    public void testPackageNamesLoaderStreamClosed() throws CheckstyleException {
-        mockStatic(Closeables.class);
-        doNothing().when(Closeables.class);
-        Closeables.closeQuietly(any(InputStream.class));
-
-        PackageNamesLoader.getPackageNames(Thread.currentThread().getContextClassLoader());
-        verifyStatic();
-        Closeables.closeQuietly(any(InputStream.class));
-    }
-
+    /**
+     * Non meaningful javadoc just to contain "noinspection" tag.
+     * Till https://youtrack.jetbrains.com/issue/IDEA-187210
+     * @noinspection JUnitTestClassNamingConvention
+     */
     private static class CheckstyleAntTaskStub extends CheckstyleAntTask {
+
         @Override
         protected List<File> scanFileSets() {
             final File mock = PowerMockito.mock(File.class);
@@ -831,8 +811,14 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
             list.add(mock);
             return list;
         }
+
     }
 
+    /**
+     * Non meaningful javadoc just to contain "noinspection" tag.
+     * Till https://youtrack.jetbrains.com/issue/IDEA-187210
+     * @noinspection JUnitTestClassNamingConvention
+     */
     private static class CheckstyleAntTaskLogStub extends CheckstyleAntTask {
 
         private final List<MessageLevelPair> loggedMessages = new ArrayList<>();
@@ -845,15 +831,21 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
         @Override
         public void log(String msg, Throwable t, int msgLevel) {
             loggedMessages.add(new MessageLevelPair(msg, msgLevel));
-
         }
 
         public List<MessageLevelPair> getLoggedMessages() {
             return Collections.unmodifiableList(loggedMessages);
         }
+
     }
 
+    /**
+     * Non meaningful javadoc just to contain "noinspection" tag.
+     * Till https://youtrack.jetbrains.com/issue/IDEA-187210
+     * @noinspection JUnitTestClassNamingConvention
+     */
     private static final class MessageLevelPair {
+
         private final String msg;
         private final int level;
 
@@ -869,6 +861,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
         public int getLevel() {
             return level;
         }
+
     }
 
 }

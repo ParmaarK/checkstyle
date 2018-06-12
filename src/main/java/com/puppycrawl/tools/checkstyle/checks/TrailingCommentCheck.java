@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,20 +25,22 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TextBlock;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * <p>
  * The check to ensure that comments are the only thing on a line.
- * For the case of // comments that means that the only thing that should
+ * For the case of {@code //} comments that means that the only thing that should
  * precede it is whitespace.
  * It doesn't check comments if they do not end line, i.e. it accept
  * the following:
- * {@code Thread.sleep( 10 &lt;some comment here&gt; );}
- * Format property is intended to deal with the "} // while" example.
+ * </p>
+ * <pre><code>Thread.sleep( 10 /*some comment here&#42;/ );</code></pre>
+ * <p>Format property is intended to deal with the <code>} // while</code> example.
  * </p>
  *
  * <p>Rationale: Steve McConnell in &quot;Code Complete&quot; suggests that endline
@@ -95,8 +97,9 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
  * &lt;/module&gt;
  * </pre>
  *
- * @author o_sukhodolsky
+ * @noinspection HtmlTagCanBeJavadocTag
  */
+@StatelessCheck
 public class TrailingCommentCheck extends AbstractCheck {
 
     /**
@@ -129,17 +132,17 @@ public class TrailingCommentCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return CommonUtils.EMPTY_INT_ARRAY;
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return CommonUtils.EMPTY_INT_ARRAY;
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return CommonUtils.EMPTY_INT_ARRAY;
+        return CommonUtil.EMPTY_INT_ARRAY;
     }
 
     @Override
@@ -172,7 +175,7 @@ public class TrailingCommentCheck extends AbstractCheck {
 
                 // do not check comment which doesn't end line
                 if (comment.getText().length == 1
-                        && !CommonUtils.isBlank(line
+                        && !CommonUtil.isBlank(line
                             .substring(comment.getEndColNo() + 1))) {
                     continue;
                 }
@@ -210,4 +213,5 @@ public class TrailingCommentCheck extends AbstractCheck {
         }
         return legal;
     }
+
 }

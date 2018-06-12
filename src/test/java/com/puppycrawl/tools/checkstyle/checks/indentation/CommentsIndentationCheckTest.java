@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -29,14 +29,8 @@ import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
-/**
-*
-* @author <a href="mailto:nesterenko-aleksey@list.ru">Aleksey Nesterenko</a>
-* @author <a href="mailto:andreyselkin@gmail.com">Andrei Selkin</a>
-*
-*/
 public class CommentsIndentationCheckTest extends AbstractModuleTestSupport {
 
     @Override
@@ -47,7 +41,7 @@ public class CommentsIndentationCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testCommentIsAtTheEndOfBlock() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(CommentsIndentationCheck.class);
+            createModuleConfig(CommentsIndentationCheck.class);
         final String[] expected = {
             "18: " + getCheckMessage(MSG_KEY_SINGLE, 17, 25, 8),
             "33: " + getCheckMessage(MSG_KEY_SINGLE, 35, 5, 4),
@@ -101,7 +95,7 @@ public class CommentsIndentationCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testCommentIsInsideSwitchBlock() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(CommentsIndentationCheck.class);
+            createModuleConfig(CommentsIndentationCheck.class);
         final String[] expected = {
             "19: " + getCheckMessage(MSG_KEY_BLOCK, 20, 12, 16),
             "25: " + getCheckMessage(MSG_KEY_SINGLE, "24, 26", 19, "16, 12"),
@@ -130,7 +124,7 @@ public class CommentsIndentationCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testCommentIsInsideEmptyBlock() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(CommentsIndentationCheck.class);
+            createModuleConfig(CommentsIndentationCheck.class);
         final String[] expected = {
             "9: " + getCheckMessage(MSG_KEY_SINGLE, 12, 19, 31),
             "10: " + getCheckMessage(MSG_KEY_BLOCK, 12, 23, 31),
@@ -147,7 +141,7 @@ public class CommentsIndentationCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testSurroundingCode() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(CommentsIndentationCheck.class);
+            createModuleConfig(CommentsIndentationCheck.class);
         final String[] expected = {
             "13: " + getCheckMessage(MSG_KEY_SINGLE, 14, 14, 12),
             "23: " + getCheckMessage(MSG_KEY_BLOCK, 24, 16, 12),
@@ -169,8 +163,8 @@ public class CommentsIndentationCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testNoNpeWhenBlockCommentEndsClassFile() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(CommentsIndentationCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+            createModuleConfig(CommentsIndentationCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         final String testInputFile = "InputCommentsIndentationNoNpe.java";
         verify(checkConfig, getPath(testInputFile), expected);
     }
@@ -178,7 +172,7 @@ public class CommentsIndentationCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testCheckOnlySingleLineComments() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(CommentsIndentationCheck.class);
+            createModuleConfig(CommentsIndentationCheck.class);
         checkConfig.addAttribute("tokens", "SINGLE_LINE_COMMENT");
         final String[] expected = {
             "13: " + getCheckMessage(MSG_KEY_SINGLE, 14, 14, 12),
@@ -194,7 +188,7 @@ public class CommentsIndentationCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testCheckOnlyBlockComments() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(CommentsIndentationCheck.class);
+            createModuleConfig(CommentsIndentationCheck.class);
         checkConfig.addAttribute("tokens", "BLOCK_COMMENT_BEGIN");
         final String[] expected = {
             "23: " + getCheckMessage(MSG_KEY_BLOCK, 24, 16, 12),
@@ -221,14 +215,14 @@ public class CommentsIndentationCheckTest extends AbstractModuleTestSupport {
         }
         catch (IllegalArgumentException ex) {
             final String msg = ex.getMessage();
-            Assert.assertEquals("Invalid excpeton message",
+            Assert.assertEquals("Invalid exception message",
                     "Unexpected token type: methodStub", msg);
         }
     }
 
     @Test
     public void testJavadoc() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(CommentsIndentationCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(CommentsIndentationCheck.class);
         final String[] expected = {
             "3: " + getCheckMessage(MSG_KEY_BLOCK, 6, 2, 0),
             "8: " + getCheckMessage(MSG_KEY_BLOCK, 9, 0, 4),
@@ -241,7 +235,7 @@ public class CommentsIndentationCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testMultiblockStructures() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(CommentsIndentationCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(CommentsIndentationCheck.class);
         final String[] expected = {
             "12: " + getCheckMessage(MSG_KEY_SINGLE, 11, 8, 12),
             "18: " + getCheckMessage(MSG_KEY_SINGLE, "17, 19", 16, "12, 8"),
@@ -268,7 +262,7 @@ public class CommentsIndentationCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void testCommentsAfterAnnotation() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(CommentsIndentationCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(CommentsIndentationCheck.class);
         final String[] expected = {
             "14: " + getCheckMessage(MSG_KEY_SINGLE, 15, 4, 0),
             "18: " + getCheckMessage(MSG_KEY_SINGLE, 19, 8, 4),

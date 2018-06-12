@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,12 +23,11 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import com.puppycrawl.tools.checkstyle.api.DetailNode;
-import com.puppycrawl.tools.checkstyle.utils.JavadocUtils;
+import com.puppycrawl.tools.checkstyle.utils.JavadocUtil;
 
 /**
  * Implementation of DetailNode interface that is mutable.
  *
- * @author Baratali Izmailov
  *
  */
 public class JavadocNodeImpl implements DetailNode {
@@ -172,11 +171,12 @@ public class JavadocNodeImpl implements DetailNode {
     public String toString() {
         return "JavadocNodeImpl["
                 + "index=" + index
-                + ", type=" + JavadocUtils.getTokenName(type)
+                + ", type=" + JavadocUtil.getTokenName(type)
                 + ", text='" + text + '\''
                 + ", lineNumber=" + lineNumber
                 + ", columnNumber=" + columnNumber
                 + ", children=" + Objects.hashCode(children)
                 + ", parent=" + parent + ']';
     }
+
 }

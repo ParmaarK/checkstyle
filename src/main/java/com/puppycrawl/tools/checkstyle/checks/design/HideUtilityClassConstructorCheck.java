@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,6 +19,7 @@
 
 package com.puppycrawl.tools.checkstyle.checks.design;
 
+import com.puppycrawl.tools.checkstyle.StatelessCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -31,8 +32,8 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * A common mistake is forgetting to hide the default constructor.
  * </p>
  *
- * @author lkuehne
  */
+@StatelessCheck
 public class HideUtilityClassConstructorCheck extends AbstractCheck {
 
     /**
@@ -43,17 +44,17 @@ public class HideUtilityClassConstructorCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return getAcceptableTokens();
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {TokenTypes.CLASS_DEF};
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getAcceptableTokens();
+        return new int[] {TokenTypes.CLASS_DEF};
     }
 
     @Override
@@ -83,7 +84,7 @@ public class HideUtilityClassConstructorCheck extends AbstractCheck {
                 && !hasNonStaticMethodOrField && hasNonPrivateStaticMethodOrField;
 
             if (isUtilClass && hasAccessibleCtor && !hasStaticModifier) {
-                log(ast.getLineNo(), ast.getColumnNo(), MSG_KEY);
+                log(ast, MSG_KEY);
             }
         }
     }
@@ -95,7 +96,7 @@ public class HideUtilityClassConstructorCheck extends AbstractCheck {
      */
     private static boolean isAbstract(DetailAST ast) {
         return ast.findFirstToken(TokenTypes.MODIFIERS)
-            .branchContains(TokenTypes.ABSTRACT);
+            .findFirstToken(TokenTypes.ABSTRACT) != null;
     }
 
     /**
@@ -105,13 +106,14 @@ public class HideUtilityClassConstructorCheck extends AbstractCheck {
      */
     private static boolean isStatic(DetailAST ast) {
         return ast.findFirstToken(TokenTypes.MODIFIERS)
-            .branchContains(TokenTypes.LITERAL_STATIC);
+            .findFirstToken(TokenTypes.LITERAL_STATIC) != null;
     }
 
     /**
      * Details of class that are required for validation.
      */
     private static class Details {
+
         /** Class ast. */
         private final DetailAST ast;
         /** Result of details gathering. */
@@ -193,9 +195,9 @@ public class HideUtilityClassConstructorCheck extends AbstractCheck {
                     final DetailAST modifiers =
                         child.findFirstToken(TokenTypes.MODIFIERS);
                     final boolean isStatic =
-                        modifiers.branchContains(TokenTypes.LITERAL_STATIC);
+                        modifiers.findFirstToken(TokenTypes.LITERAL_STATIC) != null;
                     final boolean isPrivate =
-                        modifiers.branchContains(TokenTypes.LITERAL_PRIVATE);
+                        modifiers.findFirstToken(TokenTypes.LITERAL_PRIVATE) != null;
 
                     if (!isStatic) {
                         hasNonStaticMethodOrField = true;
@@ -208,16 +210,17 @@ public class HideUtilityClassConstructorCheck extends AbstractCheck {
                     hasDefaultCtor = false;
                     final DetailAST modifiers =
                         child.findFirstToken(TokenTypes.MODIFIERS);
-                    if (!modifiers.branchContains(TokenTypes.LITERAL_PRIVATE)
-                        && !modifiers.branchContains(TokenTypes.LITERAL_PROTECTED)) {
+                    if (modifiers.findFirstToken(TokenTypes.LITERAL_PRIVATE) == null
+                        && modifiers.findFirstToken(TokenTypes.LITERAL_PROTECTED) == null) {
                         // treat package visible as public
                         // for the purpose of this Check
                         hasPublicCtor = true;
                     }
-
                 }
                 child = child.getNextSibling();
             }
         }
+
     }
+
 }

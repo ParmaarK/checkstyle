@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,6 +21,7 @@ package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import java.io.File;
 
+import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FullIdent;
@@ -36,10 +37,8 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * These directories are added to the classpath so that your classes
  * are visible to JVM when it runs the code.
  *
- * @author <a href="mailto:simon@redhillconsulting.com.au">Simon Harris</a>
- * @author Oliver Burn
- * @author Vikramaditya Kukreja
  */
+@FileStatefulCheck
 public final class PackageDeclarationCheck extends AbstractCheck {
 
     /**
@@ -73,17 +72,17 @@ public final class PackageDeclarationCheck extends AbstractCheck {
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[] {TokenTypes.PACKAGE_DEF};
+        return getRequiredTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getDefaultTokens();
+        return new int[] {TokenTypes.PACKAGE_DEF};
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {TokenTypes.PACKAGE_DEF};
+        return getRequiredTokens();
     }
 
     @Override
@@ -107,7 +106,6 @@ public final class PackageDeclarationCheck extends AbstractCheck {
         defined = true;
 
         if (matchDirectoryStructure) {
-
             final DetailAST packageNameAst = ast.getLastChild().getPreviousSibling();
             final FullIdent fullIdent = FullIdent.createFullIdent(packageNameAst);
             final String packageName = fullIdent.getText().replace('.', File.separatorChar);
@@ -129,4 +127,5 @@ public final class PackageDeclarationCheck extends AbstractCheck {
         final int lastSeparatorPos = fileName.lastIndexOf(File.separatorChar);
         return fileName.substring(0, lastSeparatorPos);
     }
+
 }

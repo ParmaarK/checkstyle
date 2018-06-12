@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -29,6 +29,7 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 
 public class EmptyStatementCheckTest
     extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/coding/emptystatement";
@@ -38,7 +39,7 @@ public class EmptyStatementCheckTest
     public void testEmptyStatements()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(EmptyStatementCheck.class);
+            createModuleConfig(EmptyStatementCheck.class);
         final String[] expected = {
             "12:7: " + getCheckMessage(MSG_KEY),
             "17:7: " + getCheckMessage(MSG_KEY),
@@ -63,10 +64,10 @@ public class EmptyStatementCheckTest
 
     @Test
     public void testTokensNotNull() {
-
         final EmptyStatementCheck check = new EmptyStatementCheck();
         Assert.assertNotNull("Acceptable tokens should not be null", check.getAcceptableTokens());
         Assert.assertNotNull("Default tokens should not be null", check.getDefaultTokens());
         Assert.assertNotNull("Required tokens should not be null", check.getRequiredTokens());
     }
+
 }

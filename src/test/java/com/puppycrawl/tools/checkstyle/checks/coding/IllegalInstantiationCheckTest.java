@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,7 @@ package com.puppycrawl.tools.checkstyle.checks.coding;
 import static com.puppycrawl.tools.checkstyle.checks.coding.IllegalInstantiationCheck.MSG_KEY;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.SortedSet;
 
 import org.junit.Assert;
@@ -34,10 +35,11 @@ import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.FileText;
 import com.puppycrawl.tools.checkstyle.api.LocalizedMessage;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class IllegalInstantiationCheckTest
     extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/coding/illegalinstantiation";
@@ -46,7 +48,7 @@ public class IllegalInstantiationCheckTest
     @Test
     public void testDefault() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(IllegalInstantiationCheck.class);
+            createModuleConfig(IllegalInstantiationCheck.class);
         checkConfig.addAttribute(
             "classes",
             "java.lang.Boolean,"
@@ -70,8 +72,8 @@ public class IllegalInstantiationCheckTest
     @Test
     public void testJava8() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(IllegalInstantiationCheck.class);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+                createModuleConfig(IllegalInstantiationCheck.class);
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig,
                 getPath("InputIllegalInstantiation.java"),
                 expected);
@@ -80,7 +82,7 @@ public class IllegalInstantiationCheckTest
     @Test
     public void testNoPackage() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(IllegalInstantiationCheck.class);
+                createModuleConfig(IllegalInstantiationCheck.class);
         checkConfig.addAttribute(
                 "classes",
                 "java.lang.Boolean");
@@ -95,7 +97,7 @@ public class IllegalInstantiationCheckTest
     @Test
     public void testJavaLangPackage() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(IllegalInstantiationCheck.class);
+                createModuleConfig(IllegalInstantiationCheck.class);
         checkConfig.addAttribute(
                 "classes",
                 "java.lang.Boolean,java.lang.String");
@@ -111,11 +113,11 @@ public class IllegalInstantiationCheckTest
     @Test
     public void testWrongPackage() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(IllegalInstantiationCheck.class);
+                createModuleConfig(IllegalInstantiationCheck.class);
         checkConfig.addAttribute(
                 "classes",
                 "jjva.lang.Boolean,java.lang*Boolean");
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig,
                 getNonCompilablePath("InputIllegalInstantiationLang.java"),
                 expected);
@@ -152,8 +154,9 @@ public class IllegalInstantiationCheckTest
 
         final IllegalInstantiationCheck check = new IllegalInstantiationCheck();
         final File inputFile = new File(getNonCompilablePath("InputIllegalInstantiationLang.java"));
-        check.setFileContents(new FileContents(new FileText(inputFile, "UTF-8")));
-        check.configure(createCheckConfig(IllegalInstantiationCheck.class));
+        check.setFileContents(new FileContents(new FileText(inputFile,
+                StandardCharsets.UTF_8.name())));
+        check.configure(createModuleConfig(IllegalInstantiationCheck.class));
         check.setClasses("java.lang.Boolean");
 
         check.visitToken(newAst);
@@ -176,9 +179,9 @@ public class IllegalInstantiationCheckTest
     @Test
     public void testTokensNotNull() {
         final IllegalInstantiationCheck check = new IllegalInstantiationCheck();
-        Assert.assertNotNull(check.getAcceptableTokens());
-        Assert.assertNotNull(check.getDefaultTokens());
-        Assert.assertNotNull(check.getRequiredTokens());
+        Assert.assertNotNull("Acceptable tokens should not be null", check.getAcceptableTokens());
+        Assert.assertNotNull("Default tokens should not be null", check.getDefaultTokens());
+        Assert.assertNotNull("Required tokens should not be null", check.getRequiredTokens());
     }
 
     @Test
@@ -196,4 +199,5 @@ public class IllegalInstantiationCheckTest
             // it is OK
         }
     }
+
 }

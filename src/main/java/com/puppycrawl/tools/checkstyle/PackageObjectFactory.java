@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.LocalizedMessage;
-import com.puppycrawl.tools.checkstyle.utils.ModuleReflectionUtils;
+import com.puppycrawl.tools.checkstyle.utils.ModuleReflectionUtil;
 
 /**
  * A factory for creating objects from package names and names.
@@ -45,10 +45,27 @@ import com.puppycrawl.tools.checkstyle.utils.ModuleReflectionUtils;
  *         that represents Check (with 'Check' suffix).
  *     </li>
  * </ul>
- * @author Rick Giles
- * @author lkuehne
  */
 public class PackageObjectFactory implements ModuleFactory {
+
+    /**
+     * Enum class to define loading options.
+     */
+    public enum ModuleLoadOption {
+
+        /**
+         * Searching from registered checkstyle modules and from packages given in constructor.
+         **/
+        SEARCH_REGISTERED_PACKAGES,
+        /**
+         * As SEARCH_REGISTERED_PACKAGES and also try to load class from all of packages given in
+         * constructor.
+         * Required for eclipse-cs plugin.
+         **/
+        TRY_IN_ALL_REGISTERED_PACKAGES,
+
+    }
+
     /** Base package of checkstyle modules checks. */
     public static final String BASE_PACKAGE = "com.puppycrawl.tools.checkstyle";
 
@@ -56,7 +73,7 @@ public class PackageObjectFactory implements ModuleFactory {
     public static final String UNABLE_TO_INSTANTIATE_EXCEPTION_MESSAGE =
             "PackageObjectFactory.unableToInstantiateExceptionMessage";
 
-    /** Exception message when there is ambigugous module name in config file. */
+    /** Exception message when there is ambiguous module name in config file. */
     public static final String AMBIGUOUS_MODULE_NAME_EXCEPTION_MESSAGE =
             "PackageObjectFactory.ambiguousModuleNameExceptionMessage";
 
@@ -87,6 +104,9 @@ public class PackageObjectFactory implements ModuleFactory {
     /** Map of third party Checkstyle module names to the set of their fully qualified names. */
     private Map<String, Set<String>> thirdPartyNameToFullModuleNames;
 
+    /** Module load option which defines class search type. */
+    private ModuleLoadOption moduleLoadOption;
+
     static {
         fillShortToFullModuleNamesMap();
     }
@@ -98,6 +118,18 @@ public class PackageObjectFactory implements ModuleFactory {
      *          core and custom modules
      */
     public PackageObjectFactory(Set<String> packageNames, ClassLoader moduleClassLoader) {
+        this(packageNames, moduleClassLoader, ModuleLoadOption.SEARCH_REGISTERED_PACKAGES);
+    }
+
+    /**
+     * Creates a new {@code PackageObjectFactory} instance.
+     * @param packageNames the list of package names to use
+     * @param moduleClassLoader class loader used to load Checkstyle
+     *          core and custom modules
+     * @param moduleLoadOption loading option
+     */
+    public PackageObjectFactory(Set<String> packageNames, ClassLoader moduleClassLoader,
+            ModuleLoadOption moduleLoadOption) {
         if (moduleClassLoader == null) {
             throw new IllegalArgumentException(NULL_LOADER_MESSAGE);
         }
@@ -108,6 +140,7 @@ public class PackageObjectFactory implements ModuleFactory {
         //create a copy of the given set, but retain ordering
         packages = new LinkedHashSet<>(packageNames);
         this.moduleClassLoader = moduleClassLoader;
+        this.moduleLoadOption = moduleLoadOption;
     }
 
     /**
@@ -144,19 +177,7 @@ public class PackageObjectFactory implements ModuleFactory {
         Object instance = null;
         // if the name is a simple class name, try to find it in maps at first
         if (!name.contains(PACKAGE_SEPARATOR)) {
-            // find the name in hardcode map
-            final String fullModuleName = NAME_TO_FULL_MODULE_NAME.get(name);
-            if (fullModuleName == null) {
-                final String fullCheckModuleName =
-                        NAME_TO_FULL_MODULE_NAME.get(name + CHECK_SUFFIX);
-                if (fullCheckModuleName != null) {
-                    instance = createObject(fullCheckModuleName);
-                }
-            }
-            else {
-                instance = createObject(fullModuleName);
-            }
-
+            instance = createFromStandardCheckSet(name);
             // find the name in third party map
             if (instance == null) {
                 if (thirdPartyNameToFullModuleNames == null) {
@@ -166,22 +187,47 @@ public class PackageObjectFactory implements ModuleFactory {
                 instance = createObjectFromMap(name, thirdPartyNameToFullModuleNames);
             }
         }
-
         if (instance == null) {
             instance = createObject(name);
         }
-        final String nameCheck = name + CHECK_SUFFIX;
-        if (instance == null) {
-            instance = createObject(nameCheck);
+        if (instance == null
+                && moduleLoadOption == ModuleLoadOption.TRY_IN_ALL_REGISTERED_PACKAGES) {
+            instance = createModuleByTryInEachPackage(name);
         }
         if (instance == null) {
-            final String attemptedNames = joinPackageNamesWithClassName(name, packages)
-                    + STRING_SEPARATOR + nameCheck + STRING_SEPARATOR
-                    + joinPackageNamesWithClassName(nameCheck, packages);
+            String attemptedNames = null;
+            if (!name.contains(PACKAGE_SEPARATOR)) {
+                final String nameCheck = name + CHECK_SUFFIX;
+                attemptedNames = joinPackageNamesWithClassName(name, packages)
+                        + STRING_SEPARATOR + nameCheck + STRING_SEPARATOR
+                        + joinPackageNamesWithClassName(nameCheck, packages);
+            }
             final LocalizedMessage exceptionMessage = new LocalizedMessage(0,
                 Definitions.CHECKSTYLE_BUNDLE, UNABLE_TO_INSTANTIATE_EXCEPTION_MESSAGE,
                 new String[] {name, attemptedNames}, null, getClass(), null);
             throw new CheckstyleException(exceptionMessage.getMessage());
+        }
+        return instance;
+    }
+
+    /**
+     * Create object from one of Checkstyle module names.
+     * @param name name of module.
+     * @return instance of module.
+     * @throws CheckstyleException if the class fails to instantiate or there are ambiguous classes.
+     */
+    private Object createFromStandardCheckSet(String name) throws CheckstyleException {
+        final String fullModuleName = NAME_TO_FULL_MODULE_NAME.get(name);
+        Object instance = null;
+        if (fullModuleName == null) {
+            final String fullCheckModuleName =
+                    NAME_TO_FULL_MODULE_NAME.get(name + CHECK_SUFFIX);
+            if (fullCheckModuleName != null) {
+                instance = createObject(fullCheckModuleName);
+            }
+        }
+        else {
+            instance = createObject(fullModuleName);
         }
         return instance;
     }
@@ -247,7 +293,7 @@ public class PackageObjectFactory implements ModuleFactory {
     private Map<String, Set<String>> generateThirdPartyNameToFullModuleName(ClassLoader loader) {
         Map<String, Set<String>> returnValue;
         try {
-            returnValue = ModuleReflectionUtils.getCheckstyleModules(packages, loader).stream()
+            returnValue = ModuleReflectionUtil.getCheckstyleModules(packages, loader).stream()
                     .collect(Collectors.toMap(
                         Class::getSimpleName,
                         cls -> Collections.singleton(cls.getCanonicalName()),
@@ -270,9 +316,9 @@ public class PackageObjectFactory implements ModuleFactory {
      * @return a string which is obtained by joining package names with a class name.
      */
     private static String joinPackageNamesWithClassName(String className, Set<String> packages) {
-        return packages.stream()
-            .collect(Collectors.joining(
-                    className + STRING_SEPARATOR, "", PACKAGE_SEPARATOR + className));
+        return packages.stream().collect(
+            Collectors.joining(PACKAGE_SEPARATOR + className + STRING_SEPARATOR, "",
+                    PACKAGE_SEPARATOR + className));
     }
 
     /**
@@ -308,6 +354,30 @@ public class PackageObjectFactory implements ModuleFactory {
     }
 
     /**
+     * Searching to class with given name (or name concatenated with &quot;Check&quot;) in existing
+     * packages. Returns instance if class found or, otherwise, null.
+     * @param name the name of a class.
+     * @return the {@code Object} created by loader.
+     * @throws CheckstyleException if an error occurs.
+     */
+    private Object createModuleByTryInEachPackage(String name) throws CheckstyleException {
+        final Set<String> possibleNames = packages.stream()
+                .map(packageName -> packageName + PACKAGE_SEPARATOR + name)
+                .collect(Collectors.toSet());
+        possibleNames.addAll(possibleNames.stream()
+                .map(possibleName -> possibleName + CHECK_SUFFIX)
+                .collect(Collectors.toSet()));
+        Object instance = null;
+        for (String possibleName : possibleNames) {
+            instance = createObject(possibleName);
+            if (instance != null) {
+                break;
+            }
+        }
+        return instance;
+    }
+
+    /**
      * Fill short-to-full module names map.
      */
     private static void fillShortToFullModuleNamesMap() {
@@ -337,6 +407,8 @@ public class PackageObjectFactory implements ModuleFactory {
     private static void fillChecksFromAnnotationPackage() {
         NAME_TO_FULL_MODULE_NAME.put("AnnotationLocationCheck",
                 BASE_PACKAGE + ".checks.annotation.AnnotationLocationCheck");
+        NAME_TO_FULL_MODULE_NAME.put("AnnotationOnSameLineCheck",
+                BASE_PACKAGE + ".checks.annotation.AnnotationOnSameLineCheck");
         NAME_TO_FULL_MODULE_NAME.put("AnnotationUseStyleCheck",
                 BASE_PACKAGE + ".checks.annotation.AnnotationUseStyleCheck");
         NAME_TO_FULL_MODULE_NAME.put("MissingDeprecatedCheck",
@@ -706,8 +778,6 @@ public class PackageObjectFactory implements ModuleFactory {
                 BASE_PACKAGE + ".checks.AvoidEscapedUnicodeCharactersCheck");
         NAME_TO_FULL_MODULE_NAME.put("DescendantTokenCheck",
                 BASE_PACKAGE + ".checks.DescendantTokenCheck");
-        NAME_TO_FULL_MODULE_NAME.put("FileContentsHolder",
-                BASE_PACKAGE + ".checks.FileContentsHolder");
         NAME_TO_FULL_MODULE_NAME.put("FinalParametersCheck",
                 BASE_PACKAGE + ".checks.FinalParametersCheck");
         NAME_TO_FULL_MODULE_NAME.put("NewlineAtEndOfFileCheck",
@@ -750,10 +820,14 @@ public class PackageObjectFactory implements ModuleFactory {
                 BASE_PACKAGE + ".filters.IntRangeFilter");
         NAME_TO_FULL_MODULE_NAME.put("SeverityMatchFilter",
                 BASE_PACKAGE + ".filters.SeverityMatchFilter");
+        NAME_TO_FULL_MODULE_NAME.put("SuppressWithPlainTextCommentFilter",
+            BASE_PACKAGE + ".filters.SuppressWithPlainTextCommentFilter");
         NAME_TO_FULL_MODULE_NAME.put("SuppressionCommentFilter",
                 BASE_PACKAGE + ".filters.SuppressionCommentFilter");
         NAME_TO_FULL_MODULE_NAME.put("SuppressionFilter",
                 BASE_PACKAGE + ".filters.SuppressionFilter");
+        NAME_TO_FULL_MODULE_NAME.put("SuppressionXpathFilter",
+                BASE_PACKAGE + ".filters.SuppressionXpathFilter");
         NAME_TO_FULL_MODULE_NAME.put("SuppressWarningsFilter",
                 BASE_PACKAGE + ".filters.SuppressWarningsFilter");
         NAME_TO_FULL_MODULE_NAME.put("SuppressWithNearbyCommentFilter",
@@ -767,4 +841,5 @@ public class PackageObjectFactory implements ModuleFactory {
         NAME_TO_FULL_MODULE_NAME.put("Checker", BASE_PACKAGE + ".Checker");
         NAME_TO_FULL_MODULE_NAME.put("TreeWalker", BASE_PACKAGE + ".TreeWalker");
     }
+
 }

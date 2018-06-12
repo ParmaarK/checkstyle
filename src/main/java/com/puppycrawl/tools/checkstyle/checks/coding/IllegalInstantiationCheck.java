@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,11 +25,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import antlr.collections.AST;
+import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FullIdent;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * <p>
@@ -59,8 +60,8 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
  * <pre>
  * &lt;module name="IllegalInstantiation"/&gt;
  * </pre>
- * @author lkuehne
  */
+@FileStatefulCheck
 public class IllegalInstantiationCheck
     extends AbstractCheck {
 
@@ -83,7 +84,7 @@ public class IllegalInstantiationCheck
     private final Set<DetailAST> instantiations = new HashSet<>();
 
     /** Set of fully qualified class names. E.g. "java.lang.Boolean" */
-    private Set<String> illegalClasses = new HashSet<>();
+    private Set<String> classes = new HashSet<>();
 
     /** Name of the package. */
     private String pkgName;
@@ -114,7 +115,6 @@ public class IllegalInstantiationCheck
 
     @Override
     public void beginTree(DetailAST rootAST) {
-        super.beginTree(rootAST);
         pkgName = null;
         imports.clear();
         instantiations.clear();
@@ -205,9 +205,7 @@ public class IllegalInstantiationCheck
             final String typeName = typeIdent.getText();
             final String fqClassName = getIllegalInstantiation(typeName);
             if (fqClassName != null) {
-                final int lineNo = newTokenAst.getLineNo();
-                final int colNo = newTokenAst.getColumnNo();
-                log(lineNo, colNo, MSG_KEY, fqClassName);
+                log(newTokenAst, MSG_KEY, fqClassName);
             }
         }
     }
@@ -221,7 +219,7 @@ public class IllegalInstantiationCheck
     private String getIllegalInstantiation(String className) {
         String fullClassName = null;
 
-        if (illegalClasses.contains(className)) {
+        if (classes.contains(className)) {
             fullClassName = className;
         }
         else {
@@ -234,7 +232,7 @@ public class IllegalInstantiationCheck
                 pkgNameLen = pkgName.length();
             }
 
-            for (String illegal : illegalClasses) {
+            for (String illegal : classes) {
                 if (isStandardClass(className, illegal)
                         || isSamePackage(className, pkgNameLen, illegal)) {
                     fullClassName = illegal;
@@ -265,8 +263,8 @@ public class IllegalInstantiationCheck
                 importArg = importArg.substring(0, importArg.length() - 1)
                         + className;
             }
-            if (CommonUtils.baseClassName(importArg).equals(className)
-                    && illegalClasses.contains(importArg)) {
+            if (CommonUtil.baseClassName(importArg).equals(className)
+                    && classes.contains(importArg)) {
                 illegalType = importArg;
                 break;
             }
@@ -326,6 +324,7 @@ public class IllegalInstantiationCheck
      * @return true if type is standard
      */
     private boolean isStandardClass(String className, String illegal) {
+        boolean isStandardClass = false;
         // class from java.lang
         if (illegal.length() - JAVA_LANG.length() == className.length()
             && illegal.endsWith(className)
@@ -340,10 +339,10 @@ public class IllegalInstantiationCheck
             final boolean isSamePackage = isSamePackage(className);
 
             if (!isSameFile && !isSamePackage) {
-                return true;
+                isStandardClass = true;
             }
         }
-        return false;
+        return isStandardClass;
     }
 
     /**
@@ -351,6 +350,7 @@ public class IllegalInstantiationCheck
      * @param names a comma separate list of class names
      */
     public void setClasses(String... names) {
-        illegalClasses = Arrays.stream(names).collect(Collectors.toSet());
+        classes = Arrays.stream(names).collect(Collectors.toSet());
     }
+
 }

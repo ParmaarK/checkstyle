@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -31,9 +31,10 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 public class ArrayTypeStyleCheckTest
     extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
-        return "com/puppycrawl/tools/checkstyle/checks/misc/arraytypestyle";
+        return "com/puppycrawl/tools/checkstyle/checks/arraytypestyle";
     }
 
     @Test
@@ -48,10 +49,11 @@ public class ArrayTypeStyleCheckTest
     public void testJavaStyleOn()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ArrayTypeStyleCheck.class);
+            createModuleConfig(ArrayTypeStyleCheck.class);
         final String[] expected = {
             "14:23: " + getCheckMessage(MSG_KEY),
-            "20:44: " + getCheckMessage(MSG_KEY),
+            "15:18: " + getCheckMessage(MSG_KEY),
+            "21:44: " + getCheckMessage(MSG_KEY),
         };
         verify(checkConfig, getPath("InputArrayTypeStyle.java"), expected);
     }
@@ -60,13 +62,13 @@ public class ArrayTypeStyleCheckTest
     public void testJavaStyleOff()
             throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(ArrayTypeStyleCheck.class);
+            createModuleConfig(ArrayTypeStyleCheck.class);
         checkConfig.addAttribute("javaStyle", "false");
         final String[] expected = {
             "13:16: " + getCheckMessage(MSG_KEY),
-            "16:39: " + getCheckMessage(MSG_KEY),
-            "22:18: " + getCheckMessage(MSG_KEY),
-            "30:20: " + getCheckMessage(MSG_KEY),
+            "17:39: " + getCheckMessage(MSG_KEY),
+            "23:18: " + getCheckMessage(MSG_KEY),
+            "31:20: " + getCheckMessage(MSG_KEY),
         };
         verify(checkConfig, getPath("InputArrayTypeStyle.java"), expected);
     }
@@ -81,4 +83,5 @@ public class ArrayTypeStyleCheckTest
         assertArrayEquals("Acceptable tokens differs from expected",
                 expected, actual);
     }
+
 }

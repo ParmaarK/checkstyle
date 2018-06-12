@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,26 +19,21 @@
 
 package com.google.checkstyle.test.chapter4formatting.rule451wheretobreak;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.junit.Test;
 
-import com.google.checkstyle.test.base.BaseCheckTestSupport;
+import com.google.checkstyle.test.base.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 import com.puppycrawl.tools.checkstyle.checks.whitespace.MethodParamPadCheck;
 
-public class MethodParamPadTest extends BaseCheckTestSupport {
+public class MethodParamPadTest extends AbstractModuleTestSupport {
 
     @Override
-    protected String getPath(String fileName) throws IOException {
-        return super.getPath("chapter4formatting" + File.separator + "rule451wheretobreak"
-                + File.separator + fileName);
+    protected String getPackageLocation() {
+        return "com/google/checkstyle/test/chapter4formatting/rule451wheretobreak";
     }
 
     @Test
     public void testOperatorWrap() throws Exception {
-
         final Class<MethodParamPadCheck> clazz = MethodParamPadCheck.class;
         final String messageKeyPrevious = "line.previous";
         final String messageKeyPreceded = "ws.preceded";
@@ -50,10 +45,11 @@ public class MethodParamPadTest extends BaseCheckTestSupport {
             "353:15: " + getCheckMessage(clazz, messageKeyPreceded, "("),
             "358:13: " + getCheckMessage(clazz, messageKeyPrevious, "("),
         };
-        final Configuration checkConfig = getCheckConfig("MethodParamPad");
+        final Configuration checkConfig = getModuleConfig("MethodParamPad");
         final String filePath = getPath("InputMethodParamPad.java");
 
         final Integer[] warnList = getLinesWithWarn(filePath);
         verify(checkConfig, filePath, expected, warnList);
     }
+
 }

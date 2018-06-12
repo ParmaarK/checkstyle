@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -29,15 +29,15 @@ import org.junit.Test;
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * Test case for the JavaNCSS-Check.
  *
- * @author Lars Ködderitzsch
  */
 // -@cs[AbbreviationAsWordInName] Test should be named as its main class.
 public class JavaNCSSCheckTest extends AbstractModuleTestSupport {
+
     @Override
     protected String getPackageLocation() {
         return "com/puppycrawl/tools/checkstyle/checks/metrics/javancss";
@@ -45,7 +45,7 @@ public class JavaNCSSCheckTest extends AbstractModuleTestSupport {
 
     @Test
     public void test() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(JavaNCSSCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(JavaNCSSCheck.class);
 
         checkConfig.addAttribute("methodMaximum", "0");
         checkConfig.addAttribute("classMaximum", "1");
@@ -71,11 +71,24 @@ public class JavaNCSSCheckTest extends AbstractModuleTestSupport {
     }
 
     @Test
+    public void testEqualToMax() throws Exception {
+        final DefaultConfiguration checkConfig = createModuleConfig(JavaNCSSCheck.class);
+
+        checkConfig.addAttribute("methodMaximum", "12");
+        checkConfig.addAttribute("classMaximum", "22");
+        checkConfig.addAttribute("fileMaximum", "39");
+
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
+
+        verify(checkConfig, getPath("InputJavaNCSS.java"), expected);
+    }
+
+    @Test
     public void testDefaultConfiguration() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(JavaNCSSCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(JavaNCSSCheck.class);
 
         createChecker(checkConfig);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputJavaNCSS.java"), expected);
     }
 
@@ -113,8 +126,8 @@ public class JavaNCSSCheckTest extends AbstractModuleTestSupport {
             TokenTypes.LITERAL_CASE,
             TokenTypes.LITERAL_DEFAULT,
         };
-        Assert.assertNotNull(actual);
-        Assert.assertArrayEquals(expected, actual);
+        Assert.assertNotNull("Acceptable tokens should not be null", actual);
+        Assert.assertArrayEquals("Invalid acceptable tokens", expected, actual);
     }
 
     @Test
@@ -151,7 +164,8 @@ public class JavaNCSSCheckTest extends AbstractModuleTestSupport {
             TokenTypes.LITERAL_CASE,
             TokenTypes.LITERAL_DEFAULT,
         };
-        Assert.assertNotNull(actual);
-        Assert.assertArrayEquals(expected, actual);
+        Assert.assertNotNull("Required tokens should not be null", actual);
+        Assert.assertArrayEquals("Invalid required tokens", expected, actual);
     }
+
 }

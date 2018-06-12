@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -26,14 +26,14 @@ import java.util.Set;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 /**
  * Factory for handlers. Looks up constructor via reflection.
  *
- * @author jrichard
  */
 public class HandlerFactory {
+
     /**
      * Registered handlers.
      */
@@ -66,6 +66,7 @@ public class HandlerFactory {
         register(TokenTypes.ARRAY_INIT, ArrayInitHandler.class);
         register(TokenTypes.METHOD_CALL, MethodCallHandler.class);
         register(TokenTypes.CTOR_CALL, MethodCallHandler.class);
+        register(TokenTypes.SUPER_CTOR_CALL, MethodCallHandler.class);
         register(TokenTypes.LABELED_STAT, LabelHandler.class);
         register(TokenTypes.STATIC_INIT, StaticInitHandler.class);
         register(TokenTypes.INSTANCE_INIT, SlistHandler.class);
@@ -88,7 +89,7 @@ public class HandlerFactory {
      * @param <T> type of the handler class object.
      */
     private <T> void register(int type, Class<T> handlerClass) {
-        final Constructor<T> ctor = CommonUtils.getConstructor(handlerClass,
+        final Constructor<T> ctor = CommonUtil.getConstructor(handlerClass,
                 IndentationCheck.class,
                 // current AST
                 DetailAST.class,
@@ -148,7 +149,7 @@ public class HandlerFactory {
         }
         else {
             final Constructor<?> handlerCtor = typeHandlers.get(ast.getType());
-            resultHandler = (AbstractExpressionHandler) CommonUtils.invokeConstructor(
+            resultHandler = (AbstractExpressionHandler) CommonUtil.invokeConstructor(
                 handlerCtor, indentCheck, ast, parent);
         }
         return resultHandler;
@@ -181,4 +182,5 @@ public class HandlerFactory {
     public void clearCreatedHandlers() {
         createdHandlers.clear();
     }
+
 }

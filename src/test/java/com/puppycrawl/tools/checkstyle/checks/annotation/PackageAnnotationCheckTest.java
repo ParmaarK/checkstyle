@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -27,7 +27,7 @@ import org.junit.Test;
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class PackageAnnotationCheckTest extends AbstractModuleTestSupport {
 
@@ -41,9 +41,9 @@ public class PackageAnnotationCheckTest extends AbstractModuleTestSupport {
      */
     @Test
     public void testGoodPackageAnnotation() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(PackageAnnotationCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(PackageAnnotationCheck.class);
 
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
         verify(checkConfig, getNonCompilablePath("package-info.java"), expected);
     }
@@ -53,21 +53,21 @@ public class PackageAnnotationCheckTest extends AbstractModuleTestSupport {
         final PackageAnnotationCheck constantNameCheckObj = new PackageAnnotationCheck();
         final int[] actual = constantNameCheckObj.getAcceptableTokens();
         final int[] expected = {TokenTypes.PACKAGE_DEF };
-        Assert.assertArrayEquals(expected, actual);
+        Assert.assertArrayEquals("Invalid acceptable tokens", expected, actual);
     }
 
     @Test
     public void testAnnotationNotInPackageInfo() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(PackageAnnotationCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(PackageAnnotationCheck.class);
 
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
         verify(checkConfig, getPath("InputPackageAnnotation.java"), expected);
     }
 
     @Test
     public void testWithoutAnnotation() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(PackageAnnotationCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(PackageAnnotationCheck.class);
 
         final String[] expected = {
             "0: " + getCheckMessage(MSG_KEY),
@@ -75,4 +75,5 @@ public class PackageAnnotationCheckTest extends AbstractModuleTestSupport {
 
         verify(checkConfig, getNonCompilablePath("InputPackageAnnotation2.java"), expected);
     }
+
 }

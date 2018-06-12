@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,10 +22,11 @@ package com.puppycrawl.tools.checkstyle.checks.metrics;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CheckUtils;
+import com.puppycrawl.tools.checkstyle.utils.CheckUtil;
 
 /**
  * Restricts nested boolean operators (&amp;&amp;, ||, &amp;, | and ^) to
@@ -34,9 +35,8 @@ import com.puppycrawl.tools.checkstyle.utils.CheckUtils;
  * method call because they can be applied to non boolean variables and
  * Checkstyle does not know types of methods from different classes.
  *
- * @author <a href="mailto:simon@redhillconsulting.com.au">Simon Harris</a>
- * @author o_sukhodolsky
  */
+@FileStatefulCheck
 public final class BooleanExpressionComplexityCheck extends AbstractCheck {
 
     /**
@@ -98,14 +98,6 @@ public final class BooleanExpressionComplexityCheck extends AbstractCheck {
     }
 
     /**
-     * Getter for maximum allowed complexity.
-     * @return value of maximum allowed complexity.
-     */
-    public int getMax() {
-        return max;
-    }
-
-    /**
      * Setter for maximum allowed complexity.
      * @param max new maximum allowed complexity.
      */
@@ -156,7 +148,7 @@ public final class BooleanExpressionComplexityCheck extends AbstractCheck {
     /**
      * Checks if {@link TokenTypes#BOR binary OR} is applied to exceptions
      * in
-     * <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.20">
+     * <a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.20">
      * multi-catch</a> (pipe-syntax).
      * @param binaryOr {@link TokenTypes#BOR binary or}
      * @return true if binary or is applied to exceptions in multi-catch.
@@ -186,7 +178,7 @@ public final class BooleanExpressionComplexityCheck extends AbstractCheck {
      */
     private void visitMethodDef(DetailAST ast) {
         contextStack.push(context);
-        final boolean check = !CheckUtils.isEqualsMethod(ast);
+        final boolean check = !CheckUtil.isEqualsMethod(ast);
         context = new Context(check);
     }
 
@@ -213,10 +205,9 @@ public final class BooleanExpressionComplexityCheck extends AbstractCheck {
     /**
      * Represents context (method/expression) in which we check complexity.
      *
-     * @author <a href="mailto:simon@redhillconsulting.com.au">Simon Harris</a>
-     * @author o_sukhodolsky
      */
     private class Context {
+
         /**
          * Should we perform check in current context or not.
          * Usually false if we are inside equals() method.
@@ -252,12 +243,13 @@ public final class BooleanExpressionComplexityCheck extends AbstractCheck {
          * @param ast a node we check now.
          */
         public void checkCount(DetailAST ast) {
-            if (checking && count > getMax()) {
+            if (checking && count > max) {
                 final DetailAST parentAST = ast.getParent();
 
-                log(parentAST.getLineNo(), parentAST.getColumnNo(),
-                    MSG_KEY, count, getMax());
+                log(parentAST, MSG_KEY, count, max);
             }
         }
+
     }
+
 }

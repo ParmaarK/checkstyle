@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -26,7 +26,6 @@ import com.puppycrawl.tools.checkstyle.api.LineColumn;
 
 /**
  * A detector that matches across multiple lines.
- * @author oliver
  */
 class MultilineDetector {
 
@@ -117,7 +116,6 @@ class MultilineDetector {
             //        209099/is-it-ever-okay-to-catch-stackoverflowerror-in-java
             options.getReporter().log(0, MSG_STACKOVERFLOW, matcher.pattern().toString());
         }
-
     }
 
     /** Perform processing at the end of a set of lines. */
@@ -139,4 +137,5 @@ class MultilineDetector {
     private void resetState() {
         currentMatches = 0;
     }
+
 }

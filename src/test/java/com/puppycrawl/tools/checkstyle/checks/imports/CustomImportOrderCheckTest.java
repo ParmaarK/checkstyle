@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -29,19 +29,21 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.lang.reflect.InvocationTargetException;
+import java.io.File;
 import java.lang.reflect.Method;
 
 import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
+import com.puppycrawl.tools.checkstyle.Checker;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
+import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
 
 public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
+
     /** Shortcuts to make code more compact. */
     private static final String STATIC = CustomImportOrderCheck.STATIC_RULE_GROUP;
     private static final String SAME = CustomImportOrderCheck.SAME_PACKAGE_RULE_GROUP;
@@ -69,7 +71,7 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testCustom() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(CustomImportOrderCheck.class);
+                createModuleConfig(CustomImportOrderCheck.class);
         checkConfig.addAttribute("standardPackageRegExp", "^(java|javax)\\.");
         checkConfig.addAttribute("thirdPartyPackageRegExp", "com|org");
         checkConfig.addAttribute("customImportOrderRules",
@@ -103,7 +105,7 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testStaticStandardThird() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(CustomImportOrderCheck.class);
+                createModuleConfig(CustomImportOrderCheck.class);
         checkConfig.addAttribute("thirdPartyPackageRegExp", "com.|org.");
         checkConfig.addAttribute("customImportOrderRules",
                 "STATIC###STANDARD_JAVA_PACKAGE###THIRD_PARTY_PACKAGE");
@@ -131,7 +133,7 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testNonSpecifiedImports() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(CustomImportOrderCheck.class);
+                createModuleConfig(CustomImportOrderCheck.class);
         checkConfig.addAttribute("thirdPartyPackageRegExp", "org.");
         checkConfig.addAttribute("customImportOrderRules",
                 "STATIC###STANDARD_JAVA_PACKAGE###THIRD_PARTY_PACKAGE###SAME_PACKAGE(3)");
@@ -157,7 +159,7 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testOrderRuleWithOneGroup() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(CustomImportOrderCheck.class);
+                createModuleConfig(CustomImportOrderCheck.class);
         checkConfig.addAttribute("thirdPartyPackageRegExp", "org.");
         checkConfig.addAttribute("customImportOrderRules",
                 "STANDARD_JAVA_PACKAGE");
@@ -183,7 +185,7 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testStaticSamePackage() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(CustomImportOrderCheck.class);
+                createModuleConfig(CustomImportOrderCheck.class);
         checkConfig.addAttribute("thirdPartyPackageRegExp", "org.");
         checkConfig.addAttribute("customImportOrderRules",
                 "STATIC###SAME_PACKAGE(3)");
@@ -207,7 +209,7 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testWithoutLineSeparator() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(CustomImportOrderCheck.class);
+                createModuleConfig(CustomImportOrderCheck.class);
         checkConfig.addAttribute("thirdPartyPackageRegExp", "org.");
         checkConfig.addAttribute("separateLineBetweenGroups", "false");
         checkConfig.addAttribute("customImportOrderRules",
@@ -232,7 +234,7 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testWithoutLineSeparator2() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(CustomImportOrderCheck.class);
+                createModuleConfig(CustomImportOrderCheck.class);
         checkConfig.addAttribute("separateLineBetweenGroups", "false");
         checkConfig.addAttribute("customImportOrderRules",
                 "STATIC###STANDARD_JAVA_PACKAGE");
@@ -249,13 +251,13 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testNoValid() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(CustomImportOrderCheck.class);
+                createModuleConfig(CustomImportOrderCheck.class);
         checkConfig.addAttribute("thirdPartyPackageRegExp", ".*");
         checkConfig.addAttribute("specialImportsRegExp", "com.google");
         checkConfig.addAttribute("sortImportsInGroupAlphabetically", "true");
         checkConfig.addAttribute("customImportOrderRules",
                 "STATIC###SPECIAL_IMPORTS###THIRD_PARTY_PACKAGE###STANDARD_JAVA_PACKAGE");
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
         verify(checkConfig, getPath("InputCustomImportOrderNoValid.java"), expected);
     }
@@ -263,7 +265,7 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testPossibleIndexOutOfBoundsException() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(CustomImportOrderCheck.class);
+                createModuleConfig(CustomImportOrderCheck.class);
         checkConfig.addAttribute("thirdPartyPackageRegExp", ".*");
         checkConfig.addAttribute("specialImportsRegExp", "com.google");
         checkConfig.addAttribute("sortImportsInGroupAlphabetically", "true");
@@ -280,7 +282,7 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testDefaultPackage2() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(CustomImportOrderCheck.class);
+                createModuleConfig(CustomImportOrderCheck.class);
         checkConfig.addAttribute("thirdPartyPackageRegExp", "com|org");
         checkConfig.addAttribute("customImportOrderRules",
             "STATIC###SAME_PACKAGE(3)###THIRD_PARTY_PACKAGE###STANDARD_JAVA_PACKAGE");
@@ -309,7 +311,7 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testWithoutThirdPartyPackage() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(CustomImportOrderCheck.class);
+                createModuleConfig(CustomImportOrderCheck.class);
         checkConfig.addAttribute("sortImportsInGroupAlphabetically", "true");
         checkConfig.addAttribute("separateLineBetweenGroups", "true");
         checkConfig.addAttribute("customImportOrderRules",
@@ -318,13 +320,14 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
             "4: " + getCheckMessage(MSG_LINE_SEPARATOR, "org.junit.*"),
         };
 
-        verify(checkConfig, getPath("InputCustomImportOrderThirdPartyPackage.java"), expected);
+        verify(checkConfig,
+            getNonCompilablePath("InputCustomImportOrderThirdPartyPackage.java"), expected);
     }
 
     @Test
     public void testThirdPartyAndSpecialImports() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(CustomImportOrderCheck.class);
+                createModuleConfig(CustomImportOrderCheck.class);
         checkConfig.addAttribute("specialImportsRegExp", "antlr.*");
         checkConfig.addAttribute("customImportOrderRules",
                 "SAME_PACKAGE(3)###THIRD_PARTY_PACKAGE###STATIC###SPECIAL_IMPORTS");
@@ -333,12 +336,66 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
                 "com.google.common.collect.HashMultimap"),
         };
 
-        verify(checkConfig, getPath("InputCustomImportOrderThirdPartyAndSpecial.java"), expected);
+        verify(checkConfig,
+            getNonCompilablePath("InputCustomImportOrderThirdPartyAndSpecial.java"), expected);
+    }
+
+    @Test
+    public void testCompareImports() throws Exception {
+        final DefaultConfiguration checkConfig =
+            createModuleConfig(CustomImportOrderCheck.class);
+        checkConfig.addAttribute("specialImportsRegExp", "com");
+        checkConfig.addAttribute("sortImportsInGroupAlphabetically", "true");
+        checkConfig.addAttribute("customImportOrderRules",
+            "STANDARD_JAVA_PACKAGE###SPECIAL_IMPORTS");
+        final String[] expected = {
+            "4: " + getCheckMessage(MSG_LEX, "java.util.Map",
+                "java.util.Map.Entry"),
+        };
+
+        verify(checkConfig, getPath("InputCustomImportOrderCompareImports.java"), expected);
+    }
+
+    @Test
+    public void testFindBetterPatternMatch() throws Exception {
+        final DefaultConfiguration checkConfig =
+            createModuleConfig(CustomImportOrderCheck.class);
+        checkConfig.addAttribute("standardPackageRegExp", "java|javax|event.*");
+        checkConfig.addAttribute("specialImportsRegExp", "An|lang|java|collect|event");
+        checkConfig.addAttribute("thirdPartyPackageRegExp", "com");
+        checkConfig.addAttribute("separateLineBetweenGroups", "true");
+        checkConfig.addAttribute("customImportOrderRules",
+            "STANDARD_JAVA_PACKAGE###SPECIAL_IMPORTS###THIRD_PARTY_PACKAGE");
+        final String[] expected = {
+            "8: " + getCheckMessage(MSG_ORDER, THIRD, SPECIAL,
+                "com.google.common.annotations.Beta"),
+        };
+
+        verify(checkConfig, getPath("InputCustomImportOrderFindBetterPatternMatch.java"), expected);
+    }
+
+    @Test
+    public void testBeginTreeClear() throws Exception {
+        final DefaultConfiguration checkConfig =
+            createModuleConfig(CustomImportOrderCheck.class);
+        checkConfig.addAttribute("specialImportsRegExp", "com");
+        checkConfig.addAttribute("separateLineBetweenGroups", "false");
+        checkConfig.addAttribute("customImportOrderRules",
+            "STANDARD_JAVA_PACKAGE###SPECIAL_IMPORTS");
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
+        final Checker checker = createChecker(checkConfig);
+        final String fileName1 = getPath("InputCustomImportOrderImportsContainingJava.java");
+        final String fileName2 = getPath("InputCustomImportOrderNoValid.java");
+        final File[] files = {
+            new File(fileName1),
+            new File(fileName2),
+        };
+        verify(checker, files, fileName1, expected);
     }
 
     @Test
     public void testImportsContainingJava() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(CustomImportOrderCheck.class);
+        final DefaultConfiguration checkConfig = createModuleConfig(CustomImportOrderCheck.class);
         checkConfig.addAttribute("customImportOrderRules",
                 "STANDARD_JAVA_PACKAGE###THIRD_PARTY_PACKAGE");
         final String[] expected = {
@@ -366,19 +423,12 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
     @Test
     // UT uses Reflection to avoid removing null-validation from static method,
     // which is a candidate for utility method in the future
-    public void testGetFullImportIdent() {
-        Object actual;
-        try {
-            final Class<?> clazz = CustomImportOrderCheck.class;
-            final Object t = clazz.getConstructor().newInstance();
-            final Method method = clazz.getDeclaredMethod("getFullImportIdent", DetailAST.class);
-            method.setAccessible(true);
-            actual = method.invoke(t, (DetailAST) null);
-        }
-        catch (NoSuchMethodException | InstantiationException
-                  | IllegalAccessException | InvocationTargetException ignored) {
-            actual = null;
-        }
+    public void testGetFullImportIdent() throws Exception {
+        final Class<?> clazz = CustomImportOrderCheck.class;
+        final Object t = clazz.getConstructor().newInstance();
+        final Method method = clazz.getDeclaredMethod("getFullImportIdent", DetailAST.class);
+        method.setAccessible(true);
+        final Object actual = method.invoke(t, (DetailAST) null);
 
         final String expected = "";
         assertEquals("Invalid getFullImportIdent result", expected, actual);
@@ -387,7 +437,7 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testSamePackageDepth2() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(CustomImportOrderCheck.class);
+                createModuleConfig(CustomImportOrderCheck.class);
         checkConfig.addAttribute("sortImportsInGroupAlphabetically", "false");
         checkConfig.addAttribute("separateLineBetweenGroups", "false");
         checkConfig.addAttribute("customImportOrderRules",
@@ -412,7 +462,7 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testSamePackageDepth3() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(CustomImportOrderCheck.class);
+                createModuleConfig(CustomImportOrderCheck.class);
         checkConfig.addAttribute("sortImportsInGroupAlphabetically", "false");
         checkConfig.addAttribute("separateLineBetweenGroups", "false");
         checkConfig.addAttribute("customImportOrderRules",
@@ -432,7 +482,7 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testSamePackageDepth4() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(CustomImportOrderCheck.class);
+                createModuleConfig(CustomImportOrderCheck.class);
         checkConfig.addAttribute("sortImportsInGroupAlphabetically", "false");
         checkConfig.addAttribute("separateLineBetweenGroups", "false");
         checkConfig.addAttribute("customImportOrderRules",
@@ -449,12 +499,12 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testSamePackageDepthLongerThenActualPackage() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(CustomImportOrderCheck.class);
+                createModuleConfig(CustomImportOrderCheck.class);
         checkConfig.addAttribute("sortImportsInGroupAlphabetically", "false");
         checkConfig.addAttribute("separateLineBetweenGroups", "false");
         checkConfig.addAttribute("customImportOrderRules",
                 "SAME_PACKAGE(5)");
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
         verify(checkConfig, getNonCompilablePath("InputCustomImportOrderSamePackageDepth25.java"),
                 expected);
@@ -463,14 +513,14 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testSamePackageDepthNegative() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(CustomImportOrderCheck.class);
+                createModuleConfig(CustomImportOrderCheck.class);
         checkConfig.addAttribute("sortImportsInGroupAlphabetically", "false");
         checkConfig.addAttribute("separateLineBetweenGroups", "false");
         checkConfig.addAttribute("customImportOrderRules",
                 "SAME_PACKAGE(-1)");
 
         try {
-            final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+            final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
             verify(checkConfig, getPath("InputCustomImportOrderDefault.java"), expected);
             fail("exception expected");
@@ -488,14 +538,14 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testSamePackageDepthZero() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(CustomImportOrderCheck.class);
+                createModuleConfig(CustomImportOrderCheck.class);
         checkConfig.addAttribute("sortImportsInGroupAlphabetically", "false");
         checkConfig.addAttribute("separateLineBetweenGroups", "false");
         checkConfig.addAttribute("customImportOrderRules",
                 "SAME_PACKAGE(0)");
 
         try {
-            final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+            final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
             verify(checkConfig, getPath("InputCustomImportOrderDefault.java"), expected);
             fail("exception expected");
@@ -513,13 +563,13 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testUnsupportedRule() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(CustomImportOrderCheck.class);
+                createModuleConfig(CustomImportOrderCheck.class);
         // #AAA##BBBB###CCCC####DDDD
         checkConfig.addAttribute("customImportOrderRules", "SAME_PACKAGE(3)###UNSUPPORTED_RULE");
         checkConfig.addAttribute("sortImportsInGroupAlphabetically", "true");
 
         try {
-            final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+            final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
             verify(checkConfig, getPath("InputCustomImportOrderDefault.java"), expected);
             fail("exception expected");
@@ -537,12 +587,12 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testSamePackageDepthNotInt() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(CustomImportOrderCheck.class);
+                createModuleConfig(CustomImportOrderCheck.class);
         checkConfig.addAttribute("customImportOrderRules", "SAME_PACKAGE(INT_IS_REQUIRED_HERE)");
         checkConfig.addAttribute("sortImportsInGroupAlphabetically", "true");
 
         try {
-            final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+            final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
             verify(checkConfig, getPath("InputCustomImportOrderDefault.java"), expected);
             fail("exception expected");
@@ -560,9 +610,9 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testNoImports() throws Exception {
         final DefaultConfiguration checkConfig =
-                createCheckConfig(CustomImportOrderCheck.class);
+                createModuleConfig(CustomImportOrderCheck.class);
         checkConfig.addAttribute("customImportOrderRules", "SAME_PACKAGE(3)");
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
 
         verify(checkConfig, getPath("InputCustomImportOrder_NoImports.java"), expected);
     }
@@ -570,17 +620,17 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testDefaultConfiguration() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(CustomImportOrderCheck.class);
+            createModuleConfig(CustomImportOrderCheck.class);
 
         createChecker(checkConfig);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputCustomImportOrderDefault.java"), expected);
     }
 
     @Test
     public void testRulesWithOverlappingPatterns() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(CustomImportOrderCheck.class);
+            createModuleConfig(CustomImportOrderCheck.class);
         checkConfig.addAttribute("customImportOrderRules",
                 "THIRD_PARTY_PACKAGE###SAME_PACKAGE(6)###STANDARD_JAVA_PACKAGE###SPECIAL_IMPORTS");
         checkConfig.addAttribute("standardPackageRegExp", "com.puppycrawl.tools.*Check$");
@@ -607,14 +657,14 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testMultiplePatternMatchesSecondPatternIsLonger() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(CustomImportOrderCheck.class);
+            createModuleConfig(CustomImportOrderCheck.class);
         checkConfig.addAttribute("customImportOrderRules",
                 "SPECIAL_IMPORTS###STANDARD_JAVA_PACKAGE");
         checkConfig.addAttribute("specialImportsRegExp", "org");
         checkConfig.addAttribute("standardPackageRegExp", "junit");
 
         createChecker(checkConfig);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputCustomImportOrder_MultiplePatternMatches.java"),
             expected);
     }
@@ -622,14 +672,14 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testMultiplePatternMatchesFirstPatternHasLaterPosition() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(CustomImportOrderCheck.class);
+            createModuleConfig(CustomImportOrderCheck.class);
         checkConfig.addAttribute("customImportOrderRules",
                 "SPECIAL_IMPORTS###STANDARD_JAVA_PACKAGE");
         checkConfig.addAttribute("specialImportsRegExp", "Test");
         checkConfig.addAttribute("standardPackageRegExp", "unit");
 
         createChecker(checkConfig);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputCustomImportOrder_MultiplePatternMatches.java"),
             expected);
     }
@@ -637,14 +687,14 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testMultiplePatternMatchesFirstPatternHasEarlierPosition() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(CustomImportOrderCheck.class);
+            createModuleConfig(CustomImportOrderCheck.class);
         checkConfig.addAttribute("customImportOrderRules",
                 "SPECIAL_IMPORTS###STANDARD_JAVA_PACKAGE");
         checkConfig.addAttribute("specialImportsRegExp", "unit");
         checkConfig.addAttribute("standardPackageRegExp", "Test");
 
         createChecker(checkConfig);
-        final String[] expected = CommonUtils.EMPTY_STRING_ARRAY;
+        final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
         verify(checkConfig, getPath("InputCustomImportOrder_MultiplePatternMatches.java"),
             expected);
     }
@@ -652,7 +702,7 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testNoPackage() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(CustomImportOrderCheck.class);
+            createModuleConfig(CustomImportOrderCheck.class);
         checkConfig.addAttribute("customImportOrderRules",
                 "STATIC###THIRD_PARTY_PACKAGE");
         checkConfig.addAttribute("sortImportsInGroupAlphabetically", "true");
@@ -669,7 +719,7 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
     @Test
     public void testNoPackage2() throws Exception {
         final DefaultConfiguration checkConfig =
-            createCheckConfig(CustomImportOrderCheck.class);
+            createModuleConfig(CustomImportOrderCheck.class);
         checkConfig.addAttribute("customImportOrderRules",
                 "STATIC###THIRD_PARTY_PACKAGE");
         checkConfig.addAttribute("sortImportsInGroupAlphabetically", "true");
@@ -678,7 +728,7 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
         createChecker(checkConfig);
         final String[] expected = {
             "3: " + getCheckMessage(MSG_LINE_SEPARATOR,
-                "com.puppycrawl.tools.checkstyle.utils.AnnotationUtility.containsAnnotation"),
+                "com.puppycrawl.tools.checkstyle.utils.AnnotationUtil.containsAnnotation"),
             "7: " + getCheckMessage(MSG_LINE_SEPARATOR,
                 "com.sun.accessibility.internal.resources.*"),
             "11: " + getCheckMessage(MSG_LINE_SEPARATOR, "java.util.Arrays"),
@@ -688,4 +738,5 @@ public class CustomImportOrderCheckTest extends AbstractModuleTestSupport {
         verify(checkConfig, getPath("InputCustomImportOrderNoPackage2.java"),
             expected);
     }
+
 }

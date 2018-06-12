@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -26,9 +26,9 @@ import java.util.List;
 /**
  * Value object for combining the list of valid validTags with information
  * about invalid validTags encountered in a certain Javadoc comment.
- * @author Oliver Burn
  */
 public final class JavadocTags {
+
     /** Valid validTags. */
     private final List<JavadocTag> validTags;
     /** Invalid validTags. */
@@ -61,4 +61,5 @@ public final class JavadocTags {
     public List<InvalidJavadocTag> getInvalidTags() {
         return Collections.unmodifiableList(invalidTags);
     }
+
 }

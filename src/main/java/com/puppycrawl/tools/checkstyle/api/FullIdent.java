@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2017 the original author or authors.
+// Copyright (C) 2001-2018 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -33,11 +33,11 @@ import java.util.List;
  * whitespace), which is often easier to work with in Checks.
  * </p>
  *
- * @author Oliver Burn
  * @see TokenTypes#DOT
  * @see TokenTypes#IDENT
  **/
 public final class FullIdent {
+
     /** The list holding subsequent elements of identifier. **/
     private final List<String> elements = new ArrayList<>();
     /** The line number. **/
@@ -112,6 +112,10 @@ public final class FullIdent {
                 extractFullIdent(
                     full, ast.getFirstChild().getNextSibling());
             }
+            else if (ast.getType() == TokenTypes.ARRAY_DECLARATOR) {
+                extractFullIdent(full, ast.getFirstChild());
+                full.append("[]");
+            }
             else {
                 full.append(ast);
             }
@@ -146,4 +150,5 @@ public final class FullIdent {
             columnNo = Math.min(columnNo, ast.getColumnNo());
         }
     }
+
 }
